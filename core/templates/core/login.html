@@ -1,0 +1,199 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Departamento Sig</title>
+
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="">
+    <style>
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          user-select: none;
+        }
+  
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+  
+        .b-example-divider {
+          height: 3rem;
+          background-color: rgba(0, 0, 0, .1);
+          border: solid rgba(241, 238, 238, 0.918);
+          border-width: 2px 0;
+          box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+        }
+  
+        .b-example-vr {
+          flex-shrink: 0;
+          width: 1.5rem;
+          height: 100vh;
+        }
+  
+        .bi {
+          vertical-align: -.125em;
+          fill: currentColor;
+        }
+  
+        .nav-scroller {
+          position: relative;
+          z-index: 2;
+          height: 2.75rem;
+          overflow-y: hidden;
+        }
+  
+        .nav-scroller .nav {
+          display: flex;
+          flex-wrap: nowrap;
+          padding-bottom: 1rem;
+          margin-top: -1px;
+          overflow-x: auto;
+          text-align: center;
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        html,
+        body {
+        height: 100%;
+        }
+
+        body {
+        display: flex;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #032044;
+        position: relative;
+        }
+
+        .form-signin {
+        max-width: 380px;
+        padding: 15px;
+        }
+
+        .form-signin .form-floating:focus-within {
+        z-index: 2;
+        }
+
+        .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+        }
+
+        .form-signin input[type="password"],
+        .form-signin input.show-password {
+          margin-bottom: 10px;
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+        }
+        
+        .image-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url('/media/assets/image/3.jpg');
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: cover;
+          opacity: 1;
+          z-index: -1;
+        }
+      </style>
+</head>
+
+
+<body class="text-center">
+  <div class="image-overlay">
+    <br>
+  </div>
+    <main class="form-signin w-100 m-auto">
+      <h1 style="color: rgb(255, 255, 255); font-size: 57px;" >Departamento SIG</h1>
+      <form action="{% url 'core_login' %}" method="POST">
+        {% csrf_token %}
+        
+        <h1 style="color: rgb(255, 255, 255);" class="h3 mb-3 fw-normal">Iniciar sesión</h1>
+      
+        <div class="form-floating">
+          <input type="text" class="form-control" id="Usuario" name="Usuario" placeholder="nombre@ejemplo.com" required>
+          <label for="email">Usuario</label>
+        </div>
+      
+        <div class="form-floating">
+          <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+          <label for="password">Contraseña</label>
+          <div class="input-group-append">
+            <label style="color: rgb(255, 255, 255);" for="">Ver Contraseña   </label>
+            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+              <i class="bi bi-eye-slash"></i>
+            </button>
+          </div>
+        </div>
+
+        <br>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Iniciar sesión</button>
+      </form>
+
+        {% if mensaje %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {{mensaje }}
+            </div>
+        {% endif %}
+    </main>
+    
+    
+        
+        
+    
+    <div style="position: static !important;"></div>
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+    {% block custom_js %}
+    <script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const togglePasswordBtn = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("password");
+
+      togglePasswordBtn.addEventListener("click", function() {
+        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+        passwordInput.setAttribute("type", type);
+        this.classList.toggle("active");
+
+        if (type === "text") {
+        passwordInput.classList.add("show-password");
+      } else {
+        passwordInput.classList.remove("show-password");
+      }
+
+
+        const icon = this.querySelector("i");
+        icon.classList.toggle("bi-eye");
+        icon.classList.toggle("bi-eye-slash");
+      });
+    });
+    </script>
+    {% endblock custom_js %}
+</body>
+</html>

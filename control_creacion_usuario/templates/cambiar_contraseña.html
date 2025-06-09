@@ -1,0 +1,66 @@
+{% extends 'core/Slide.html' %}
+
+{% load static %}
+
+{% block main_content %}
+  {% block custom_css %}
+  <link href="{% static 'css/cambiar_contraseña.css' %}" rel="stylesheet" />
+
+  {% endblock %}
+  <section class="container">
+    <div class="flex-column-red">
+      <div class="flex-row-content p-1">
+        <div class="flex-row-dashboard fill-available">
+          <div class="flex-column-gap fill-available">
+            <div class="info-box p-1 fill-available">
+              <form method="POST" class="form-neumorphism">
+                {% csrf_token %}
+
+                <h1 class="h3 mb-3 fw-normal text-light">Cambiar Contraseña</h1>
+
+                <div class="form-floating mb-4 position-relative">
+                  <input type="password" class="form-control text-black" id="password1" name="password1" placeholder="Nueva Contraseña" required />
+                  <label for="password1" class="text-black">Nueva Contraseña</label>
+                  <span class="position-absolute" style="right: 15px; top: 15px; cursor: pointer;" onclick="togglePassword('password1', 'togglePasswordIcon1')"><i class="bi bi-eye" id="togglePasswordIcon1"></i></span>
+                </div>
+
+                <div class="form-floating mb-3 ">
+                  <input type="password" class="form-control text-black" id="password2" name="password2" placeholder="Confirmar Contraseña" required />
+                  <label for="password2" class="text-black">Confirmar Contraseña</label>
+                  <span class="position-absolute" style="right: 15px; top: 15px; cursor: pointer;" onclick="togglePassword('password2', 'togglePasswordIcon2')"><i class="bi bi-eye" id="togglePasswordIcon2"></i></span>
+                </div>
+
+                <button type="submit" class="w-100 btn-neumorphic green white-bg btn-lg">Cambiar Contraseña</button>
+
+                {% if messages %}
+                  <div class="mt-3">
+                    {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function togglePassword(fieldId, iconId) {
+      const passwordField = document.getElementById(fieldId)
+      const togglePasswordIcon = document.getElementById(iconId)
+    
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text'
+        togglePasswordIcon.classList.remove('bi-eye')
+        togglePasswordIcon.classList.add('bi-eye-slash')
+      } else {
+        passwordField.type = 'password'
+        togglePasswordIcon.classList.remove('bi-eye-slash')
+        togglePasswordIcon.classList.add('bi-eye')
+      }
+    }
+  </script>
+{% endblock %}

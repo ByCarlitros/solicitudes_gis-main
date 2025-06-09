@@ -1,0 +1,75 @@
+<!-- C:\Users\jaime.sanchez\Proyectos\solicitudes_gis\control_creacion_usuario\templates\Gestion_imagen.html -->
+
+{% extends 'core/Slide.html' %}
+{% load static %}
+
+{% block custom_css %}
+  <link href="{% static 'css/gestion_imagen.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block main_content %}
+  <section class="container">
+    <h1 class="section-title">Gestión de admin suplente </h1>
+
+    <div class="flex-row-content mb-4">
+      <!-- Instrucciones de Uso -->
+      <div class="info-box">
+        <form id="delegar-admin-form">
+            {% for usuario in Usuarios %}
+                <div>
+                    <label>
+                        <input type="checkbox" name="user_id" value="{{ usuario.id }}" 
+                        {% if usuario.is_superuser %}checked{% endif %}>
+
+                        {{ usuario.username }} ({{ usuario.email }})
+                    </label>
+                </div>
+            {% endfor %}
+            <button type="button" onclick="delegarAdmin()">Delegar Admin</button>
+        </form>
+    </div>
+    
+    </div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block custom_js %}
+<script>
+function delegarAdmin() {
+    const checkboxes = document.querySelectorAll('input[name="user_id"]');
+    const updates = Array.from(checkboxes).map(checkbox => ({
+        user_id: checkbox.value,
+        is_superuser: checkbox.checked // true si está marcado, false si no lo está
+    }));
+
+    fetch("{% url 'delegar_admin' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ updates })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+            location.reload(); // Recargar la página para ver los cambios
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>
+
+
+{% endblock %}

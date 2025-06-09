@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal SECPLA - Glassmorphism</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #ffffff; /* Fondo blanco para que los colores destaquen */
+            --glass-bg: rgba(255, 255, 255, 0.65); /* Menos transparente */
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px rgba(0, 31, 63, 0.15);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --blue: #3b82f6;
+            --red: #ef4444;
+            --green: #10b981;
+            --yellow: #f59e0b;
+            --purple: #8b5cf6;
+            --teal: #14b8a6;
+            --blur-amount: 10px;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Elementos decorativos de fondo */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.3; /* Reducida para que no interfiera tanto con los colores */
+        }
+
+        .shape-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(59, 130, 246, 0.2);
+            top: -200px;
+            right: -100px;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(239, 68, 68, 0.15);
+            bottom: -100px;
+            left: -150px;
+        }
+
+        .shape-3 {
+            width: 350px;
+            height: 350px;
+            background: rgba(16, 185, 129, 0.15);
+            top: 40%;
+            left: 30%;
+        }
+
+        /* Header */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 68px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--blue);
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-text {
+            font-size: 29px;
+            font-weight: 600;
+            color: var(--blue);
+            letter-spacing: -0.5px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 60px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* Carousel */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            padding: 0 50px;
+            margin-bottom: 30px;
+        }
+
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            height: 300px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform var(--transition-speed) ease;
+            height: 100%;
+        }
+
+        .department-card {
+            flex: 0 0 100%;
+            height: 100%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Borde de color más prominente */
+        .department-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px; /* Borde más ancho */
+            height: 100%;
+            background: var(--card-color, var(--blue));
+            opacity: 0.9; /* Más opaco */
+        }
+
+        /* Fondo de color sutil para cada tarjeta */
+        .department-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--card-color, var(--blue));
+            opacity: 0.05; /* Muy sutil para no interferir con el texto */
+            z-index: -1;
+        }
+
+        .card-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            z-index: 1;
+            margin-left: 10px; /* Espacio para el borde de color */
+        }
+
+        .card-left {
+            flex: 0 0 auto;
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9); /* Más opaco */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            border: 2px solid var(--card-color, var(--blue)); /* Borde de color */
+        }
+
+        .department-icon {
+            width: 40px;
+            height: 40px;
+            color: var(--card-color, var(--blue));
+        }
+
+        .card-right {
+            flex: 1;
+        }
+
+        .department-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .department-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+            max-width: 600px;
+        }
+
+        .card-action {
+            background: var(--card-color, var(--blue));
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: white; /* Texto blanco para mejor contraste */
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.1);
+        }
+
+        .card-action svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Card Colors */
+        .card-planificacion { --card-color: var(--blue); }
+        .card-comunitario { --card-color: var(--red); }
+        .card-obras { --card-color: var(--green); }
+        .card-proyectos { --card-color: var(--yellow); }
+        .card-administrativo { --card-color: var(--purple); }
+        .card-medioambiente { --card-color: var(--teal); }
+
+        /* Card Glow Effect */
+        .card-glow {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.4; /* Más visible */
+            z-index: 0;
+        }
+
+        .glow-1 {
+            top: -30px;
+            right: -30px;
+            background: var(--card-color, var(--blue));
+        }
+
+        .glow-2 {
+            bottom: -30px;
+            left: 30%;
+            background: var(--card-color, var(--blue));
+            opacity: 0.2;
+        }
+
+        /* Navigation Controls */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-nav:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .carousel-nav svg {
+            width: 24px;
+            height: 24px;
+            color: var(--text-primary);
+        }
+
+        .carousel-prev {
+            left: 0;
+        }
+
+        .carousel-next {
+            right: 0;
+        }
+
+        /* Pagination */
+        .carousel-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(100, 116, 139, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination-dot.active {
+            background: var(--text-primary);
+            transform: scale(1.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(30, 41, 59, 0.9); /* Más opaco */
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            color: white;
+            text-align: center;
+            padding: 24px;
+            font-size: 14px;
+            margin-top: 60px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .department-description {
+                margin-bottom: 20px;
+            }
+
+            .carousel {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 40px 15px;
+            }
+
+            .carousel-container {
+                padding: 0 30px;
+            }
+
+            .department-card {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 26px;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Formas de fondo sutiles -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_0Cnp6ZH.png" alt="Logo SECPLA" class="logo-icon">
+                <span class="logo-text">Portal SECPLA</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Acceso a Plataformas por Departamento</h1>
+
+        <div class="carousel-container">
+            <div class="carousel">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Departamento de Planificación -->
+                    <div class="department-card card-planificacion">
+                        <div class="card-glow glow-1"></div>
+                        <div class="card-glow glow-2"></div>
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="7" height="9"></rect>
+                                        <rect x="14" y="3" width="7" height="5"></rect>
+                                        <rect x="14" y="12" width="7" height="9"></rect>
+                                        <rect x="3" y="16" width="7" height="5"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento Sistema de Informacíon Geografica</h2>
+                                <p class="department-description">Accede a la intranet del Departamento SIG</p>
+                                <a href="https://departamento1.secpla.cl" class="card-action">
+                                    Acceder a la plataforma
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento de Desarrollo Comunitario -->
+                    <div class="department-card card-comunitario">
+                        <div class="card-glow glow-1"></div>
+                        <div class="card-glow glow-2"></div>
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento </h2>
+                                <p class="department-description">Accede a la intranet </p>
+                                <a href="https://departamento2.secpla.cl" class="card-action">
+                                    Acceder a la plataforma
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento de Obras Municipales -->
+                    <div class="department-card card-obras">
+                        <div class="card-glow glow-1"></div>
+                        <div class="card-glow glow-2"></div>
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="12" width="6" height="8"></rect>
+                                        <rect x="9" y="8" width="6" height="12"></rect>
+                                        <rect x="16" y="4" width="6" height="16"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Estudios y Pre Inversiones</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Inversiones</p>
+                                <a href="https://departamento3.secpla.cl" class="card-action">
+                                    Acceder a la plataforma
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento de Proyectos -->
+                    <div class="department-card card-proyectos">
+                        <div class="card-glow glow-1"></div>
+                        <div class="card-glow glow-2"></div>
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <path d="M12 18v-6"></path>
+                                        <path d="M8 18v-1"></path>
+                                        <path d="M16 18v-3"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Asesoria Urbana</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Asesoria Urbana</p>
+                                <a href="https://departamento4.secpla.cl" class="card-action">
+                                    Acceder a la plataforma
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento Administrativo -->
+                    <div class="department-card card-administrativo">
+                        <div class="card-glow glow-1"></div>
+                        <div class="card-glow glow-2"></div>
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Planificacíon</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Planificación.</p>
+                                <a href="https://departamento5.secpla.cl" class="card-action">
+                                    Acceder a la plataforma
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento de Medio Ambiente -->
+                    <div class="department-card card-medioambiente">
+                        <div class="card-glow glow-1"></div>
+                        <div class="card-glow glow-2"></div>
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                        <path d="M2 12h20"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Presupuesto</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Presupuesto.</p>
+                                <a href="https://departamento6.secpla.cl" class="card-action">
+                                    Acceder a la plataforma
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de navegación -->
+            <button class="carousel-nav carousel-prev" id="prevBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+            <button class="carousel-nav carousel-next" id="nextBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Paginación -->
+        <div class="carousel-pagination" id="pagination"></div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 SECPLA - Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.getElementById('carouselTrack');
+            const slides = track.children;
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pagination = document.getElementById('pagination');
+            
+            let currentIndex = 0;
+            const slideCount = slides.length;
+            
+            // Crear paginación
+            for (let i = 0; i < slideCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('pagination-dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                pagination.appendChild(dot);
+            }
+            
+            // Actualizar posición del carrusel
+            function updateCarousel() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Actualizar paginación
+                const dots = pagination.children;
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].classList.toggle('active', i === currentIndex);
+                }
+            }
+            
+            // Ir a una diapositiva específica
+            function goToSlide(index) {
+                currentIndex = index;
+                updateCarousel();
+            }
+            
+            // Ir a la diapositiva anterior
+            function goToPrev() {
+                currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                updateCarousel();
+            }
+            
+            // Ir a la diapositiva siguiente
+            function goToNext() {
+                currentIndex = (currentIndex + 1) % slideCount;
+                updateCarousel();
+            }
+            
+            // Event listeners
+            prevBtn.addEventListener('click', goToPrev);
+            nextBtn.addEventListener('click', goToNext);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') goToPrev();
+                if (e.key === 'ArrowRight') goToNext();
+            });
+            
+            // Swipe navigation para móviles
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            track.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            track.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    goToNext();
+                }
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    goToPrev();
+                }
+            }
+            
+            // Inicializar carrusel
+            updateCarousel();
+        });
+    </script>
+</body>
+</html>

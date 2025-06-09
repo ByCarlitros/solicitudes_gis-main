@@ -1,0 +1,114 @@
+{% extends 'core/Slide.html' %}
+{% load static %}
+
+{% block custom_css %}
+  <link href="{% static 'css/gestion_imagen.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block main_content %}
+  <section class="container">
+    <div class="flex-column-red">
+      <div class="flex-row-content p-1">
+        <div class="info-gestion-box">
+          <div class="flex-row-dashboard fill-available">
+            <!-- Instrucciones de Uso -->
+            <div class="flex-column-gap fill-available">
+              <h1 class="section-title">Gestión de Imágenes</h1>
+              <div class="info-box p-1 fill-available">
+                <h2 class="section-subtitle">Instrucciones de uso:</h2>
+                <div class="data-box">
+                  <ol class="font-light">
+                    <li>
+                      <strong>Archivo adjunto:</strong> Solo sirve para guardar la previa de la imagen.
+                    </li>
+                    <li>
+                      <strong>Botón "Subir nueva imagen":</strong> Ese botón sube la imagen al servidor.
+                    </li>
+                    <li>
+                      <strong>Copia URL:</strong> Sirve para copiar la dirección de la imagen.
+                    </li>
+                    <li>
+                      <strong>Eliminar imagen:</strong> Ese botón es para eliminar la imagen.
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-row-dashboard fill-available">
+            <!-- Formulario de Subida de Imágenes -->
+            <div class="flex-column-gap fill-available">
+              <div class="info-box p-1 fill-available">
+                <form id="imageForm" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+                  <div style="margin-inline: auto;max-width: 50%;overflow: hidden;max-height: 11rem;">
+                    <img id="previewImage" src="#" alt="Vista previa de la imagen" class="img-thumbnail" style="display: none;" />
+                  </div>
+                  <button type="submit" class="btn-neumorphic green white-bg">Subir nueva imagen</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-row-dashboard fill-available">
+          <div class="flex-column-gap fill-available">
+            <div class="info-box p-1 fill-available">
+              <div class="row flex-container">
+                {% for imagen in page_obj %}
+                  {% if imagen.archivo_adjunto %}
+                    <div class="card h-100">
+                      <a href="{{ imagen.archivo_adjunto.url }}"><img src="{{ imagen.archivo_adjunto.url }}" class="card-img-top" alt="Imagen" /></a>
+                      <div class="button-imagen-container">
+                        <button class="btn-neumorphic blue tea-green-bg" onclick="copiarURL('{{ imagen.archivo_adjunto.url }}')">Copiar URL</button>
+                        <form action="{% url 'eliminar_imagen' imagen.id %}" method="post" class="mb-0">
+                          {% csrf_token %}
+                          <button type="submit" class="btn-neumorphic red tea-green-bg">Eliminar</button>
+                        </form>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+              <div>
+                <!-- Paginación -->
+                <nav aria-label="Paginación">
+                  <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg me-2" href="?page=1">&laquo; Primero</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg me-2" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                      </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                      <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg ms-2" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg ms-2" href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block custom_js %}
+  <script src="{% static 'js/gestion_imagen.js' %}"></script>
+{% endblock %}

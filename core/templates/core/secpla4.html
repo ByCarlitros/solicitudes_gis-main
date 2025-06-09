@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal SECPLA - Neobrutalismo Morfista</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f4f8; /* Gris claro de fondo */
+            --panel-bg: rgba(255, 255, 255, 0.8); /* Panel blanco ligeramente translúcido */
+            --panel-border: #e0e0e0;
+            --panel-shadow: 8px 8px 16px rgba(0, 0, 0, 0.05);
+            --text-primary: #222;
+            --text-secondary: #555;
+            --accent-blue: #4a7bff;
+            --accent-red: #ff6b6b;
+            --accent-green: #51cf66;
+            --font-primary: 'Space Grotesk', sans-serif;
+            --font-secondary: 'Roboto Mono', monospace;
+            --transition-speed: 0.2s ease-in-out;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-primary);
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+            padding: 30px;
+        }
+
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 20px;
+            opacity: 0.3;
+            background: var(--accent-blue);
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 15%;
+            filter: blur(50px);
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            bottom: 15%;
+            right: 10%;
+            background: var(--accent-red);
+            filter: blur(70px);
+        }
+
+        .header {
+            background: var(--panel-bg);
+            border-bottom: 2px solid var(--panel-border);
+            padding: 25px 35px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            box-shadow: var(--panel-shadow);
+            margin-bottom: 40px;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 87px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.7em;
+            box-shadow: 6px 6px 12px rgba(var(--accent-blue), 0.2);
+        }
+
+        .logo-text {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 0 35px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: var(--text-primary);
+            letter-spacing: -1.5px;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 950px;
+            padding: 0 50px;
+            margin-bottom: 50px;
+        }
+
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            box-shadow: var(--panel-shadow);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform var(--transition-speed);
+            width: 100%;
+        }
+
+        .department-card {
+            flex: 0 0 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 18px;
+            box-shadow: none; /* La sombra está en el carrusel */
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-content {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .card-left {
+            flex: 0 0 auto;
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.08);
+            border: 2px solid var(--accent-blue);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .icon-wrapper:hover {
+            transform: scale(1.03);
+            box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .department-icon {
+            width: 40px;
+            height: 40px;
+            color: var(--accent-blue);
+        }
+
+        .card-right {
+            flex: 1;
+        }
+
+        .department-title {
+            font-size: 2.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+
+        .department-description {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            max-width: 600px;
+        }
+
+        .card-action {
+            background: var(--accent-blue);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 4px 4px 8px rgba(var(--accent-blue), 0.3);
+        }
+
+        .card-action:hover {
+            background: #3d67d6;
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 12px rgba(var(--accent-blue), 0.4);
+        }
+
+        .card-action svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Card Specific Colors */
+        .card-planificacion .icon-wrapper,
+        .card-planificacion .department-icon,
+        .card-planificacion .card-action {
+            --accent-blue: #6c5ce7; /* Morado */
+        }
+
+        .card-comunitario .icon-wrapper,
+        .card-comunitario .department-icon,
+        .card-comunitario .card-action {
+            --accent-blue: #e84393; /* Rosa */
+        }
+
+        .card-obras .icon-wrapper,
+        .card-obras .department-icon,
+        .card-obras .card-action {
+            --accent-blue: #00b894; /* Verde azulado */
+        }
+
+        .card-proyectos .icon-wrapper,
+        .card-proyectos .department-icon,
+        .card-proyectos .card-action {
+            --accent-blue: #f9ca24; /* Amarillo */
+        }
+
+        .card-administrativo .icon-wrapper,
+        .card-administrativo .department-icon,
+        .card-administrativo .card-action {
+            --accent-blue: #30336b; /* Azul oscuro */
+        }
+
+        .card-medioambiente .icon-wrapper,
+        .card-medioambiente .department-icon,
+        .card-medioambiente .card-action {
+            --accent-blue: #22a6b3; /* Cian */
+        }
+
+        /* Navigation Controls */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed), background-color var(--transition-speed);
+            box-shadow: var(--panel-shadow);
+        }
+
+        .carousel-nav:hover {
+            transform: translateY(-50%) scale(1.05);
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .carousel-nav svg {
+            width: 24px;
+            height: 24px;
+            color: var(--text-primary);
+        }
+
+        .carousel-prev {
+            left: -4px;
+        }
+
+        .carousel-next {
+            right: -4px;
+        }
+
+        /* Pagination */
+        .carousel-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            opacity: 0.5;
+            cursor: pointer;
+            transition: opacity var(--transition-speed), transform var(--transition-speed);
+        }
+
+        .pagination-dot.active {
+            opacity: 0.8;
+            transform: scale(1.2);
+            background: var(--accent-blue);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--panel-bg);
+            border-top: 2px solid var(--panel-border);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 25px;
+            font-size: 0.95em;
+            margin-top: 60px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: -8px -8px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-content {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
+            }
+
+            .card-left {
+                order: 1;
+            }
+
+            .card-right {
+                order: 2;
+            }
+
+            .department-description {
+                margin-bottom: 20px;
+                max-width: 100%;
+            }
+
+            .carousel-container {
+                padding: 0 30px;
+            }
+
+            .department-card {
+                padding: 30px;
+            }
+
+            .page-title {
+                font-size: 2.5em;
+                margin-bottom: 40px;
+            }
+
+            .header {
+                padding: 20px 25px;
+            }
+
+            .logo-text {
+                font-size: 1.6em;
+            }
+
+            .carousel-nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0 20px;
+            }
+
+            .carousel-container {
+                padding: 0 15px;
+            }
+
+            .department-card {
+                padding: 25px;
+            }
+
+            .page-title {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+
+            .logo {
+                gap: 10px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.6em;
+            }
+
+            .logo-text {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_0Cnp6ZH.png" alt="Logo SECPLA" class="logo-icon">
+                <span class="logo-text">Portal SECPLA</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Plataformas de Departamentos</h1>
+
+        <div class="carousel-container">
+            <div class="carousel">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="department-card card-planificacion">
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="7" height
+                                        ="9"></rect>
+                                        <rect x="14" y="3" width="7" height="5"></rect>
+                                        <rect x="14" y="12" width="7" height="9"></rect>
+                                        <rect x="3" y="16" width="7" height="5"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento Sistema de Informacíon Geografica</h2>
+                                <p class="department-description">Accede a la intranet del Departamento SIG.</p>
+                                <a href="https://planificacion.secpla.cl" class="card-action">
+                                    Ir a Sig
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="department-card card-comunitario">
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Estudios y Pre Inversiones</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Inversiones.</p>
+                                <a href="https://comunitario.secpla.cl" class="card-action">
+                                    Ir a Inversiones
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="department-card card-obras">
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="12" width="6" height="8"></rect>
+                                        <rect x="9" y="8" width="6" height="12"></rect>
+                                        <rect x="16" y="4" width="6" height="16"></rect>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Asesoria Urbana</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Asesoria Urbana.</p>
+                                <a href="https://obras.secpla.cl" class="card-action">
+                                    Ir a Asesoria 
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="department-card card-proyectos">
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <path d="M12 18v-6"></path>
+                                        <path d="M8 18v-1"></path>
+                                        <path d="M16 18v-3"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Planificacíon</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Planificación.</p>
+                                <a href="https://proyectos.secpla.cl" class="card-action">
+                                    Ir a Planificación
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="department-card card-administrativo">
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento de Presupuesto</h2>
+                                <p class="department-description">Accede a la intranet del Departamento de Presupuesto.</p>
+                                <a href="https://administrativo.secpla.cl" class="card-action">
+                                    Ir a Presupuesto
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="department-card card-medioambiente">
+                        <div class="card-content">
+                            <div class="card-left">
+                                <div class="icon-wrapper">
+                                    <svg class="department-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                        <path d="M2 12h20"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="card-right">
+                                <h2 class="department-title">Departamento</h2>
+                                <p class="department-description">Accede a la intranet del Departamento</p>
+                                <a href="https://medioambiente.secpla.cl" class="card-action">
+                                    Ir a Departamento
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12h14"></path>
+                                        <path d="M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel-nav carousel-prev" id="prevBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+            <button class="carousel-nav carousel-next" id="nextBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="carousel-pagination" id="pagination"></div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2025 SECPLA - Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.getElementById('carouselTrack');
+            const slides = track.children;
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pagination = document.getElementById('pagination');
+
+            let currentIndex = 0;
+            const slideCount = slides.length;
+
+            // Crear paginación
+            for (let i = 0; i < slideCount; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('pagination-dot');
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(i));
+                pagination.appendChild(dot);
+            }
+
+            // Actualizar posición del carrusel
+            function updateCarousel() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                // Actualizar paginación
+                const dots = pagination.children;
+                for (let i = 0; i < dots.length; i++) {
+                    dots[i].classList.toggle('active', i === currentIndex);
+                }
+            }
+
+            // Ir a una diapositiva específica
+            function goToSlide(index) {
+                currentIndex = index;
+                updateCarousel();
+            }
+
+            // Ir a la diapositiva anterior
+            function goToPrev() {
+                currentIndex = (currentIndex - 1 + slideCount) % slideCount;
+                updateCarousel();
+            }
+
+            // Ir a la diapositiva siguiente
+            function goToNext() {
+                currentIndex = (currentIndex + 1) % slideCount;
+                updateCarousel();
+            }
+
+            // Event listeners
+            prevBtn.addEventListener('click', goToPrev);
+            nextBtn.addEventListener('click', goToNext);
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') goToPrev();
+                if (e.key === 'ArrowRight') goToNext();
+            });
+
+            // Swipe navigation para móviles
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            track.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            track.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    goToNext();
+                }
+                if (touchEndX > touchStartX + swipeThreshold) {
+                    goToPrev();
+                }
+            }
+
+            // Inicializar carrusel
+            updateCarousel();
+        });
+    </script>
+</body>
+</html>

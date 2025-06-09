@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar Tarea</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+</head>
+<style>
+ /* Contenedor principal */
+.container {
+    margin-top: 50px; /* Espaciado superior */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Para centrar el formulario verticalmente */
+}
+
+/* Fila que contiene la tarjeta */
+.row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* Columna con tamaño mediano */
+.col-md-6 {
+    max-width: 500px; /* Ajusta el ancho de la tarjeta */
+}
+
+/* Tarjeta principal */
+.card {
+    background: #ffffff; /* Color de fondo */
+    border-radius: 29px; /* Bordes redondeados */
+    overflow: hidden; /* Evita que se desborden elementos */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.8); /* Sombra para efecto elevado */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto hover en la tarjeta */
+.card:hover {
+    transform: translateY(-5px); /* Eleva ligeramente la tarjeta */
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.8);
+}
+
+/* Cabecera de la tarjeta */
+.card-header {
+    background: linear-gradient(135deg, #f4a261, #CEF2B3); /* Degradado moderno */
+    color: white; /* Color del texto */
+    text-align: center;
+    padding: 15px 20px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Título dentro de la cabecera */
+.card-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+}
+
+/* Contenido dentro de la tarjeta */
+.card-body {
+    padding: 20px;
+}
+
+/* Botones dentro de la tarjeta */
+.card-footer {
+    background: #f8f9fa;
+    padding: 15px;
+    text-align: center;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* Estilos para los botones */
+.btn {
+    padding: 10px 20px;
+    border-radius: 29x;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #a71d2a;
+}
+
+/* Responsividad: Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+    .col-md-6 {
+        max-width: 90%; /* Reducir el ancho en móviles */
+    }
+}
+ .form-container {
+            max-width: 500px;               /* Ancho máximo deseado */
+            margin: 20px auto;              /* Centrado horizontal y un margen superior/inferior */
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 29px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* Contenedor para cada fila del formulario en formato horizontal */
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        /* Estilo para el label: ancho fijo, alineación a la derecha */
+        .form-label {
+            width: 30%;
+            text-align: right;
+            padding-right: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        /* Contenedor del input: ocupa el espacio restante */
+        .form-input {
+            width: 70%;
+        }
+        
+        /* Estilos modernos para los cuadros de entrada */
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 29px;
+            background: linear-gradient(145deg, #f9f9f9, #ffffff);
+            transition: all 0.3s ease;
+        }
+        
+        /* Efecto de elevación al hacer foco en los inputs */
+        input:focus, textarea:focus, select:focus {
+            border-color: #3f51b5;
+            box-shadow: 0 4px 8px rgba(63, 81, 181, 0.8);
+            transform: translateY(-2px);
+            outline: none;
+        }
+        
+        /* Animación específica para el input de fecha */
+        input[type="date"]:focus {
+            transform: translateY(-2px) scale(1.03);
+        }
+        
+        /* Estilo para mostrar errores (manteniendo la alineación de apoyo) */
+        .text-danger {
+            color: #d9534f;
+            margin-left: 31%; /* Alineado con el input */
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        /* Responsividad: en dispositivos pequeños, se apilan los elementos */
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .form-label {
+                width: 100%;
+                text-align: left;
+                padding-right: 0;
+                margin-bottom: 5px;
+            }
+            .form-input {
+                width: 100%;
+            }
+            .text-danger {
+                margin-left: 0;
+            }
+        }
+
+ /* Contenedor de los botones */
+.btn-group {
+    display: flex;
+    justify-content: flex-end; /* Mueve los botones a la derecha */
+    gap: 10px; /* Espaciado entre los botones */
+    margin-top: 15px;
+    padding-right: 15px;
+}
+
+/* Estilos generales para los botones */
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px; /* Tamaño reducido */
+    font-size: 0.9rem; /* Letra más pequeña */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 30px; /* Bordes redondeados más suaves */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    min-width: 120px; /* Ancho uniforme pero más compacto */
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de brillo al pasar el mouse */
+.btn-custom::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 250%;
+    height: 250%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.4s ease-in-out;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+}
+
+.btn-custom:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Botón Guardar (Verde Moderno) */
+.btn-custom.save {
+    background: linear-gradient(135deg, #00C853, #388E3C);
+    color: white;
+}
+
+.btn-custom.save:hover {
+    background: linear-gradient(135deg, #CEF2B3, #47BF0F);
+    box-shadow: 0px 5px 10px rgba(0, 200, 83, 0.3);
+}
+
+/* Botón Cerrar (Rojo Moderno) */
+.btn-custom.close {
+    background: linear-gradient(135deg, #D32F2F, #B71C1C);
+    color: white;
+}
+
+.btn-custom.close:hover {
+    background: linear-gradient(135deg, #E57373, #C62828);
+    box-shadow: 0px 5px 10px rgba(211, 47, 47, 0.3);
+}
+
+/* Animación de clic */
+.btn-custom:active {
+    transform: scale(0.92);
+}
+
+</style>
+
+
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-warning text-white text-center">
+                        <h3>Editar Tarea</h3>
+                    </div>
+
+                    
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Campo oculto para conservar la URL de redirección -->
+                            <input type="hidden" name="next" value="{{ next_url }}">
+                            
+                            <!-- Mostrar errores de validación -->
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>¡Error!</strong> Por favor, revisa los campos.
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Renderizar formulario con clases Bootstrap -->
+                            <div class="form-container">
+                                {% for field in form %}
+                                    <div class="form-row">
+                                        <label class="form-label">{{ field.label }}</label>
+                                        <div class="form-input">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+                                    {% if field.errors %}
+                                        <div class="text-danger">
+                                            {{ field.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            
+                            <div class="btn-group">
+                                <a href="{{ request.META.HTTP_REFERER }}" class="btn-custom close ">Volver</a>
+                                <button type="submit" class="btn-custom save ">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

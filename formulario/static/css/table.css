@@ -1,0 +1,180 @@
+.nombre-solicitante {
+    word-break: break-word; /* Permite que las palabras largas se ajusten */
+    white-space: normal;    /* Permite el salto de línea */
+}
+
+/* Estilos generales para la tabla */
+.table-custom {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Encabezado de la tabla */
+.table-custom thead {
+    background-color: #1263b4; /* Color suave para el encabezado */
+    color: #ffffff;
+}
+
+.table-custom thead th {
+    padding: 12px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 14px;
+    border-bottom: 2px solid #dee2e6;
+
+}
+
+/* Celdas de la tabla */
+.table-custom tbody td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #cdcdcd;
+}
+
+/* Filas */
+.table-custom tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hover para filas */
+.table-custom tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Ajustes en dispositivos móviles */
+@media (max-width: 768px) {
+    .table-custom thead {
+        display: none; /* Oculta encabezado en móviles */
+    }
+
+    .table-custom tbody tr {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .table-custom tbody td {
+        display: block;
+        text-align: right;
+        padding: 8px;
+        border: none;
+        position: relative;
+    }
+
+    .table-custom tbody td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding-right: 10px;
+    }
+}
+
+  #previewData {
+    color: black;
+  }
+/* Estilo básico del select */
+.profesional-select, .estado-select, .limite-select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #1a1a1b;
+    font-size: 14px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    appearance: none; /* Oculta la flecha nativa del select */
+    cursor: pointer;
+}
+
+/* Estilo cuando el select está enfocado */
+.profesional-select:focus, .estado-select:focus, .limite-select:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Icono personalizado para el select */
+.profesional-select::after, .estado-select::after, .limite-select::after {
+    content: '\25BC'; /* Flecha hacia abajo */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #495057;
+}
+
+/* Contenedor del select para aplicar el icono personalizado */
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.link {
+    color: #007bff; /* Color del enlace */
+    text-decoration: none; /* Sin subrayado por defecto */
+    font-weight: bold; /* Negrita */
+    position: relative; /* Necesario para el subrayado decorativo */
+    display: inline-block; /* Para hacer el efecto más fluido */
+}
+
+/* Efecto de subrayado decorativo */
+.link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; /* Espacio entre el texto y la línea */
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #007bff;
+    transition: width 0.3s ease; /* Suaviza la animación */
+}
+
+/* Efecto de hover */
+.link:hover::after {
+    width: 100%;
+}
+
+.link:hover {
+    color: #007bff; /* Color al hacer hover */
+    text-decoration: underline; /* Subrayado al hacer hover */
+}
+
+.link:focus {
+    outline: none; /* Sin borde al hacer click */
+    color: #007bff; /* Color de enfoque */
+}
+
+/* Colores personalizados para los diferentes estados */
+.text-success {
+    color: #28a745; /* Verde */
+    font-weight: bold;
+}
+
+.text-danger {
+    color: #dc3545; /* Rojo */
+    font-weight: bold;
+}
+
+.text-warning {
+    color: #ffc107; /* Amarillo */
+    font-weight: bold;
+}
+
+.text-muted {
+    color: #6c757d; /* Gris */
+    font-weight: bold;
+}
+
+.acciones{
+    position: relative;
+    height: 45px;
+    width: 45px;
+    padding: 5px;
+    fill: #1a1a1b;
+}

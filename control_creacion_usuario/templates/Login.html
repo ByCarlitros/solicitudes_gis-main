@@ -1,0 +1,51 @@
+
+{% load static %}
+<body>
+  
+  <video autoplay loop muted playsinline id="background-video">
+    <source src="/media/assets/video/mundop.mp4" type="video/mp4">
+    Tu navegador no soporta el video.
+  </video>
+<div class="content">
+
+<link rel="stylesheet" href="{% static 'css/login_v.css' %}" />
+  <div class="container">
+    <img src="/media/assets/image/LOGO- PORTAL.png" alt="" class="logo">
+    <h1> PORTAL SIG</h1>
+  <div class="wrapper">
+    <form action="{% url 'core_login' %}" method="POST" >
+      {% csrf_token %}
+      <h2>Iniciar Sesión</h2>
+        <div class="input-field">
+        <input type="text" id="email" name="email" required >
+        <label>Usuario</label>
+      </div>
+      <div class="input-field">
+        <input type="password" id="password" name="password" required>
+        <label>Contraseña</label>
+      </div>
+      <button type="submit">Ingresar</button>
+    </form>
+  </div>
+    <br>
+    <br>
+    {% if messages %}
+  <div class="wrapper-error">
+    <div class="alert alert-danger">
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+</div>
+</body>
+  <!-- Mostrar Mensajes de Error (si existen) -->
+
+
+    <!-- Link al JS específico de Login -->
+    <!-- <script src="{% static 'js/Login.js' %}"></script> -->
+
+
+

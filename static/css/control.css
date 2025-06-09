@@ -1,0 +1,359 @@
+
+
+/* =========================================
+   Flex Containers
+========================================= */
+
+/* Flex Container con columna, neutro, espacio entre */
+.flex-column-red {
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Flex Container con fila, neutro, espacio entre y padding */
+.flex-row-content {
+    flex-direction: row;
+}
+
+/* Flex Container con columna, gap y ancho */
+.flex-column-gap {
+    flex-direction: column;
+}
+
+/* Clase utilitaria para padding: 1rem; */
+.p-1 {
+    padding: 1rem;
+}
+
+/* Fill Available */
+.fill-available {
+    flex: 1;
+    /* Mejor compatibilidad y responsividad */
+}
+
+/* =========================================
+   Dashboard Layouts
+========================================= */
+
+/* Flex Row Dashboard con Flexbox */
+.flex-row-dashboard {
+    flex-direction: column;
+}
+
+/* Dashboard Top */
+.dashboard-top {
+    display: flex;
+}
+
+/* Dashboard Middle */
+.dashboard-middle {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 0 0.5rem;
+    grid-area: dashboard-middle;
+}
+
+/* Dashboard Bottom */
+.dashboard-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    grid-area: dashboard-bottom;
+}
+
+/* =========================================
+   Dashboard Boxes Styles
+========================================= */
+
+/* Información General: Gráfico de Barras */
+.info-box {
+    flex-direction: column;
+}
+
+/* Estilos para las cajas internas con Neumorfismo */
+.dashboard-box-1,
+.dashboard-box-2,
+.dashboard-box-3,
+.dashboard-box-4,
+.dashboard-box-5 {
+    background-color: ghostwhite;
+    /* Fondo neutro para neumorfismo */
+    border-radius: 20px;
+    box-shadow:
+        inset 4px 4px 8px #E0E0E0,
+        /* Sombra interna oscura adaptada */
+        inset -4px -4px 8px #FFFFFF;
+    /* Sombra interna clara adaptada */
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Estilos específicos para cada caja */
+
+/* .dashboard-box-1: Total de Solicitudes */
+/* Ya tiene fondo neutro definido arriba */
+
+/* .dashboard-box-2: Promedio de carga de trabajo */
+/* Ya tiene fondo neutro definido arriba */
+
+/* .dashboard-box-3: En Proceso */
+.dashboard-box-3 {
+    background-color: #a9dbed;
+    /* Azul claro para "En Proceso" */
+    box-shadow:
+        inset 4px 4px 8px #6fa8dc,
+        /* Sombra interna oscura azul */
+        inset -4px -4px 8px #cce0f7;
+    /* Sombra interna clara azul */
+}
+
+/* .dashboard-box-4: Ejecutadas */
+.dashboard-box-4 {
+    background-color: #90ff77;
+    /* Verde claro para "Ejecutadas" */
+    box-shadow:
+        inset 4px 4px 8px #6ac47d,
+        /* Sombra interna oscura verde */
+        inset -4px -4px 8px #c6ffb3;
+    /* Sombra interna clara verde */
+}
+
+/* .dashboard-box-5: Rechazadas */
+.dashboard-box-5 {
+    background-color: #f39589;
+    /* Rosa claro para "Rechazadas" */
+    box-shadow:
+        inset 4px 4px 8px #f67c7c,
+        /* Sombra interna oscura rosa */
+        inset -4px -4px 8px #ffb3b3;
+    /* Sombra interna clara rosa */
+}
+
+/* Estilos para los encabezados dentro de las cajas */
+.dashboard-box-1 h3,
+.dashboard-box-2 h3,
+.dashboard-box-3 h3,
+.dashboard-box-4 h3,
+.dashboard-box-5 h3 {
+    font-size: 1.2rem;
+    color: var(--oxford-blue) !important;
+    /* Asegura que los encabezados usan OXFORD BLUE */
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+/* Estilos específicos para cada caja */
+
+/* .dashboard-box-1: Total de Solicitudes */
+/* Ya tiene fondo neutro definido arriba */
+
+/* .dashboard-box-2: Promedio de carga de trabajo */
+/* Ya tiene fondo neutro definido arriba */
+
+/* .dashboard-box-3: En Proceso */
+.dashboard-box-3 {
+    background-color: #a9dbed;
+    /* Azul claro para "En Proceso" */
+    /* Mantener box-shadow sin cambios */
+}
+
+/* .dashboard-box-4: Ejecutadas */
+.dashboard-box-4 {
+    background-color: #90ff77;
+    /* Verde claro para "Ejecutadas" */
+    /* Mantener box-shadow sin cambios */
+}
+
+/* .dashboard-box-5: Rechazadas */
+.dashboard-box-5 {
+    background-color: #f39589;
+    /* Rosa claro para "Rechazadas" */
+    /* Mantener box-shadow sin cambios */
+}
+
+/* =========================================
+   Buttons con Neumorfismo
+========================================= */
+.btn-custom {
+    background-color: ghostwhite;
+    /* Fondo adaptado */
+    border-radius: 20px;
+    box-shadow:
+        6px 6px 12px #E0E0E0,
+        /* Sombra externa oscura adaptada */
+        -6px -6px 12px #FFFFFF;
+    /* Sombra externa clara adaptada */
+    color: var(--oxford-blue) !important;
+    /* Color del texto */
+    padding: 0.75rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: var(--tea-green-v2);
+    /* Utiliza Tea Green V2 para el fondo al hover */
+    box-shadow:
+        4px 4px 8px #E0E0E0,
+        /* Sombra externa oscura adaptada */
+        -4px -4px 8px #FFFFFF;
+    /* Sombra externa clara adaptada */
+}
+
+/* =========================================
+   Typography
+========================================= */
+.section-title {
+    font-size: 36px;
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    font-weight: 600;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.section-subtitle {
+    font-size: 24px;
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    font-weight: 500;
+    margin: 5px 0;
+    text-align: center;
+}
+
+.font-light {
+    font-weight: 300;
+}
+
+.font-medium {
+    font-weight: 600;
+}
+
+
+/* =========================================
+   Counter Styles
+========================================= */
+.counter {
+    font-size: 3.5rem;
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    font-weight: bold;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.counter.visible {
+    opacity: 1;
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Counter Sizes */
+@media (max-width: 768px) {
+    .counter {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .counter {
+        font-size: 1.5rem;
+    }
+}
+
+/* =========================================
+   Responsive Adjustments
+========================================= */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 28px;
+    }
+
+    .section-subtitle {
+        font-size: 22px;
+    }
+
+    .btn-custom.btn-lg {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-title {
+        font-size: 24px;
+    }
+
+    .section-subtitle {
+        font-size: 18px;
+    }
+
+    .btn-custom.btn-lg {
+        font-size: 0.9rem;
+    }
+}
+
+/* =========================================
+   Estilos para dashboard-box-2
+========================================= */
+.dashboard-box-2 p {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    font-size: 2rem;
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    font-weight: bold;
+    margin-bottom: 0px;
+}
+
+.dashboard-box-2 p span {
+    font-size: 2rem;
+}
+
+.dashboard-box-2 ul li span {
+    font-size: 1.1rem;
+}
+
+.dashboard-box-2 ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    font-size: 1rem;
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.dashboard-box-2 ul li {
+    display: flex;
+    align-items: flex-end;
+    gap: .25rem;
+}
+
+.dashboard-box-2 h3 {
+    margin-block: 1rem 0rem;
+}

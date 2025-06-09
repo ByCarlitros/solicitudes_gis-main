@@ -1,0 +1,52 @@
+.form-neumorphism {
+    background-color: transparent;
+    border-radius: 20px;
+    box-shadow: 0px 0px 0px rgb(0 0 0 / 0%), 0px 0px 0px rgb(0 0 0 / 0%);
+}
+
+
+.table-custom {
+    background-color: #ffffff;
+    color: black;
+    /* Color de fondo de la tabla */
+}
+
+.flex-row-dashboard {
+    width: 100%;
+}
+
+.info-box {
+    width: 100%;
+}
+
+.container h1 {
+    font-size: 30px;
+}
+
+/* =========================================
+   Ocultar el Botón Predeterminado de Mostrar/Ocultar Contraseña
+========================================= */
+
+/* Para Chrome, Safari, Edge */
+input[type="password"]::-webkit-password-toggle {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Para Firefox */
+input[type="password"] {
+    -moz-appearance: textfield;
+}
+
+/* Para IE y Edge Legacy */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+/* Asegurar que el campo de contraseña no muestre iconos adicionales */
+input[type="password"] {
+    position: relative;
+    padding-right: 40px;
+    /* Espacio para el botón personalizado */
+}

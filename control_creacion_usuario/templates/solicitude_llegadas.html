@@ -1,0 +1,1219 @@
+{% extends 'core/Slide.html' %}
+
+{% load static %}
+
+{% block main_content%}
+
+{% block custom_css %}
+<style>
+    .row>* {
+        padding: calc(var(--bs-gutter-x)* .5);
+    }
+
+    #tabla_registro {
+        width: 90%;
+        font-family: "Roboto Condensed";
+    }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+    text-align: left;
+    border: 1px solid #ddd;
+    table-layout: fixed; /* Hace que los th definan el ancho de la columna */
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    word-wrap: break-word; /* Permite saltos de línea */
+    white-space: normal; /* Hace que el texto se ajuste dentro del ancho */
+    overflow-wrap: break-word;
+}
+
+th {
+    background-color: #0f52a9;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Ajustar el ancho de los encabezados para que controlen sus columnas */
+th:nth-child(1) { width: 90px; } /* Id de la solicitud */
+th:nth-child(2) { width: 90px; } /* Id de la solicitud */
+th:nth-child(3) { width: 110px; } /* Solicitante */
+th:nth-child(4) { width: 130px; } /* Fecha de llegada */
+th:nth-child(5) { width: 130px; } /* Departamento */
+th:nth-child(6) { width: 180px; } /* Acciones */
+th:nth-child(7) { width: 120px; } /* Estado */
+th:nth-child(8) { width: 190px; } /* Carga de trabajo */
+th:nth-child(9) { width: 300px; } /* Profesional SIG */
+th:nth-child(10) { width: 100px; } /* Fecha Designio */
+th:nth-child(11) { width: 100px; } /* Fecha Enviado */
+th:nth-child(12) { width: 100px; } /* Días Hábiles */
+
+/* Alternar colores en filas */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hacer la tabla responsiva */
+@media screen and (max-width: 768px) {
+    table {
+        font-size: 12px;
+    }
+    
+    th, td {
+        padding: 8px;
+    }
+
+    /* Reducir el tamaño de las columnas en móviles */
+    th, td {
+        width: auto;
+    }
+}
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.pagination-container .page-link {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination-container .page-link:hover {
+    background-color: #1a5da4;
+    color: white;
+}
+
+.pagination-container .page-link.active {
+    background-color: #1a5da4;
+    color: white;
+    font-weight: bold;
+}
+
+
+</style>
+
+{% endblock custom_css %}
+
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
+
+<script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/table.css' %}" />
+
+<style>
+
+
+</style>
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=text_snippet" />
+<section class="d-flex justify-content-center">
+    <div class="row">
+        <div class="col" style="display: flex;justify-content: center;flex-wrap: wrap;">
+            <div class="container_new">
+                {% if request.user.is_superuser %}
+
+                <div class="container" style="margin: 1rem; width: auto;">
+                    <div class="wrapper">
+                        <a class="enviado" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal" class="dropdown-item" href="#">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </a>
+                    </div>
+                    
+                </div>
+                {% endif %}           
+                <div class="container" style="margin: 1rem; width: auto;">
+                    <div id="paginacion" class="pagination-container"></div>
+                </div>
+
+                <div class="container" style="width: 280px;">
+                    <input type="text" id="buscador-id" class="form-control" placeholder="Buscar por ID...">
+                </div>
+
+            </div>
+
+           
+            <div class="toast-container position-fixed top-0 end-0 p-3">
+                <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            📌 La tabla ha sido actualizada
+                        </div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+            
+            <table id="tabla_registro" class="display table-custom">
+                <thead>
+                    <tr>
+                        <th>Id de la solicitud</th>
+                        <th>Orden Trabajo</th>
+
+                        <th>Solicitante</th>
+                        <th>Fecha de llegada</th>
+                        <th>Departamento</th>
+                        <th style="max-width: 220px;">Acciones</th>
+                        <th>Estado</th>
+                        <th style="max-width: 250px;">Carga de trabajo</th>
+                        <th>profesional SIG</th>
+                        <th>Fecha Designio</th>
+                        <th>Fecha Enviado</th>
+                        <th>Dias Hábiles</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los datos se llenarán dinámicamente aquí -->
+                </tbody>
+            </table>
+            </div>
+    </div>
+
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #707eff;">
+                    <h5 class="modal-title" id="previewModalLabel">Vista previa de solicitud</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <p id="previewData"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Modal Dinámico de ENVIAR AL CORREO -->
+    <div class="modal fade" id="dynamicEmailModal" tabindex="-1" aria-labelledby="dynamicEmailModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dynamicEmailModalLabel">Enviar Correo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dynamicEmailForm">
+                        <!-- Campo para agregar correos -->
+
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label">1. Destinatario</label>
+                            <ul id="destinatarioList" class="list-group mb-3">
+                                <!-- Aquí se mostrará dinámicamente el destinatario -->
+                            </ul>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label">2. Agregar en copia</label>
+                            <input type="email" class="form-control" id="emailInput" placeholder="Ingresa un correo">
+                        </div>
+                        
+                        <textarea class="form-control" id="messageText" rows="5" placeholder="Escribe tu mensaje aquí">{% if request.user.is_superuser %}Estimado,
+                        Por favor, proceda con la solicitud según corresponda.
+                        Agradezco su atención.
+                        Atte.{% else %}Estimado Solicitante,
+                        Atte.{% endif %}
+                        </textarea>
+
+
+
+                        <!-- Campo para adjuntar archivos -->
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">4. Adjuntar el o los archivos(10 mb se adjuntar
+                                normalmente, 300mb sera exportado a link. )</label>
+                            <input type="file" class="form-control" id="fileInput" multiple>
+                        </div>
+
+                        <!-- Lista de archivos adjuntados -->
+                        <ul id="fileList" class="list-group mb-3"></ul>
+                    </form>
+                </div>
+                <br>
+                <div id="loadingSpinner" class="text-center mb-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Enviando...</span>
+                    </div>
+                    <p>Enviando datos, por favor espera...</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="sendData()">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Bootstrap para el motivo del cambio -->
+    <div class="modal fade" id="registro_De_Designio" tabindex="-1" role="dialog"
+        aria-labelledby="registro_De_DesignioLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registro_De_DesignioLabel">Motivo del cambio de profesional</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+                    <form id="motivoCambioForm">
+                        <div class="form-group">
+                            <label for="motivo">Motivo del cambio</label>
+                            <textarea class="form-control" id="motivo" name="motivo" rows="3" required></textarea>
+                        </div>
+                        <input type="hidden" id="nuevo_profesional_id" name="nuevo_profesional_id">
+                        <input type="hidden" id="solicitud_id" name="solicitud_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="guardarMotivo">Guardar motivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="registroPreviewModal" tabindex="-1" aria-labelledby="registroPreviewModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #707eff;">
+                    <h5 class="modal-title" id="registroPreviewModalLabel">Vista previa de registros</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="registroPreviewData"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="Nueva_fecha_Designio" tabindex="-1" role="dialog"
+        aria-labelledby="Nueva_fecha_DesignioLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="Nueva_fecha_DesignioLabel">Designación de Dias hábiles</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="fechaNueva">Seleccione la nueva fecha y hora:</label>
+                    <input type="datetime-local" id="fechaNueva" class="form-control">
+                    <div id="errorFecha" class="text-danger mt-2" style="display: none;">La fecha seleccionada no puede
+                        ser un sábado o domingo.</div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="guardarFecha">Guardar Nueva Fecha</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal para agregar apoyos al protocolo -->
+    <div class="modal fade" id="apoyoModal" tabindex="-1" aria-labelledby="apoyoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="apoyoModalLabel">Agregar Apoyos al Protocolo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <p><strong>Protocolo ID:</strong> <span id="protocoloId"></span></p>
+            <p><strong>Profesional Responsable:</strong> <span id="profesionalActual"></span></p>
+            <p>Selecciona los usuarios que deseas agregar como apoyo:</p>
+            <div id="listaApoyos">
+                <!-- Aquí se insertarán dinámicamente los checkboxes de usuarios -->
+            </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="guardarApoyo">Guardar</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+   
+    
+    
+    
+</section>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    var currentPage = 1;
+    var itemsPerPage = 10;
+    var totalPages = 1;
+
+    function actualizarTabla() {
+
+        $.ajax({
+            url: "{% url 'solicitudes_json' %}",
+            method: 'GET',
+            success: function(response) {
+                var tbody = $('#tabla_registro tbody');
+                tbody.empty();  // Limpia la tabla antes de agregar nuevos datos
+
+                var esSuperuser = response.es_superuser;
+                var usuarios = response.Usuarios;
+                var id_user = response.id_user;
+
+                var totalItems = response.Solicitudes.length; // Usamos el total real de elementos
+                 totalPages = Math.ceil(totalItems / itemsPerPage); // Calculamos totalPages aquí
+                // Lista de profesionales
+                response.Solicitudes.sort((a, b) => b.id - a.id);
+
+                var start = (currentPage - 1) * itemsPerPage;
+                var end = start + itemsPerPage;
+                var itemsToShow = response.Solicitudes.slice(start, end);
+
+                itemsToShow.forEach(function(item) {
+                    var estados = response.OPCIONES.ESTADO;
+                    var limites = response.OPCIONES.LIMITE_DE_DIA;
+                    var disabledAttr = esSuperuser ? "" : "disabled";
+
+                    var selectEstado = `<select class="estado-select" data-solicitud-id="${item.id}" ${disabledAttr}>`;
+                    estados.forEach(function(estado) {
+                        var selected = item.estado === estado[0] ? 'selected' : '';
+                        selectEstado += `<option value="${estado[0]}" ${selected}>${estado[1]}</option>`;
+                    });
+                    selectEstado += `</select>`;
+
+                    var correo_destinatario = "";
+                    if (esSuperuser) {
+                        correo_destinatario = item.profesional_correo;
+                    } else {
+                        correo_destinatario = item.corre_solicitante;
+                    }
+                
+                    var selectLimite = `<select class="limite-select" data-solicitud-id="${item.id}" ${disabledAttr}>`;
+                    limites.forEach(function(limite) {
+                        var selected = item.tipo_limite === limite[0] ? 'selected' : '';
+                        selectLimite += `<option value="${limite[0]}" ${selected}>${limite[1]}</option>`;
+                    });
+                    selectLimite += `</select>`;
+
+                    var selectProfesional = `<select class="profesional-select" data-solicitud-id="${item.id}" data-antiguo-profesional="${item.profesional_id ? item.profesional_id : 'None'}" ${disabledAttr}>`;
+                    selectProfesional += `<option value="" disabled ${!item.profesional_id ? "selected" : ""}>Selecciona un profesional</option>`;
+
+                    usuarios.forEach(function(usuario) {
+                        var selected = item.profesional_id === usuario.id ? 'selected' : '';
+                        selectProfesional += `<option value="${usuario.id}" ${selected}>${usuario.first_name} ${usuario.last_name}</option>`;
+                    });
+                    selectProfesional += `</select>`;
+
+                    // Botón de Enviar Correo
+                    // Verificar si el usuario puede enviar correos
+                    var puedeEnviarCorreo = esSuperuser || item.profesional_id === id_user;
+
+                    // Determinar el color del ícono del correo
+                    var colorCorreo = esSuperuser
+                        ? (item.enviado_correo ? "rgb(66, 190, 13)" : "rgb(16, 97, 196)")  // Superuser
+                        : (item.enviado_correo_t ? "rgb(66, 190, 13)" : "rgb(16, 97, 196)");  // Usuario normal
+
+                    // Si el usuario NO puede enviar correos, deshabilitar el enlace
+                    var btnEmail = puedeEnviarCorreo
+                        ? `<a href="#" class="email-link" style="text-decoration: none;" 
+                                data-bs-toggle="modal" data-bs-target="#dynamicEmailModal"
+                                data-id="${item.id}" 
+                                data-correo="${correo_destinatario}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="acciones" style="fill: ${colorCorreo};">
+                                        <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/>
+                                    </svg>
+                            </a>`
+                        : `<a href="#" class="email-link disabled" style="text-decoration: none; cursor: not-allowed; pointer-events: none;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="acciones" style="fill: grey;">
+                                        <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/>
+                                    </svg>
+                            </a>`;
+
+
+
+                    // Botón de Vista Previa con atributos `data-*` para pasar datos al modal
+                    var btnPreview = `
+                        <a style="text-decoration: none; position:relative;" href="#" class="preview-link" 
+                        data-item='${JSON.stringify(item)}'> 
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="acciones">
+                                <path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 288c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128z"/>
+                            </svg>
+                        </a>`;
+
+                        var btnDescargar = `
+                        <a style="text-decoration: none; position: relative;" href="/solicitud/descargar_pdf/${item.id}"download>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="acciones">
+                                <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32v242.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64v-32c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                            </svg>
+                        </a>`;
+
+                    var btnRegistroPreview = "";
+                        if (esSuperuser) {
+                            if (item.numero_designios === 0) {
+                                btnRegistroPreview = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="acciones" style="fill: darkgrey;">
+                                        <path d="M128 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm32 97.3c28.3-12.3 48-40.5 48-73.3c0-44.2-35.8-80-80-80S48 51.8 48 96c0 32.8 19.7 61 48 73.3L96 224l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l256 0 0 54.7c-28.3 12.3-48 40.5-48 73.3c0 44.2 35.8 80 80 80s80-35.8 80-80c0-32.8-19.7-61-48-73.3l0-54.7 256 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-54.7c28.3-12.3 48-40.5 48-73.3c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 32.8 19.7 61 48 73.3l0 54.7-320 0 0-54.7zM488 96a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM320 392a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                                    </svg>
+                                `;
+                            } else {
+                                btnRegistroPreview = `
+                                    <a href="#" class="registro-preview-link" data-protocolo-id="${item.id}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="acciones">
+                                            <path d="M128 72a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm32 97.3c28.3-12.3 48-40.5 48-73.3c0-44.2-35.8-80-80-80S48 51.8 48 96c0 32.8 19.7 61 48 73.3L96 224l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l256 0 0 54.7c-28.3 12.3-48 40.5-48 73.3c0 44.2 35.8 80 80 80s80-35.8 80-80c0-32.8-19.7-61-48-73.3l0-54.7 256 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-54.7c28.3-12.3 48-40.5 48-73.3c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 32.8 19.7 61 48 73.3l0 54.7-320 0 0-54.7zM488 96a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM320 392a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                                        </svg>
+                                    </a>
+                                `;
+                            }
+                        }
+
+                        var btnAgregar = "";
+                        if (esSuperuser) {
+                            var btnAgregar = `
+                        <a style="text-decoration: none; position:relative;" href="#" class="apoyo-link" 
+                        data-item='${JSON.stringify(item)}'> 
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="acciones">
+                            <path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3zM504 312l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/>
+                        </svg>
+                        </a>`;
+                        }
+
+
+
+                    let colorClase = ""; 
+
+                    if (item.dias_restantes.includes("Pasada ")) {
+                        colorClase = "text-danger" ; //  Rojo (Bootstrap)
+                    } else if (item.dias_restantes.includes("horas")) {
+                        colorClase = "text-warning"; // Amarillo
+                    } else if (item.dias_restantes.includes("días hábiles")) {
+                        colorClase = "text-primary"; // Azul
+                    } else if (item.dias_restantes.includes("Trabajo terminado")) {
+                        colorClase = "text-success"; // Verde
+                    } else if (item.dias_restantes.includes("Rechazado")) {
+                        colorClase = "text-danger"; // Verde
+                    }
+
+                    var diasRestantesTd = `<td style="font-weight: bolder;" class="${colorClase}">${item.dias_restantes}</td>`;
+
+
+                    var row = `<tr>
+                        <td>${item.id}</td>
+                        <td style="color: ${ isNaN(item.order_trabajo) ? 'black' : '#0f52a9' }; font-weight: bold;">${item.order_trabajo}</td>                   
+                        <td>${item.nombre_solicitante}</td>
+                        <td>${item.fecha}</td>
+                        <td>${item.departamento}</td>
+                        <td>${btnPreview} ${btnDescargar} ${btnEmail} ${btnRegistroPreview} </td>
+                        <td>${selectEstado}</td>
+                        <td>${selectLimite}</td>
+                        <td>${selectProfesional} ${btnAgregar} </td>
+                        <td>${item.fecha_D}</td>
+                        <td>${item.fecha_T}</td>
+
+                        ${diasRestantesTd}
+
+                    </tr>`;
+
+                    tbody.append(row);
+                });
+
+                $("#buscador-id").trigger("keyup"); 
+
+                $(".registro-preview-link").off("click").on("click", cargarVistaPrevia);
+
+                $(".estado-select").off("change").on("change", manejarCambioEstado);
+
+                $(".limite-select").off("change").on("change", manejarCambioLimite);
+
+                $(".profesional-select").off("change").on("change", manejarCambioProfesional);
+                // Evento para abrir el modal al hacer clic en "Vista Previa" (Sin AJAX)
+                $(document).on("click", ".preview-link", function(e) {
+                e.preventDefault();  // Evita la recarga de la página
+
+                var item = JSON.parse($(this).attr("data-item"));
+                
+                var archivosHTML = (item.archivos_adjuntos_urls && Array.isArray(item.archivos_adjuntos_urls) && item.archivos_adjuntos_urls.length > 0)
+                ? `<ul>` + item.archivos_adjuntos_urls.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join('') + `</ul>`
+                : "<p>No hay archivos adjuntos.</p>";
+
+                // Generar lista de apoyos
+                var apoyosHTML = (item.apoyos && Array.isArray(item.apoyos) && item.apoyos.length > 0)
+                    ? `<ul>` + item.apoyos.map(apoyo => `<li>${apoyo.nombre} (${apoyo.correo})</li>`).join('') + `</ul>`
+                    : "<p>No hay apoyos asignados.</p>";
+
+                // Insertar los datos directamente en el modal
+                $('#previewData').html(`
+                    <strong>ID:</strong> ${item.id} <br>
+                    <strong>Código:</strong> ${item.codigo} <br>
+                    <strong>Departamento:</strong> ${item.departamento} <br>
+                    <strong>Dirección:</strong> ${item.direccion} <br>
+                    <strong>Solicitante:</strong> ${item.nombre_solicitante} <br>
+                    <strong>Proyecto:</strong> ${item.nombre_proyecto} <br>
+                    <strong>Correo Solicitante:</strong> ${item.corre_solicitante} <br>
+                    <strong>Área:</strong> ${item.area} <br>
+                    <strong>Objetivos:</strong> ${item.objetivos} <br>
+                    <strong>Cambios Posibles:</strong> ${item.cambios_posible} <br>
+                    <strong>Fecha:</strong> ${item.fecha} <br>
+                    <strong>Fecha Designio:</strong> ${item.fecha_D} <br>
+                    <strong>Fecha Término:</strong> ${item.fecha_T} <br>
+                    <strong>Fecha Límite:</strong> ${item.fecha_L} <br>
+                    <strong>Profesional:</strong> ${item.profesional_nombre} <br>
+                    <strong>Correo Profesional:</strong> ${item.profesional_correo} <br>
+                    <strong>Tipo de Límite:</strong> ${item.tipo_limite} <br>
+                    <strong>Estado:</strong> ${item.estado} <br>
+                    <strong>Correo Enviado:</strong> ${item.enviado_correo ? 'Sí' : 'No'} <br>
+                    <strong>Correo Enviado (Solicitante):</strong> ${item.enviado_correo_t ? 'Sí' : 'No'} <br>
+                    <strong>Número de Designios:</strong> ${item.numero_designios} <br>
+                    <strong>Días Restantes:</strong> ${item.dias_restantes} <br>
+                    <strong>Archivos Adjuntos:</strong> ${archivosHTML} <br>
+                    <strong>Apoyos Asignados:</strong> ${apoyosHTML} <br> <!-- Aquí agregamos los apoyos -->
+                `);
+
+                // Mostrar el modal
+                $('#previewModal').modal('show');
+            });
+
+
+                $('.email-link').click(function (event) {
+                    event.preventDefault();  // Evita la recarga de la página
+
+                    var btn = $(this);
+                    var correo_destinatario = btn.data('correo');
+                    var solicitudId = btn.data('id');
+
+                    // Limpiar la lista anterior y agregar el nuevo destinatario
+                    $('#destinatarioList').html(`<li class="list-group-item" style="color:gray;">${correo_destinatario}</li>`);
+
+                    // Guardar el ID de la solicitud seleccionada
+                    selectedFichaId = solicitudId;
+                });
+
+                
+                generarPaginacion();  // Llamamos a la paginación aquí
+
+            },
+            
+            error: function() {
+                console.log('Error al cargar los datos');
+            }
+        });
+    }
+
+    function generarPaginacion() {
+        var paginacion = $("#paginacion");
+        paginacion.empty();
+
+        if (totalPages <= 1) return;
+
+        var prevDisabled = currentPage === 1 ? "disabled" : "";
+        paginacion.append(`<button class="page-link" ${prevDisabled} onclick="cambiarPagina(${currentPage - 1})">&lt;</button>`);
+
+        for (var i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                var activeClass = i === currentPage ? "active" : "";
+                paginacion.append(`<button class="page-link ${activeClass}" onclick="cambiarPagina(${i})">${i}</button>`);
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                paginacion.append(`<span class="page-link">...</span>`);
+            }
+        }
+
+        var nextDisabled = currentPage === totalPages ? "disabled" : "";
+        paginacion.append(`<button class="page-link" ${nextDisabled} onclick="cambiarPagina(${currentPage + 1})">&gt;</button>`);
+    }
+
+    function cambiarPagina(page) {
+    if (page < 1 || page > totalPages) return;
+
+    currentPage = page;
+    actualizarTabla(); // ✅ Llamamos a actualizarTabla() con la nueva página
+}
+
+    function actualizarEstado(id, estado) {
+        $.ajax({
+            url: "{% url 'actualizar_estado_solicitud' %}",
+            method: 'POST',
+            data: {
+                'id': id,
+                'estado': estado,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (response) {
+                console.log('Estado actualizado correctamente');
+            },
+            error: function () {
+                console.log('Error al actualizar el estado');
+            }
+        });
+    }
+
+    function actualizarLimite(id, limite) {
+        $.ajax({
+            url: "{% url 'actualizar_limite_solicitud' %}",
+            method: 'POST',
+            data: {
+                'id': id,
+                'tipo_limite': limite,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (response) {
+                console.log('Carga de trabajo actualizada correctamente');
+            },
+            error: function () {
+                console.log('Error al actualizar la carga de trabajo');
+            }
+        });
+    }
+
+    function manejarCambioLimite() {
+        var solicitudId = $(this).data('solicitud-id');
+        var nuevoLimite = $(this).val();
+
+        if (nuevoLimite === 'P') {
+            var now = new Date();
+            var today = now.toISOString().slice(0, 16);
+            $("#fechaNueva").val(today);
+            $("#Nueva_fecha_Designio").modal('show');
+
+            // Limpiar eventos previos y asignar el nuevo evento correctamente
+            $("#guardarFecha").off("click").on("click", function () {
+                var fechaSeleccionada = new Date($("#fechaNueva").val());
+                var dia = fechaSeleccionada.getDay(); // 0 = Domingo, 6 = Sábado
+
+                if (dia === 0 || dia === 6) {
+                    $("#errorFecha").show();
+                } else {
+                    $("#errorFecha").hide();
+
+                    $.ajax({
+                        url: "{% url 'actualizar_limite' %}",
+                        type: "POST",
+                        data: {
+                            solicitud_id: solicitudId,
+                            nuevoLimite: nuevoLimite,
+                            fecha: fechaSeleccionada.toISOString(),
+                            csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Fecha y límite actualizados correctamente",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            $("#Nueva_fecha_Designio").modal('hide'); 
+
+                            // Refrescar solo la tabla sin recargar la página
+                            setTimeout(() => {
+                                actualizarTabla();
+                            }, 1000);
+                        },
+                        error: function (xhr, status, error) {
+                            alert("Error al actualizar el límite:", error);
+                        }
+                    });
+                }
+            });
+
+        } else {
+            $.ajax({
+                url: "{% url 'actualizar_limite' %}",
+                type: "POST",
+                data: {
+                    solicitud_id: solicitudId,
+                    nuevoLimite: nuevoLimite,
+                    csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
+                },
+                success: function (response) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Estado actualizado correctamente",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    setTimeout(() => {
+                        actualizarTabla();
+                    }, 1500);
+                },
+                error: function (xhr, status, error) {
+                    alert("Error al actualizar el estado:", error);
+                }
+            });
+        }
+    }
+
+    function manejarCambioProfesional() {
+        var solicitudId = $(this).data('solicitud-id');
+        var nuevoProfesional = $(this).val();
+        var antProfesional = $(this).data('antiguo-profesional');
+
+        if (!antProfesional || antProfesional === "None") {
+            // Si no hay un profesional anterior, actualizar directamente
+            actualizarProfesional(solicitudId, nuevoProfesional);
+        } else {
+            // Si hay un profesional anterior, mostrar el modal para el motivo
+            $("#nuevo_profesional_id").val(nuevoProfesional);
+            $("#solicitud_id").val(solicitudId);
+            $("#registro_De_Designio").modal("show");
+        }
+    }
+
+    function actualizarProfesional(solicitudId, nuevoProfesional) {
+        var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+
+        $.ajax({
+            url: "{% url 'actualizar_profesional' %}",
+            type: "POST",
+            data: {
+                solicitud_id: solicitudId,
+                profesional: nuevoProfesional,
+                csrfmiddlewaretoken: csrfToken
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Profesional actualizado correctamente",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    setTimeout(() => {
+                        actualizarTabla(); // Recargar solo la tabla
+                    }, 1000);
+                } else {
+                    alert("Error al actualizar el profesional");
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("Error al actualizar el profesional:", error);
+            }
+        });
+    }
+
+    $("#guardarMotivo").click(function() {
+        var motivo = $("#motivo").val();
+        var solicitudId = $("#solicitud_id").val();
+        var nuevoProfesional = $("#nuevo_profesional_id").val();
+        var csrfToken = $("input[name='csrfmiddlewaretoken']").val();
+
+        if (!motivo) {
+            alert("Debe ingresar el motivo del cambio.");
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'actualizar_profesional' %}",
+            type: "POST",
+            data: {
+                solicitud_id: solicitudId,
+                profesional: nuevoProfesional,
+                motivo: motivo,
+                csrfmiddlewaretoken: csrfToken
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Profesional y motivo actualizados correctamente",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    $("#registro_De_Designio").modal("hide");
+                    setTimeout(() => {
+                        actualizarTabla(); 
+                    }, 1000);
+                } else {
+                    alert("Error al actualizar el profesional");
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("Error al actualizar el profesional:", error);
+            }
+        });
+    });
+
+    function manejarCambioEstado() {
+        var solicitudId = $(this).data('solicitud-id');
+        var nuevoEstado = $(this).val();
+
+        $.ajax({
+            url: "{% url 'actualizar_estado_solicitud' %}",
+            type: "POST",
+            data: {
+                solicitud_id: solicitudId,
+                estado: nuevoEstado,
+                csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Estado actualizado correctamente",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    setTimeout(() => {
+                        actualizarTabla();
+                    }, 1000);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert("Error al actualizar el estado:", error);
+            }
+        });
+    }
+
+    function cargarVistaPrevia(event) {
+        event.preventDefault();
+        var protocoloId = $(this).data("protocolo-id");
+
+        $.ajax({
+            url: `/vista_previa_reaccinacion/${protocoloId}`,
+            method: 'GET',
+            success: function(response) {
+                var previewDataElement = $('#registroPreviewData');
+               
+
+                $('#registroPreviewModal').modal('show');
+            },
+            error: function() {
+                console.log("Error al cargar los datos");
+            }
+        });
+    }
+
+    function guardarApoyo() {
+    var protocoloId = $("#protocoloId").text();
+    var usuariosSeleccionados = [];
+    
+    $(".apoyo-checkbox:checked").each(function () {
+        usuariosSeleccionados.push($(this).val());
+    });
+
+    if (usuariosSeleccionados.length === 0) {
+        alert("Por favor, selecciona al menos un usuario.");
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'agregar_apoyo' %}",
+        type: "POST",
+        data: {
+            protocolo_id: protocoloId,
+            usuarios: JSON.stringify(usuariosSeleccionados),
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function (response) {
+            alert("Apoyos agregados con éxito.");
+            $("#apoyoModal").modal("hide");
+            actualizarTabla();
+        },
+        error: function () {
+            alert("Error al agregar los apoyos.");
+        }
+    });
+}
+
+function abrirModalApoyo(item) {
+    var protocoloId = item.id;
+    
+    var profesionalActual = item.profesional ? `${item.profesional.first_name} ${item.profesional.last_name}` : "No asignado";
+    $("#protocoloId").text(protocoloId);
+    $("#profesionalActual").text(profesionalActual);
+
+    // Llamada AJAX para obtener usuarios disponibles
+    $.ajax({
+        url: "{% url 'usuarios_disponibles' %}",
+        type: "GET",
+        data: { protocolo_id: protocoloId },
+        success: function (response) {
+            var container = $("#listaApoyos");
+            container.empty();
+
+            response.usuarios.forEach(function (usuario) {
+                var checked = usuario.ya_agregado ? "checked" : "";
+                container.append(`
+                    <div class="form-check">
+                      <input class="form-check-input apoyo-checkbox" type="checkbox" value="${usuario.id}" id="usuario_${usuario.id}" ${checked}>
+                      <label class="form-check-label" for="usuario_${usuario.id}">
+                        ${usuario.first_name} ${usuario.last_name}
+                      </label>
+                    </div>
+                `);
+            });
+
+            $("#apoyoModal").modal("show");
+        },
+        error: function () {
+            alert("Error al obtener usuarios disponibles.");
+        }
+    });
+}
+    
+    $(document).ready(function () {
+        actualizarTabla();
+    });
+
+
+    $(document).ready(function() {
+        $("#buscador-id").on("keyup", function() {
+            var searchText = $(this).val().trim().toLowerCase(); // Obtiene el texto ingresado y lo limpia
+
+            $("#tabla_registro tbody tr").each(function() {
+                var idText = $(this).find("td:first").text().trim().toLowerCase(); // Obtiene solo la columna ID
+                $(this).toggle(idText.includes(searchText)); // Muestra solo las filas que coincidan con el ID ingresado
+            });
+        });
+    });
+</script>
+
+
+<script>
+
+function mostrarToast() {
+        var toast = new bootstrap.Toast(document.getElementById('liveToast'));
+    toast.show();
+    }
+
+    var protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+    var socket = new WebSocket(protocol + window.location.host + "/ws/solicitudes/");
+
+
+    socket.onmessage = function (event) {
+        var data = JSON.parse(event.data);
+        if (data.message === "actualizar") {
+            console.log("🔄 Tabla actualizada automáticamente");
+            actualizarTabla();
+            mostrarToast();
+        }
+    };
+
+
+    socket.onopen = function () {
+        console.log("✅ Conectado al WebSocket");
+    };
+
+    socket.onerror = function (error) {
+        console.error("❌ Error en WebSocket:", error);
+    };
+
+</script>
+<script src="/static/js/solicitud_llegadas_v1.js">
+</script>
+<script>
+$(document).on("click", ".apoyo-link", function (event) {
+    event.preventDefault();
+
+    var item = JSON.parse($(this).attr("data-item"));
+    var protocoloId = item.id;
+    var profesionalActual = item.profesional_id ? `${item.profesional_nombre}` : "No asignado";
+
+    $("#protocoloId").text(protocoloId);
+    $("#profesionalActual").text(profesionalActual);
+
+    // Llamada AJAX para obtener usuarios disponibles
+    $.ajax({
+        url: "{% url 'usuarios_disponibles' %}",
+        type: "GET",
+        data: { protocolo_id: protocoloId },
+        success: function (response) {
+            var container = $("#listaApoyos");
+            container.empty();
+
+            response.usuarios.forEach(function (usuario) {
+                // Si ya está agregado, el checkbox se marca por defecto
+                var checked = usuario.ya_agregado ? "checked" : "";
+                container.append(`
+                    <div class="form-check">
+                      <input class="form-check-input apoyo-checkbox" type="checkbox" value="${usuario.id}" id="usuario_${usuario.id}" ${checked}>
+                      <label class="form-check-label" for="usuario_${usuario.id}">
+                        ${usuario.first_name} ${usuario.last_name}
+                      </label>
+                    </div>
+                `);
+            });
+
+            $("#apoyoModal").modal("show");
+        },
+        error: function () {
+            alert("Error al obtener usuarios disponibles.");
+        }
+    });
+});
+
+
+$("#guardarApoyo").click(function () {
+    var protocoloId = $("#protocoloId").text();
+    var usuariosSeleccionados = [];
+    $(".apoyo-checkbox:checked").each(function () {
+        usuariosSeleccionados.push($(this).val());
+    });
+
+    if (usuariosSeleccionados.length > 1) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Solo puedes seleccionar un usuario como apoyo.'
+        });
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'agregar_apoyo' %}",
+        type: "POST",
+        data: {
+            protocolo_id: protocoloId,
+            usuarios: JSON.stringify(usuariosSeleccionados),
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function (response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: 'Apoyo actualizado con éxito.'
+            }).then(() => {
+                $("#apoyoModal").modal("hide");
+                location.reload();
+            });
+        },
+        error: function () {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un problema al actualizar el apoyo.'
+            });
+        }
+    });
+});
+
+</script>
+
+
+<script>
+    var csrf_token = "{{ csrf_token }}";  // Pasar el CSRF Token a JS
+</script>
+
+<script>
+$(document).on("click", "#GuardarNota", function () {
+    var protocoloId = $("#protocoloId_modal").text().trim();
+    var porcentajeTotal = parseFloat($("#porcentajeInputTotal").val());  // Tomar el valor de "Distribución de Trabajo"
+
+    // Si no hay apoyo, el profesional toma el 100% del total
+    var porcentajeProfesional = porcentajeTotal;
+    var porcentajeApoyo = 0;
+
+    // Si hay apoyo, tomamos los valores ajustados por el usuario
+    if ($("#distribucionSection").is(":visible")) {
+        porcentajeProfesional = parseFloat($("#porcentajeInputProfesional").val());
+        porcentajeApoyo = parseFloat($("#porcentajeInputApoyo").val());
+    }
+
+    // Obtener los apoyos seleccionados
+    var apoyosSeleccionados = [];
+    $(".apoyo-checkbox:checked").each(function () {
+        apoyosSeleccionados.push($(this).val());
+    });
+
+    // Validar que los valores no sean NaN
+    if (isNaN(porcentajeTotal) || isNaN(porcentajeProfesional) || isNaN(porcentajeApoyo)) {
+        alert("Error: Valores inválidos.");
+        return;
+    }
+
+    // Asegurar que la suma de profesional y apoyo no exceda el total
+    var sumaDistribucion = porcentajeProfesional + porcentajeApoyo;
+    if (sumaDistribucion > porcentajeTotal) {
+        alert("Error: La distribución entre profesional y apoyo no puede exceder el total asignado.");
+        return;
+    }
+
+    // Ajustar valores en caso de desajustes
+    if (sumaDistribucion < porcentajeTotal) {
+        porcentajeProfesional = (porcentajeProfesional / sumaDistribucion) * porcentajeTotal;
+        porcentajeApoyo = (porcentajeApoyo / sumaDistribucion) * porcentajeTotal;
+    }
+
+    
+});
+
+</script>
+
+<script>
+    $(document).ready(function () {
+    // Sincronizar el slider total con el input numérico
+    $("#porcentajeSliderTotal").on("input", function () {
+        $("#porcentajeInputTotal").val($(this).val());
+        actualizarDistribucion();
+    });
+
+    $("#porcentajeInputTotal").on("input", function () {
+        var valor = Math.min(100, Math.max(0, $(this).val())); // Asegurar entre 0-100
+        $("#porcentajeSliderTotal").val(valor);
+        actualizarDistribucion();
+    });
+
+    // Sincronizar el slider del profesional con su input
+    $("#porcentajeSliderProfesional").on("input", function () {
+        $("#porcentajeInputProfesional").val($(this).val());
+        actualizarDistribucion();
+    });
+
+    $("#porcentajeInputProfesional").on("input", function () {
+        var valor = Math.min(100, Math.max(0, $(this).val())); // Asegurar entre 0-100
+        $("#porcentajeSliderProfesional").val(valor);
+        actualizarDistribucion();
+    });
+
+    // Sincronizar el slider del apoyo con su input
+    $("#porcentajeSliderApoyo").on("input", function () {
+        $("#porcentajeInputApoyo").val($(this).val());
+        actualizarDistribucion();
+    });
+
+    $("#porcentajeInputApoyo").on("input", function () {
+        var valor = Math.min(100, Math.max(0, $(this).val())); // Asegurar entre 0-100
+        $("#porcentajeSliderApoyo").val(valor);
+        actualizarDistribucion();
+    });
+
+    // Función para distribuir el trabajo sin exceder el total
+    function actualizarDistribucion() {
+        var totalDistribucion = parseFloat($("#porcentajeSliderTotal").val());
+        var profesional = parseFloat($("#porcentajeSliderProfesional").val());
+        var apoyo = parseFloat($("#porcentajeSliderApoyo").val());
+
+        // Si la suma excede el total, ajustar proporcionalmente
+        if (profesional + apoyo > totalDistribucion) {
+            var factor = totalDistribucion / (profesional + apoyo);
+            profesional *= factor;
+            apoyo *= factor;
+        }
+
+        // Actualizar valores
+        $("#porcentajeSliderProfesional").val(profesional);
+        $("#porcentajeInputProfesional").val(profesional.toFixed(0));
+        $("#porcentajeSliderApoyo").val(apoyo);
+        $("#porcentajeInputApoyo").val(apoyo.toFixed(0));
+    }
+});
+
+</script>
+{% endblock %}

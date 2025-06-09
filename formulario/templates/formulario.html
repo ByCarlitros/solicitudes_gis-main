@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo</title>
+    <link rel="icon" type="image/x-icon" href="/media/assets/image/iconoSIG.ico" />
+    <!-- Incluir el CSS de Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Incluir jQuery (Select2 depende de jQuery) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Incluir el JS de Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<!-- Incluir Select2 con casillas de verificación -->
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.0.0/dist/select2-bootstrap-5.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.0.0/dist/select2-bootstrap-5.min.js"></script>
+    
+    <style>
+        /* Logo */
+        /* Aseguramos que el contenedor del logo sea centrado */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        h1 {
+            font-family: 'Ysabeau', sans-serif;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+        }
+        
+        
+        
+        .modal-header .warning-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            color: #cf8401; 
+        }
+        #form-container {
+        width: 800px; /* O usa width: 80%; para un ancho relativo */
+        margin: 0 auto; /* Centrar el contenedor horizontalmente */
+        background-color: #e7e7e7;
+        box-shadow: 1px 2px 16px rgba(0, 0, 0, 0.9);
+        padding: 1px;
+        border-radius: 5px;
+    }
+
+    </style>
+    <header class="py-0" style="background-color: #212529; box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.4);">
+        <div class="logo-container">
+            <img src="/media/assets/image/version-negativo-caluga-logoSIG.png"  height="200" alt="Municipio Valparaíso Logo" class="logo">
+        </div>
+    </header>
+    
+    <div class="container text-center mt-5">
+        <h1 style="color: #030d29; font-weight: bold; ">Protocolo Traspaso de Datos Geoespaciales</h1>
+        <br>
+    </div>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+</head>
+
+<body style="background-color: #e7e7e7;">
+    <div class="container py-5">
+        <!-- Formulario -->
+        <div id="form-container" class="mx-auto p-1 border-1 rounded" style="background-color: #e7e7e7; box-shadow: 1px 2px 16px rgba(0, 0, 0, 0.9);">
+            <form method='POST' id="form-guardar-pdf" class="px-3" enctype="multipart/form-data" action="{% url 'crear_protocolo' %}">
+                {% csrf_token %}
+                <h3 class="text-center mb-4" style="color:#000000; margin-top: 20px">Formulario de Protocolo</h3>
+
+                <!-- Campos de formulario -->
+                <div class="form-group mb-3">
+                    <label for="direccion">{{ forms.direccion.label }}</label>
+                    {{ forms.direccion }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="departamento">{{ forms.departamento.label }}</label>
+                    {{ forms.departamento }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="nombre_solicitante">{{ forms.nombre_solicitante.label }}</label>
+                    {{ forms.nombre_solicitante }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="nombre_proyecto">{{ forms.nombre_proyecto.label }}</label>
+                    {{ forms.nombre_proyecto }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="corre_solicitante">{{ forms.corre_solicitante.label }}</label>
+                    {{ forms.corre_solicitante }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="area">{{ forms.area.label }}</label>
+                    {{ forms.area }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="objetivos">{{ forms.objetivos.label }}</label>
+                    {{ forms.objetivos }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="insumo">Insumo:</label>
+                    <select name="insumo" class="select2" multiple="multiple">
+                        <option value="insumo_1">Planos Impresos</option>
+                        <option value="insumo_2">Planos Digital </option>
+                        <option value="insumo_3">Excel</option>
+                        <option value="insumo_4">Cuadro de Mando </option>
+                        <option value="insumo_5">Aplicación</option>
+                        <option value="insumo_6">KMZ</option>
+                        <option value="insumo_7">Shape</option>
+                        <option value="insumo_8">CAD</option>
+                        <option value="insumo_9">Formulario Digital</option>
+                        <option value="insumo_10">Web Experience</option>
+                        <option value="insumo_11">Story Maps</option>
+                        <option value="insumo_12">Plataforma</option>
+                        <option value="insumo_13">Estudios y otros </option>
+                        <option value="insumo_14">Soporte Web </option>
+                        <option value="insumo_15">Plataforma Web</option>
+                    </select>
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="objetivos">{{ forms.anexo.label }}</label>
+                    {{ forms.anexo }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="cambios_posible">{{ forms.cambios_posible.label }}</label>
+                    {{ forms.cambios_posible }}
+                </div>
+
+                <!-- Archivo adjunto -->
+                <div class="form-group mb-4">
+                    <label for="archivo"><strong>Adjuntar Archivos (máx. 300MB)</strong></label>
+                    <input type="file" name="archivo" multiple="multiple" class="form-control" id="archivo">
+                </div>
+
+
+                <div class="text-center">
+                    <button type="submit" id="btn-guardar-pdf" class="pushable">
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front"> Enviar </span>
+                    </button>
+                </div>    
+                                    
+                <!-- Mensaje de información -->
+                <div class="mt-4 text-center" style="font-size: 14px; color: #555;">
+                    <label><b>Recibirás una copia en PDF y un código para verificar el estado de la ficha.</b></label>
+                </div>
+            </form>
+        </div>
+        <!-- Modal -->
+        <div id="myModal" class="modal">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <img class="modal-content" id="imagenModal">
+        </div>
+        <br>
+    </div>
+    
+    <!-- Mensaje de éxito -->
+    <div id="success-message" style="display: none; text-align: center; font-size: 24px;">
+        <p>Su formulario se ha enviado correctamente. Esta página se cerrará en breve.</p>
+    </div>
+</body>
+</html>
+
+{% verbatim %}
+
+<script>
+
+
+function myFunction() {
+    alert("!!IMPORTANTE!!"
+    +"\nUna vez realizada y enviada la solicitud, la encargada del Departamento SIG (Deisy.Pereira@munivalpo.cl) revisará y asignará la solicitud de acuerdo con los procedimientos establecidos. Lo solicitado se entregará al correo institucional del solicitante.");
+    }
+
+    function cerrarModal() {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+    }
+
+    const botonGuardarPDF = document.getElementById('btn-guardar-pdf');
+
+    botonGuardarPDF.addEventListener('click', (event) => {
+    if (!validarCampos()) {
+        event.preventDefault(); // Evita el envío del formulario
+        alert('Por favor, complete todos los campos antes de generar el PDF.');
+    } else {
+
+        setTimeout(() => {
+        window.close(); // Cierra la ventana actual
+        }, 12000);
+    }
+    });
+
+    function validarCampos() {
+    const formulario = document.forms[0];
+
+    // Acceder a los campos por su posición en el formulario
+    const direccion = formulario.elements[0].value.trim();
+    const departamento = formulario.elements[1].value.trim();
+    const nombreSolicitante = formulario.elements[2].value.trim();
+    const nombreProyecto = formulario.elements[3].value.trim();
+    const area = formulario.elements[4].value.trim();
+    const objetivos = formulario.elements[5].value.trim();
+    const insumo = formulario.elements[6].value.trim();
+    const producto = formulario.elements[7].value.trim();
+    const cambiosPosible = formulario.elements[8].value.trim();
+
+    // Validar que los campos no estén vacíos
+    if (
+        direccion === '' ||
+        departamento === '' ||
+        nombreSolicitante === '' ||
+        nombreProyecto === '' ||
+        area === '' ||
+        objetivos === '' ||
+        insumo === '' ||
+        producto === '' ||
+        cambiosPosible === ''
+    ) {
+        return false;
+    }
+
+    return true;
+    }
+    </script>
+    
+    
+    <script>
+    document.getElementById('form-guardar-pdf').addEventListener('submit', function(event) {
+        // Evitar el envío del formulario
+        event.preventDefault();
+        // Obtener el contenedor del formulario y el mensaje de éxito
+        var formContainer = document.getElementById('form-container');
+        var successMessage = document.getElementById('success-message');
+
+        // Ocultar el contenedor del formulario y mostrar el mensaje de éxito
+        formContainer.style.display = 'none';
+        successMessage.style.display = 'block';
+        this.submit();
+    });
+
+    </script>
+
+<div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="warningModalLabel">Advertencia</h5>
+                <span class="warning-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </span>
+            </div>
+            <div class="modal-body">
+                <p><strong>¡Atención!</strong> Si se requiere información en capas, podrá entregarse exclusivamente sobre una fracción específica del territorio (Barrios, Unidad Vecinal, etc.) </p>
+                <p>Para otros casos, consulta <a href="https://geoportal-sistema-de-informacion-geografica-munivalpo.hub.arcgis.com/" target="_blank">este enlace</a>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmarAccionBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Script de warning -->
+<script>
+    window.onload = function() {
+        var myModal = new bootstrap.Modal(document.getElementById('warningModal'), {
+            keyboard: false,  
+            backdrop: 'static' 
+        });
+        myModal.show();  
+    }
+
+    // bOTON de confirmacion
+    document.getElementById('confirmarAccionBtn').addEventListener('click', function() {
+        // Cierra el modal al confirmar
+        var myModal = bootstrap.Modal.getInstance(document.getElementById('warningModal'));
+        myModal.hide(); 
+
+        document.getElementById('contenidoPagina').style.display = 'block';
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Seleccione uno o más",
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $(document.body)  // Importante para que se vea bien en el modal o fuera de un contenedor
+        });
+    });
+</script>
+{% endverbatim %}

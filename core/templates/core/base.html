@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es" class="h-100">
+<head>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Departamento SIG - Municipio Valparaíso" />
+    <meta name="author" content="Municipio Valparaíso" />
+    <title>Departamento SIG - Municipio Valparaíso</title>
+
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/media/assets/image/iconoSIG.ico" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ysabeau:wght@300;700&display=swap" rel="stylesheet">
+
+    
+    
+<style>
+        :root {
+            --color-primary: #A9E5BB; /* Verde claro */
+            --color-secondary: #8FD19E; /* Verde intermedio */
+            --color-accent: #74C69D; /* Verde intenso */
+            --color-nodark: #57A7C6; /* Azul suave */
+            --color-dark: #0A3568; /* Azul oscuro */
+            --color-darker: #054A91; /* Azul profundo */
+            --color-let: #030d29; /* Verde oscuro */
+        }
+
+
+        body {
+            font-family: 'Ysabeau', sans-serif;
+            background: linear-gradient(to top left, #5bbd005d, #9fd5ee, #5bbd005d);
+            background-size: 600% 600%; /* Amplía el área para la animación */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            animation: gradient 35s ease infinite; /* Animación suave */
+            min-height: 100vh;
+            color: rgb(0, 0, 0);
+            margin: 0;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .card {
+            max-width: auto; /* Asegura que la tarjeta ocupe el ancho completo */
+            width: auto; /* Ajusta el tamaño según sea necesario */
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            border-radius: 15px;
+            overflow: hidden; /* Evita el desbordamiento */
+            background-color: rgba(255, 255, 255, 0.3); /* Fondo blanco semitransparente */
+            box-shadow: 4px 8px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        
+
+        .card img {
+            max-width: 100%; /* Asegura que la imagen no se salga del contenedor */
+            height: 100%; /* Mantiene la relación de aspecto */
+            object-fit: cover; /* Cubre el área disponible sin distorsionar la imagen */
+            }
+
+        .card-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: flex-start;
+            flex-grow: 1;
+        }
+
+        .card-body p {
+            font-family: 'Helvetica', sans-serif;
+            margin: 0; /* Elimina márgenes innecesarios */
+            line-height: 1.6; /* Mejora la legibilidad del texto */
+            font-size: 18px;
+            
+        }
+
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 50% 100%; }
+            100% { background-position: 50% 0%; }
+        }
+
+
+        /* Aseguramos que el contenedor del logo sea centrado */
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+
+
+        h1 {
+            font-family: 'Ysabeau', sans-serif;
+            font-size: 3rem;
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-item {
+            color: var(--color-let);
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            box-shadow: 0 4px 8px rgba(141, 137, 137, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            overflow: hidden;
+            
+        }
+        
+
+        .service-item:hover {
+            background-color: rgba(255, 255, 255, 0.473);
+            transform: translateY(-10px) scale(1.05);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .icon-color {
+            color: #030d29; 
+            font-size: 30px;
+            transition: transform 0.3s ease, font-size 0.3s ease;
+
+        }
+
+
+        .service-item span {
+            font-size: 20px;
+            transition: font-size 0.3s ease;
+             /* Cambia gradualmente el tamaño del texto */
+        }
+
+        .service-item:hover span {
+            font-size: 25px; /* Aumenta ligeramente el tamaño del texto */
+            color: #030d29; /* Cambia el color del texto */
+        }
+
+        .service-item:hover .icon-color {
+            transform: scale(1.2); /* Aumenta el tamaño del icono con el contenedor */
+        }
+
+        .modal-content {
+            background-color: rgba(12, 52, 75, 0.8); /* Azul con opacidad del 50% */
+            color: white;
+        }
+
+        /* From Uiverse.io by satyamchaudharydev */ 
+        .buttondep {
+        --bg: #448daa;;
+        --text-color: #fff;
+        position: relative;
+        width: auto;
+        height: 30px;
+        border: none;
+        font-weight: bold; /* Ya está en negrita, asegurándonos de que se aplique */
+        font-family: Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text-color);
+        padding: 1em;
+        font-weight: bold;
+        transition: 0.2s;
+        border-radius: 5px;
+        opacity: 0.8;
+        letter-spacing: 1px;
+        box-shadow: #c6ffcd 0px 3px 2px, #000 0px 8px 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        }
+
+        .buttondep:hover {
+        opacity: 1;
+        }
+
+        .buttondep:active {
+        top: 4px;
+        box-shadow: #4880c0 0px 3px 2px,#000 0px 3px 5px;
+        }
+
+
+    </style>
+</head>
+
+<header class="py-0" style="background-color: #212529; box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.4);">
+    <div class="logo-container">
+        <img src="/media/assets/image/version-negativo-caluga-logoSIG.png" height="200"  alt="Municipio Valparaíso Logo" class="logo">
+    </div>
+</header>
+
+<body class="d-flex flex-column h-100">
+
+    <main class="flex-shrink-0">
+        <div class="container my-5">
+            <h1 class="text-center mb-5">DEPARTAMENTO SIG</h1>
+            
+            
+            <b><div class="service-grid mb-5">
+                <a href="{% url 'arcgis' %}?departamento={{ departamento_seleccionado }}" target="_blank" class="service-item text-decoration-none">
+                    <i class="fa-solid fa-laptop icon-color"></i>
+                    <span class="d-block">Mapa<br> Digital</span>
+                </a>
+                <a href="{% url 'SS' %}" target="_blank" class="service-item text-decoration-none">
+                    <i class="fa-regular fa-pen-to-square icon-color"></i>
+                    <span class="d-block">Solicitud <br> SIG</span>
+                </a>
+                <a href="#" class="service-item text-decoration-none" data-bs-toggle="modal" data-bs-target="#timeManagementModal">
+                    <i class="fa-regular fa-calendar icon-color"></i>
+                    <span class="d-block">Gestión de <br> Tiempo</span>
+                </a>
+                
+                <a href="{% url 'gestionsig' %}" target="_blank" class="service-item text-decoration-none">
+                    <i class="fa-regular fa-handshake icon-color"></i>
+                    <span class="d-block">Gestión SIG</span>
+                </a>
+                <a href="https://drive.google.com/file/d/1Rx3FDBdR3vndG1NsleuOQb_p1SM1Km6z/view?usp=drive_link" target="_blank" class="service-item text-decoration-none">
+                    <i class="fa-regular fa-file icon-color"></i>
+                    <span class="d-block">Manual de Procedimientos Solicitudes SIG</span>
+                </a>
+                <a href="https://geoportal-sistema-de-informacion-geografica-munivalpo.hub.arcgis.com/" target="_blank" class="service-item text-decoration-none">
+                    <i class="fa-solid fa-earth-americas icon-color"></i>
+                    <span class="d-block">Geoportal Valparaíso</span>
+                </a>
+              
+            </div></b>
+
+            <div class="card mb-3" style="border: none;">
+                <div class="row g-1">
+                    <div class="col-md-2"> <!-- La imagen ocupa la mitad -->
+                        <img src="/media/assets/image/3.jpg" class="GEO DATA" alt="...">
+                    </div>
+                    <div class="col-md-10"> <!-- El texto ocupa la otra mitad -->
+                        <div class="card-body">
+                            <p class="card-text">
+                                Bienvenid@ a la plataforma que brinda acceso a una amplia gama de datos georreferenciados de nuestra comuna; estos datos son fundamentales para la planificación urbana.
+                            </p>
+                        <br>
+                            <p class="card-text">
+                                En nuestro departamento de Sistema de Información Geográfica, nos esforzamos por mantener y mejorar continuamente la calidad de los datos georreferenciados. Trabajamos en conformidad con estándares internacionales reconocidos en geodatos, siguiendo rigurosos procedimientos de captura, validación y actualización de la información.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+        </div>   
+    </main>
+
+
+    <footer class="footer mt-auto py-3" style="background-color: #212529; box-shadow: 2px 8px 20px rgba(0, 0, 0, 0.7);">
+        <div class="container text-center">
+            <span class="text-muted">&copy; 2025 Ilustre Municipalidad de Valparaíso. Todos los derechos reservados.</span>
+        </div>
+    </footer>
+    
+
+    <!-- Time Management Modal -->
+    <div class="modal fade" id="timeManagementModal" tabindex="-1" aria-labelledby="timeManagementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="timeManagementModalLabel">Gestión de tiempo y Revisión de Solicitud</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="/media/assets/image/Referencia.jpeg" class="img-fluid mb-3" alt="Imagen modal">
+                    <p class="fw-bold">Si tiene una solicitud y quiere ver su estado, inserte el código que se encuentra en la parte superior de la ficha.</p>
+                    <p id="estado_protocolo" class="fw-bold text-danger"></p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="codigo_protocolo" class="form-control" placeholder="Ingrese el código">
+                        <button class="btn btn-primary" type="button" id="buscar_protocolo">Buscar</button>
+                    </div>
+
+                    <div class="input-group mb-3" id="correo_container" style="display:none;">
+                        <input type="email" id="correo_protocolo" class="form-control" placeholder="Ingrese su correo">
+                        <button class="btn btn-success" type="button" id="verificar_correo">Verificar</button>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Selection Modal -->
+    <div class="modal fade" id="seleccionarDepartamentoModal" tabindex="-1" aria-labelledby="seleccionarDepartamentoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="seleccionarDepartamentoModalLabel">Seleccionar Dirección</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="departamentoSelect" class="form-label">Dirección:</label>
+                    <select id="departamentoSelect" class="form-select">
+                        <option value="Alcaldia">Alcaldía</option>
+                        <option value="Dirección de Desarrollo Comunitario">Dirección de Desarrollo Comunitario</option>
+                        <option value="Dirección de Obras Municipales">Dirección de Obras Municipales</option>
+                        <option value="Dirección de Tránsito y Transporte público">Dirección de Tránsito y Transporte público</option>
+                        <option value="Dirección de Administración y Finanzas">Dirección de Administración y Finanzas</option>
+                        <option value="Dirección desarrollo Económico y Cooperación Internacional">Dirección desarrollo Económico y Cooperación Internacional</option>
+                        <option value="Dirección de Operaciones">Dirección de Operaciones</option>
+                        <option value="Dirección de Desarrollo Cultural">Dirección de Desarrollo Cultural</option>
+                        <option value="Dirección de Seguridad Ciudadana">Dirección de Seguridad Ciudadana</option>
+                        <option value="Dirección de Vivienda, Barrio y Territorio">Dirección de Vivienda, Barrio y Territorio</option>
+                        <option value="Dirección de Medioambiente">Dirección de Medioambiente</option>
+                        <option value="Dirección de Género, Mujeres y Diversidades">Dirección de Género, Mujeres y Diversidades</option>
+                        <option value="Dirección de Asesoría Jurídica">Dirección de Asesoría Jurídica</option>
+                        <option value="SECPLA">SECPLA</option>
+                        <option value="SIG">SIG</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="buttondep" id="guardarDepartamentoBtn">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        let correoCorrecto = "";
+
+
+$(document).ready(function () {
+    // Paso 1: Buscar por código
+    $("#buscar_protocolo").click(function () {
+        const codigo = $("#codigo_protocolo").val().trim();
+
+        $.ajax({
+            url: "{% url 'buscar_protocolo' %}",
+            type: "POST",
+            data: {
+                codigo: codigo,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.error) {
+                    $("#estado_protocolo").html("<span class='text-danger'>" + response.message + "</span>");
+                    $("#correo_container").hide();
+                } else {
+                    // Mostrar estado
+                    $("#estado_protocolo").html("Estado: <strong>" + response.estado + "</strong>");
+                    correoCorrecto = response.correo;
+
+                    // Mostrar input de correo y limpiar anteriores
+                    $("#correo_container").show();
+                    $("#correo_protocolo").val("");
+                    $("#correo_container").data("codigo", codigo);  // Guardamos el código en el DOM
+                    $("#estado_protocolo").append("<br><span class='text-muted'>Ingrese el correo con el que registró la solicitud</span>");
+                }
+            },
+            error: function () {
+                $("#estado_protocolo").html("<span class='text-danger'>Error al buscar el protocolo.</span>");
+            }
+        });
+    });
+
+    // Paso 2: Verificar correo
+    $("#verificar_correo").click(function () {
+        const codigo = $("#correo_container").data("codigo");
+        const correo_input = $("#correo_protocolo").val().trim();
+
+        $.ajax({
+            url: "{% url 'buscar_protocolo' %}",
+            type: "POST",
+            data: {
+                codigo: codigo,
+                correo_input: correo_input,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.error) {
+                    $("#estado_protocolo").append("<br><span class='text-danger'>" + response.message + "</span>");
+                } else {
+                    if (response.respuesta) {
+                        $("#estado_protocolo").append("<br><strong>Respuesta:</strong> " + response.respuesta);
+                    }
+
+                    if (response.archivos && response.archivos.length > 0) {
+                        let archivosHtml = "<br><strong>Archivos adjuntos:</strong><ul>";
+                        response.archivos.forEach(function (archivo) {
+                            archivosHtml += "<li><a href='" + archivo.url + "' target='_blank'>" + archivo.nombre + "</a></li>";
+                        });
+                        archivosHtml += "</ul>";
+                        $("#estado_protocolo").append(archivosHtml);
+                    }
+                }
+            },
+            error: function () {
+                $("#estado_protocolo").append("<br><span class='text-danger'>Error al verificar el correo.</span>");
+            }
+        });
+    });
+
+        // Verificar correo ingresado
+        $("#verificar_correo").click(function () {
+            const correoIngresado = $("#correo_protocolo").val().trim();
+
+            if (correoIngresado === correoCorrecto) {
+                let respuesta = $("#correo_container").data("respuesta");
+                let archivos = $("#correo_container").data("archivos");
+
+                if (respuesta) {
+                    $("#estado_protocolo").append("<br><strong>Respuesta:</strong> " + respuesta);
+                }
+
+                if (archivos && archivos.length > 0) {
+                    let archivosHtml = "<br><strong>Archivos adjuntos:</strong><ul>";
+                    archivos.forEach(function (archivo) {
+                        archivosHtml += "<li><a href='" + archivo.url + "' target='_blank'>" + archivo.nombre + "</a></li>";
+                    });
+                    archivosHtml += "</ul>";
+                    $("#estado_protocolo").append(archivosHtml);
+                }
+            } else {
+                $("#estado_protocolo").append("<br><span class='text-danger'>El correo no coincide.</span>");
+            }
+        });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+            }
+
+            function getCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for(var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+
+            var departamentoGuardado = getCookie("departamento");
+            if (!departamentoGuardado) {
+                $("#seleccionarDepartamentoModal").modal("show");
+            }
+
+        $("#guardarDepartamentoBtn").click(function() {
+            var departamentoSeleccionado = $("#departamentoSelect").val();
+            setCookie("departamento", departamentoSeleccionado, 365);
+            $("#seleccionarDepartamentoModal").modal("hide");
+        });
+    });
+
+
+    if (window.location.pathname === "/") { // Asumiendo que "/" es la URL de la página principal
+    function actualizarVisitasDepartamentosig() {
+        // ... tu código ...
+    }
+
+    function contarVisitaDepartamentosig() {
+        // ... tu código ...
+    }
+
+    contarVisitaDepartamentosig();
+    setInterval(actualizarVisitasDepartamentosig, 5000);
+}
+
+document.getElementById("guardarDepartamentoBtn").addEventListener("click", function() {
+    var departamentoSeleccionado = document.getElementById("departamentoSelect").value;
+
+    fetch("/guardar_departamento/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCSRFToken() // Función para obtener el token CSRF
+        },
+        body: "departamento=" + encodeURIComponent(departamentoSeleccionado)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.mensaje);
+    })
+    .catch(error => console.error("Error:", error));
+});
+
+// Función para obtener el token CSRF
+function getCSRFToken() {
+    let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]");
+    return csrfToken ? csrfToken.value : "";
+}
+    </script>
+</body>
+</html>

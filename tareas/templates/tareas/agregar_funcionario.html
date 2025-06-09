@@ -1,0 +1,19 @@
+
+{% block content %}
+    <h1 style="text-align: center; font-family: Arial, sans-serif; color: #4CAF50;">Agregar Funcionario</h1>
+    <form method="post" style="max-width: 500px; margin: 0 auto; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        {% csrf_token %}
+        
+        <!-- Estilo para los campos del formulario -->
+        <div style="margin-bottom: 20px;">
+            {{ form.as_p }}
+        </div>
+        
+        <!-- Botón de envío con un diseño más atractivo -->
+        <div style="text-align: center;">
+            <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; transition: background-color 0.3s;">
+                Guardar
+            </button>
+        </div>
+    </form>
+{% endblock %}

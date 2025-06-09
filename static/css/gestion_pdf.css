@@ -1,0 +1,123 @@
+section.container {
+    height: auto;
+
+}
+
+.info-gestion-box {
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-gestion-box .info-box ul {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* .flex-column-red {
+    flex-direction: column;
+    justify-content: space-between;
+} */
+
+
+
+.flex-row-content {
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Flex Row Dashboard con Flexbox */
+.flex-row-dashboard {
+    flex-direction: column;
+    width: -webkit-fill-available;
+}
+
+.info-gestion-box .flex-row-dashboard {
+
+    height: 25rem;
+}
+
+/* Flex Container con columna, gap y ancho */
+.flex-column-gap {
+    flex-direction: column;
+}
+
+.container h1 {
+    margin-bottom: 0;
+}
+
+/* Información General: Gráfico de Barras */
+.info-box {
+
+    flex-direction: column;
+
+}
+
+#PDFForm {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 100%;
+    justify-content: space-between;
+    padding: 1.5rem;
+}
+
+#PDFForm p {
+    margin-bottom: 0rem;
+}
+
+#PDFForm textarea {
+
+    height: 10rem;
+}
+
+
+.card .btn-neumorphic {
+    height: 3.5rem;
+}
+
+.button-imagen-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.row .card a {
+    margin-block: auto;
+}
+
+.flex-container {
+    display: flex;
+    /* flex-flow: wrap; */
+    flex-wrap: wrap;
+    /* background-color: #bbdefb; */
+    height: 100%;
+    width: 100%;
+    padding: 15px;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.flex-container>div {
+    padding: 1rem;
+    height: 25rem !important;
+    width: 30%;
+    justify-content: space-between;
+    display: flex;
+    background-color: var(--tea-green);
+    border: transparent;
+    border-radius: 20px;
+    box-shadow: inset 4px 4px 8px #B3E2A9, inset -4px -4px 8px #F0FCD2;
+    padding: 1rem;
+}
+
+.card div a>svg {
+    font-size: 150px;
+    color: var(--oxford-blue);
+}
+
+.justify-content-center {
+    margin: 0;
+    padding-block: 1rem;
+}

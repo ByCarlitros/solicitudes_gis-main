@@ -1,0 +1,30 @@
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-control {
+  border-radius: 0;
+}
+.container {
+  display: flex;
+  justify-content: center;
+}
+.form-container {
+    margin-top: 50px;
+}
+.my-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+.my-input-class {
+  
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+
+
+
+
+

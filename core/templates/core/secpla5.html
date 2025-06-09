@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal SECPLA - Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset y estilos base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-bg-light: #f9fafb;
+      --color-bg-dark: #111827;
+      --color-text-light: #1f2937;
+      --color-text-dark: #f9fafb;
+      --color-border-light: #e5e7eb;
+      --color-border-dark: #374151;
+      --color-card-light: #ffffff;
+      --color-card-dark: #1f2937;
+      --color-sidebar-light: #ffffff;
+      --color-sidebar-dark: #1f2937;
+      --color-header-light: #ffffff;
+      --color-header-dark: #1f2937;
+      --color-muted-light: #6b7280;
+      --color-muted-dark: #9ca3af;
+      --color-primary: #4f46e5;
+      --color-primary-hover: #4338ca;
+      --color-primary-dark: #6366f1;
+      --color-primary-dark-hover: #818cf8;
+      --transition-speed: 0.3s;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      color: var(--color-text-light);
+      background-color: var(--color-bg-light);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+
+    body.dark {
+      color: var(--color-text-dark);
+      background-color: var(--color-bg-dark);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 16rem;
+      background-color: var(--color-sidebar-light);
+      border-right: 1px solid var(--color-border-light);
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 30;
+      overflow-y: auto;
+      transition: transform var(--transition-speed), background-color var(--transition-speed), border-color var(--transition-speed);
+    }
+
+    .dark .sidebar {
+      background-color: var(--color-sidebar-dark);
+      border-color: var(--color-border-dark);
+    }
+
+    .sidebar-hidden {
+      transform: translateX(-100%);
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar {
+        position: sticky;
+      }
+      .sidebar-hidden {
+        transform: translateX(0);
+      }
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .dark .sidebar-logo {
+      border-color: var(--color-border-dark);
+    }
+
+    .sidebar-logo img {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-right: 0.75rem;
+    }
+
+    .sidebar-logo h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .sidebar-content {
+      padding: 1rem 1.5rem;
+    }
+
+    .sidebar-section {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-heading {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+
+    .dark .sidebar-heading {
+      color: var(--color-primary-dark);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      color: var(--color-text-light);
+      text-decoration: none;
+      transition: background-color var(--transition-speed);
+    }
+
+    .dark .sidebar-link {
+      color: var(--color-text-dark);
+    }
+
+    .sidebar-link:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .sidebar-link:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-link.active {
+      background-color: rgba(79, 70, 229, 0.1);
+      color: var(--color-primary);
+      font-weight: 500;
+    }
+
+    .dark .sidebar-link.active {
+      background-color: rgba(99, 102, 241, 0.2);
+      color: var(--color-primary-dark);
+    }
+
+    .sidebar-link svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    .dark .sidebar-footer {
+      border-color: var(--color-border-dark);
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      color: var(--color-muted-light);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      transition: background-color var(--transition-speed);
+    }
+
+    .dark .theme-toggle {
+      color: var(--color-muted-dark);
+    }
+
+    .theme-toggle:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .theme-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .theme-toggle svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-right: 0.5rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Header */
+    .header {
+      background-color: var(--color-header-light);
+      border-bottom: 1px solid var(--color-border-light);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    }
+
+    .dark .header {
+      background-color: var(--color-header-dark);
+      border-color: var(--color-border-dark);
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .sidebar-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.375rem;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      margin-right: 1rem;
+      color: var(--color-text-light);
+      transition: background-color var(--transition-speed);
+    }
+
+    .dark .sidebar-toggle {
+      color: var(--color-text-dark);
+    }
+
+    .sidebar-toggle:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .sidebar-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-toggle svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      .sidebar-toggle {
+        display: none;
+      }
+    }
+
+    .notification-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      background-color: rgba(0, 0, 0, 0.05);
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-light);
+      transition: background-color var(--transition-speed);
+    }
+
+    .dark .notification-button {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-text-dark);
+    }
+
+    .notification-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .notification-button:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .notification-button svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    /* Dashboard Content */
+    .dashboard {
+      padding: 1.5rem;
+    }
+
+    .dashboard-welcome {
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .dashboard-subtitle {
+      color: var(--color-muted-light);
+      margin-bottom: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s ease-out 0.1s forwards;
+    }
+
+    .dark .dashboard-subtitle {
+      color: var(--color-muted-dark);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (min-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stat-card {
+      background-color: var(--color-card-light);
+      border: 1px solid var(--color-border-light);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s ease-out forwards;
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), box-shadow var(--transition-speed);
+    }
+
+    .dark .stat-card {
+      background-color: var(--color-card-dark);
+      border-color: var(--color-border-dark);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .stat-card:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .stat-card:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .stat-card:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .stat-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-muted-light);
+    }
+
+    .dark .stat-title {
+      color: var(--color-muted-dark);
+    }
+
+    .stat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.375rem;
+    }
+
+    .stat-icon svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-description {
+      font-size: 0.875rem;
+      color: var(--color-muted-light);
+    }
+
+    .dark .stat-description {
+      color: var(--color-muted-dark);
+    }
+
+    /* Departments Section */
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    /* Departments Grid */
+    .departments-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .departments-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .departments-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .department-card {
+      background-color: var(--color-card-light);
+      border: 1px solid var(--color-border-light);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s ease-out forwards;
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), box-shadow var(--transition-speed), transform 0.2s;
+    }
+
+    .department-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .department-card {
+      background-color: var(--color-card-dark);
+      border-color: var(--color-border-dark);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .dark .department-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    }
+
+    .department-card:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .department-card:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .department-card:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .department-card:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .department-card:nth-child(5) {
+      animation-delay: 0.1s;
+    }
+
+    .department-card:nth-child(6) {
+      animation-delay: 0.2s;
+    }
+
+    .department-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .dark .department-header {
+      border-color: var(--color-border-dark);
+    }
+
+    .department-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 0.375rem;
+    }
+
+    .department-icon svg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .department-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .department-body {
+      padding: 1.5rem;
+    }
+
+    .department-description {
+      color: var(--color-muted-light);
+      margin-bottom: 1.5rem;
+    }
+
+    .dark .department-description {
+      color: var(--color-muted-dark);
+    }
+
+    .department-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem;
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    .dark .department-footer {
+      border-color: var(--color-border-dark);
+    }
+
+    .department-button {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      background-color: var(--color-primary);
+      color: white;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color var(--transition-speed);
+    }
+
+    .department-button:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .dark .department-button {
+      background-color: var(--color-primary-dark);
+    }
+
+    .dark .department-button:hover {
+      background-color: var(--color-primary-dark-hover);
+    }
+
+    .department-button svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      margin-right: 0.5rem;
+    }
+
+    .department-stats {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-item-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: block;
+    }
+
+    .stat-item-label {
+      font-size: 0.75rem;
+      color: var(--color-muted-light);
+    }
+
+    .dark .stat-item-label {
+      color: var(--color-muted-dark);
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Colores específicos */
+    .color-blue {
+      color: #3b82f6;
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .dark .color-blue {
+      color: #60a5fa;
+      background-color: rgba(96, 165, 250, 0.2);
+    }
+
+    .bg-blue {
+      background-color: #3b82f6;
+    }
+
+    .bg-blue:hover {
+      background-color: #2563eb;
+    }
+
+    .dark .bg-blue {
+      background-color: #60a5fa;
+    }
+
+    .dark .bg-blue:hover {
+      background-color: #93c5fd;
+    }
+
+    .color-red {
+      color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+
+    .dark .color-red {
+      color: #f87171;
+      background-color: rgba(248, 113, 113, 0.2);
+    }
+
+    .bg-red {
+      background-color: #ef4444;
+    }
+
+    .bg-red:hover {
+      background-color: #dc2626;
+    }
+
+    .dark .bg-red {
+      background-color: #f87171;
+    }
+
+    .dark .bg-red:hover {
+      background-color: #fca5a5;
+    }
+
+    .color-teal {
+      color: #14b8a6;
+      background-color: rgba(20, 184, 166, 0.1);
+    }
+
+    .dark .color-teal {
+      color: #2dd4bf;
+      background-color: rgba(45, 212, 191, 0.2);
+    }
+
+    .bg-teal {
+      background-color: #14b8a6;
+    }
+
+    .bg-teal:hover {
+      background-color: #0d9488;
+    }
+
+    .dark .bg-teal {
+      background-color: #2dd4bf;
+    }
+
+    .dark .bg-teal:hover {
+      background-color: #5eead4;
+    }
+
+    .color-amber {
+      color: #f59e0b;
+      background-color: rgba(245, 158, 11, 0.1);
+    }
+
+    .dark .color-amber {
+      color: #fbbf24;
+      background-color: rgba(251, 191, 36, 0.2);
+    }
+
+    .bg-amber {
+      background-color: #f59e0b;
+    }
+
+    .bg-amber:hover {
+      background-color: #d97706;
+    }
+
+    .dark .bg-amber {
+      background-color: #fbbf24;
+    }
+
+    .dark .bg-amber:hover {
+      background-color: #fcd34d;
+    }
+
+    .color-purple {
+      color: #a855f7;
+      background-color: rgba(168, 85, 247, 0.1);
+    }
+
+    .dark .color-purple {
+      color: #c084fc;
+      background-color: rgba(192, 132, 252, 0.2);
+    }
+
+    .bg-purple {
+      background-color: #a855f7;
+    }
+
+    .bg-purple:hover {
+      background-color: #9333ea;
+    }
+
+    .dark .bg-purple {
+      background-color: #c084fc;
+    }
+
+    .dark .bg-purple:hover {
+      background-color: #d8b4fe;
+    }
+
+    .color-green {
+      color: #22c55e;
+      background-color: rgba(34, 197, 94, 0.1);
+    }
+
+    .dark .color-green {
+      color: #4ade80;
+      background-color: rgba(74, 222, 128, 0.2);
+    }
+
+    .bg-green {
+      background-color: #22c55e;
+    }
+
+    .bg-green:hover {
+      background-color: #16a34a;
+    }
+
+    .dark .bg-green {
+      background-color: #4ade80;
+    }
+
+    .dark .bg-green:hover {
+      background-color: #86efac;
+    }
+
+    .color-indigo {
+      color: #6366f1;
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    .dark .color-indigo {
+      color: #818cf8;
+      background-color: rgba(129, 140, 248, 0.2);
+    }
+
+    .color-emerald {
+      color: #10b981;
+      background-color: rgba(16, 185, 129, 0.1);
+    }
+
+    .dark .color-emerald {
+      color: #34d399;
+      background-color: rgba(52, 211, 153, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar sidebar-hidden" id="sidebar">
+      <div class="sidebar-logo">
+        <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_0Cnp6ZH.png" alt="Logo SECPLA">
+        <h1>Portal SECPLA</h1>
+      </div>
+      
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <h2 class="sidebar-heading">General</h2>
+          <ul class="sidebar-menu">
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+              </a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Usuarios
+              </a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Documentos
+              </a>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="sidebar-heading">Departamentos</h2>
+          <ul class="sidebar-menu">
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M13 17V9"></path>
+                  <path d="M18 17V5"></path>
+                  <path d="M8 17v-3"></path>
+                </svg>
+                Planificación
+              </a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Desarrollo Comunitario
+              </a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path>
+                  <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
+                  <path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"></path>
+                  <path d="M10 16h4"></path>
+                  <path d="M10 19h4"></path>
+                  <path d="M10 8h4"></path>
+                  <path d="M10 5h4"></path>
+                </svg>
+                Obras Municipales
+              </a>
+            </li>
+            <li class="sidebar-menu-item">
+              <a href="#" class="sidebar-link">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                  <path d="M2 12h20"></path>
+                </svg>
+                Medio Ambiente
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="sidebar-footer">
+        <button id="theme-toggle" class="theme-toggle">
+          <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span id="theme-text">Modo Oscuro</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="header">
+        <div class="flex items-center">
+          <button id="sidebar-toggle" class="sidebar-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1 class="header-title">Dashboard</h1>
+        </div>
+        
+        <div>
+          <button class="notification-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="dashboard">
+        <div class="dashboard-welcome">
+          <h2 class="dashboard-title">Bienvenido al Portal SECPLA</h2>
+          <p class="dashboard-subtitle">Accede a todas las plataformas departamentales desde un solo lugar</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Usuarios Activos</span>
+              <div class="stat-icon color-indigo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value">2,845</div>
+            <div class="stat-description">+12% desde el mes pasado</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Documentos Procesados</span>
+              <div class="stat-icon color-emerald">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value">14,328</div>
+            <div class="stat-description">+8% desde el mes pasado</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Proyectos Activos</span>
+              <div class="stat-icon color-amber">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value">78</div>
+            <div class="stat-description">+5 nuevos este mes</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Presupuesto Ejecutado</span>
+              <div class="stat-icon color-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="stat-value">68%</div>
+            <div class="stat-description">$4.2M de $6.2M</div>
+          </div>
+        </div>
+
+        <!-- Departments Section -->
+        <div class="section-header">
+          <h2 class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            Departamentos
+          </h2>
+        </div>
+
+        <div class="departments-grid">
+          <!-- Departamento de Planificación -->
+          <div class="department-card">
+            <div class="department-header">
+              <div class="department-icon color-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M13 17V9"></path>
+                  <path d="M18 17V5"></path>
+                  <path d="M8 17v-3"></path>
+                </svg>
+              </div>
+              <h3 class="department-name">Departamento de Planificación</h3>
+            </div>
+            <div class="department-body">
+              <p class="department-description">Gestiona y coordina los procesos de planificación estratégica y territorial de la municipalidad, desarrollando estudios y proyectos para el desarrollo comunal.</p>
+            </div>
+            <div class="department-footer">
+              <a href="#" class="department-button bg-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Acceder
+              </a>
+              <div class="department-stats">
+                <div class="stat-item">
+                  <span class="stat-item-value">24</span>
+                  <span class="stat-item-label">Proyectos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-item-value">45</span>
+                  <span class="stat-item-label">Usuarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Departamento de Desarrollo Comunitario -->
+          <div class="department-card">
+            <div class="department-header">
+              <div class="department-icon color-red">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <h3 class="department-name">Departamento de Desarrollo Comunitario</h3>
+            </div>
+            <div class="department-body">
+              <p class="department-description">Promueve el desarrollo social y comunitario, implementando programas y servicios orientados a mejorar la calidad de vida de los habitantes de la comuna.</p>
+            </div>
+            <div class="department-footer">
+              <a href="#" class="department-button bg-red">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Acceder
+              </a>
+              <div class="department-stats">
+                <div class="stat-item">
+                  <span class="stat-item-value">36</span>
+                  <span class="stat-item-label">Proyectos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-item-value">78</span>
+                  <span class="stat-item-label">Usuarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Departamento de Obras Municipales -->
+          <div class="department-card">
+            <div class="department-header">
+              <div class="department-icon color-teal">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path>
+                  <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
+                  <path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"></path>
+                  <path d="M10 16h4"></path>
+                  <path d="M10 19h4"></path>
+                  <path d="M10 8h4"></path>
+                  <path d="M10 5h4"></path>
+                </svg>
+              </div>
+              <h3 class="department-name">Departamento de Obras Municipales</h3>
+            </div>
+            <div class="department-body">
+              <p class="department-description">Supervisa y ejecuta las obras de infraestructura municipal, velando por el cumplimiento de las normativas de construcción y urbanismo en la comuna.</p>
+            </div>
+            <div class="department-footer">
+              <a href="#" class="department-button bg-teal">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Acceder
+              </a>
+              <div class="department-stats">
+                <div class="stat-item">
+                  <span class="stat-item-value">18</span>
+                  <span class="stat-item-label">Proyectos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-item-value">32</span>
+                  <span class="stat-item-label">Usuarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Departamento de Proyectos -->
+          <div class="department-card">
+            <div class="department-header">
+              <div class="department-icon color-amber">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9.663 17h4.673M12 12v-1M8.5 8.5a3.5 3.5 0 1 1 7 0v1.5"></path>
+                  <path d="M17 18a5 5 0 0 0-10 0"></path>
+                  <path d="M12 3v1M3 12h1M21 12h-1M18.5 5.5l-1 1M4.5 19.5l1-1M19.5 19.5l-1-1M4.5 5.5l1 1"></path>
+                </svg>
+              </div>
+              <h3 class="department-name">Departamento de Proyectos</h3>
+            </div>
+            <div class="department-body">
+              <p class="department-description">Diseña, formula y gestiona proyectos de inversión pública, buscando financiamiento y coordinando su implementación para el desarrollo comunal.</p>
+            </div>
+            <div class="department-footer">
+              <a href="#" class="department-button bg-amber">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Acceder
+              </a>
+              <div class="department-stats">
+                <div class="stat-item">
+                  <span class="stat-item-value">42</span>
+                  <span class="stat-item-label">Proyectos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-item-value">29</span>
+                  <span class="stat-item-label">Usuarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Departamento Administrativo -->
+          <div class="department-card">
+            <div class="department-header">
+              <div class="department-icon color-purple">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <path d="M14 2v6h6"></path>
+                  <path d="M16 13H8"></path>
+                  <path d="M16 17H8"></path>
+                  <path d="M10 9H8"></path>
+                </svg>
+              </div>
+              <h3 class="department-name">Departamento Administrativo</h3>
+            </div>
+            <div class="department-body">
+              <p class="department-description">Gestiona los procesos administrativos internos, incluyendo recursos humanos, adquisiciones y servicios generales para el funcionamiento municipal.</p>
+            </div>
+            <div class="department-footer">
+              <a href="#" class="department-button bg-purple">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Acceder
+              </a>
+              <div class="department-stats">
+                <div class="stat-item">
+                  <span class="stat-item-value">12</span>
+                  <span class="stat-item-label">Proyectos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-item-value">65</span>
+                  <span class="stat-item-label">Usuarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Departamento de Medio Ambiente -->
+          <div class="department-card">
+            <div class="department-header">
+              <div class="department-icon color-green">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                  <path d="M2 12h20"></path>
+                </svg>
+              </div>
+              <h3 class="department-name">Departamento de Medio Ambiente</h3>
+            </div>
+            <div class="department-body">
+              <p class="department-description">Desarrolla e implementa políticas y programas de protección ambiental, promoviendo la sustentabilidad y educación ambiental en la comuna.</p>
+            </div>
+            <div class="department-footer">
+              <a href="#" class="department-button bg-green">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Acceder
+              </a>
+              <div class="department-stats">
+                <div class="stat-item">
+                  <span class="stat-item-value">28</span>
+                  <span class="stat-item-label">Proyectos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-item-value">41</span>
+                  <span class="stat-item-label">Usuarios</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elementos DOM
+    const body = document.body;
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+
+    // Verificar si hay una preferencia de tema guardada
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      body.classList.add('dark');
+      updateThemeToggle(true);
+    }
+
+    // Alternar la barra lateral
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-hidden');
+    });
+
+    // Alternar el tema claro/oscuro
+    themeToggle.addEventListener('click', () => {
+      const isDark = body.classList.toggle('dark');
+      updateThemeToggle(isDark);
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // Actualizar el botón de tema
+    function updateThemeToggle(isDark) {
+      if (isDark) {
+        themeIcon.innerHTML = `
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        `;
+        themeText.textContent = 'Modo Claro';
+      } else {
+        themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+        themeText.textContent = 'Modo Oscuro';
+      }
+    }
+
+    // Ocultar la barra lateral en dispositivos móviles por defecto
+    function checkMobileView() {
+      if (window.innerWidth < 1024) {
+        sidebar.classList.add('sidebar-hidden');
+      } else {
+        sidebar.classList.remove('sidebar-hidden');
+      }
+    }
+
+    // Verificar el tamaño de la pantalla al cargar y al cambiar el tamaño
+    window.addEventListener('load', checkMobileView);
+    window.addEventListener('resize', checkMobileView);
+  </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+{% extends 'core/Slide.html' %}
+
+{% load static %}
+
+{% block main_content %}
+  {% block custom_css %}
+    <!-- Link al CSS específico de Gestion_PDF -->
+    <link href="{% static 'css/gestion_pdf.css' %}" rel="stylesheet" />
+    <!-- Incluye Font Awesome si sigue siendo necesario -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-..." crossorigin="anonymous" />
+  {% endblock %}
+
+  <!-- HTML del contenido -->
+  <section class="container">
+    <div class="flex-column-red">
+      <div class="flex-row-content p-1">
+        <div class="info-gestion-box">
+          <div class="pdf-management flex-row-dashboard fill-available">
+            <div class="flex-column-gap fill-available">
+              <h1 class="section-title">Gestión de PDF</h1>
+              <div class="info-box p-1 fill-available">
+                <h2 class="section-subtitle">Instrucciones de uso:</h2>
+                <div class="data-box">
+                  <ul class="instruction-list">
+                    <li>Archivo adjunto: solo sirve para guardar la previa del PDF.</li>
+                    <li>Botón "Subir nueva PDF": sube el PDF en el servidor.</li>
+                    <li>Copia URL: sirve para copiar la dirección del PDF.</li>
+                    <li>Eliminar PDF: ese botón elimina el PDF.</li>
+                    {% comment %} <li>Se pueden subir otros archivos, pero se descargarán y no se visualizarán en la web como un PDF.</li> {% endcomment %}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column flex-row-dashboard fill-available">
+            <div class="flex-column-gap fill-available">
+              <div class="info-box p-1 fill-available">
+                <form id="PDFForm" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <p>
+                    <label for="">Archivo adjunto:</label>
+                    {{ form.archivo_adjunto }}
+                  </p>
+                  <div style="margin-inline: auto;">{{ form.nombre }}</div>
+                  <button type="submit" class="btn-neumorphic green white-bg">Subir nueva PDF</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-row-dashboard fill-available">
+          <div class="flex-column-gap fill-available">
+            <div class="info-box p-1 fill-available">
+              <div class="row flex-container">
+                {% for PDF in page_obj %}
+                  {% if PDF.archivo_adjunto %}
+                    <div class="card h-100">
+                      <!-- Si el PDF tiene un archivo adjunto, muéstralo -->
+                      <div>
+                        <a href="{{ PDF.archivo_adjunto.url }}"><i class="fas fa-file-pdf" ></i></a>
+                      </div>
+                      <h3>{{ PDF.nombre }}</h3>
+                      <div class="button-imagen-container">
+                        <button onclick="copiarURL('{{ PDF.archivo_adjunto.url }}')" class="btn-neumorphic blue tea-green-bg">Copiar URL</button>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <div class="pagination-container" style="display: flex; justify-content: center;">
+                <!-- Paginación Neumórfica -->
+                <nav aria-label="Paginación">
+                  <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg me-2" href="?page=1">&laquo; Primero</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg me-2" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                      </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                      <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg ms-2" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                      </li>
+                      <li class="page-item">
+                        <a class="page-link btn-neumorphic green white-bg ms-2" href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% block custom_js %}
+    <!-- Link al JS específico de Gestion_PDF -->
+    <script src="{% static 'js/gestion_PDF.js' %}"></script>
+  {% endblock %}
+{% endblock %}

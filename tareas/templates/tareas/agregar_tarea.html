@@ -1,0 +1,294 @@
+<!-- 
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-light">
+
+
+
+<div class="container mt-5">
+
+<div class="card shadow-lg">
+
+<div class="card-header bg-primary text-white text-center">
+
+<h2>Repositorio de Tareas</h2>
+
+</div>
+
+<div class="card-body">
+
+
+
+<div class="mb-3">
+
+<label for="funcionarioSelect" class="form-label"><strong>Filtrar por Funcionario:</strong></label>
+
+<select id="funcionarioSelect" class="form-select">
+
+<option value="">Seleccione un funcionario</option>
+
+{% for funcionario in funcionarios %}
+
+<option value="{% url 'tareas_por_funcionario' funcionario.id %}">{{ funcionario }}</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+
+
+
+
+<h3 class="mt-4">Tareas</h3>
+
+<div class="table-responsive">
+
+<table class="table table-striped">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Descripción</th>
+
+<th>Funcionario</th>
+
+<th>Acciones</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for tarea in tareas %}
+
+<tr>
+
+<td>{{ tarea.descripcion }}</td>
+
+<td>{{ tarea.funcionario }}</td>
+
+<td>
+
+<a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-warning btn-sm">Editar</a>
+
+<a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="3" class="text-center">No hay tareas registradas</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+
+
+
+<div class="d-flex justify-content-between mt-4">
+
+<a href="{% url 'agregar_tarea' %}" class="btn btn-success">Agregar Tarea</a>
+
+<a href="{% url 'agregar_funcionario' %}" class="btn btn-primary">Agregar Funcionario</a>
+
+</div>
+
+
+
+</div>
+
+</div>
+
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+<script>
+
+document.getElementById('funcionarioSelect').addEventListener('change', function() {
+
+if (this.value) {
+
+window.location.href = this.value;
+
+}
+
+});
+
+</script>
+
+
+
+</body>
+
+</html>  -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Repositorio de Tareas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2>Repositorio de Tareas</h2>
+            </div>
+            <div class="card-body">
+
+                <div class="mb-3">
+                    <label for="funcionarioSelect" class="form-label"><strong>Filtrar por Funcionario:</strong></label>
+                    <select id="funcionarioSelect" class="form-select">
+                        <option value="">Seleccione un funcionario</option>
+                        {% for funcionario in funcionarios %}
+                        <option value="{% url 'tareas_por_funcionario' funcionario.id %}">{{ funcionario }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h3 class="mt-4">Tareas</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Funcionario</th>
+                                <th>Fecha</th>  <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tarea in tareas %}
+                            <tr>
+                                <td>{{ tarea.descripcion }}</td>
+                                <td>{{ tarea.funcionario }}</td>
+                                <td>{{ tarea.fecha }}</td> <td>
+                                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-warning btn-sm">Editar</a>
+                                    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No hay tareas registradas</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#agregarTareaModal">Agregar Tarea</button>
+                    <a href="{% url 'tareas_funcionario' %}" class="btn btn-primary">Agregar Funcionario</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="agregarTareaModal" tabindex="-1" aria-labelledby="agregarTareaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarTareaModalLabel">Agregar Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-tarea">
+                        {% csrf_token %}  <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción:</label>
+                            <input type="text" class="form-control" id="descripcion" name="descripcion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="funcionario" class="form-label">Funcionario:</label>
+                            <input type="text" class="form-control" id="funcionario" name="funcionario" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha" class="form-label">Fecha:</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('funcionarioSelect').addEventListener('change', function() {
+            if (this.value) {
+                window.location.href = this.value;
+            }
+        });
+
+        document.getElementById('formulario-tarea').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const descripcion = document.getElementById('descripcion').value;
+            const funcionario = document.getElementById('funcionario').value;
+            const fecha = document.getElementById('fecha').value;
+            
+
+            // Aquí debes enviar los datos al servidor para guardar la tarea
+            // Puedes usar fetch o XMLHttpRequest
+            fetch('{% url "guardar_tarea" %}', {  // Reemplaza con tu URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value // Si usas CSRF
+                },
+                body: JSON.stringify({
+                    descripcion: descripcion,
+                    funcionario: funcionario,
+                    fecha: fecha
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Cerrar el modal y actualizar la tabla
+                $('#agregarTareaModal').modal('hide');
+                // Recargar la página o actualizar la tabla dinámicamente
+                window.location.reload(); // Recarga la página (opción más sencilla)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Mostrar mensaje de error al usuario
+            });
+
+
+            this.reset(); // Limpia el formulario
+        });
+    </script>
+
+</body>
+
+</html>

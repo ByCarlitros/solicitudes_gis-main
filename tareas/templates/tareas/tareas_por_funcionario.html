@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tareas de {{ funcionario }}</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+    background: linear-gradient(to right, #ece9e6, #ffffff);
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+.card-header {
+    background: linear-gradient(to right, #5eac3b, #CEF2B3) !important;
+    border-bottom: none; /* Opcional: elimina el borde inferior si es necesario */
+/* Encabezados */}
+h1 {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+h1.text-primary {
+    color: #007bff;
+}
+
+/* Elementos de lista */
+.list-group-item {
+    background-color: #fff;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.list-group-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.pagination a {
+    margin: 0 8px;
+    text-decoration: none;
+    padding: 8px 14px;
+    border: 1px solid #2c3e50;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+    color: #2c3e50;
+}
+
+.pagination a:hover {
+    background-color: #2c3e50;
+    color: #fff;
+}
+
+.pagination .step-links a {
+    color: #2c3e50;
+}
+
+.pagination .step-links .current {
+    color: #495057;
+    font-weight: bold;
+}
+
+.pagination .step-links a:hover {
+    text-decoration: underline;
+}
+
+    
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        .list-group-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            border-radius: 10 px;
+        }
+
+        .pagination a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .task-item {
+            transition: 0.3s;
+        }
+
+        .task-item:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        h1.text-primary {
+            color: #007bff;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .pagination .step-links a {
+            color: #007bff;
+        }
+
+        .pagination .step-links .current {
+            color: #495057;
+        }
+
+        .pagination .step-links a:hover {
+            text-decoration: underline;
+        }
+        .btn-common {
+        width: 120px;
+        padding: 5px 10px;
+        font-size: 0.6em;
+        text-align: center;
+        background-color: #eaf9e6;
+        color: #28a745;
+        border-radius: 10px;
+        display: inline-block;
+        font-weight: bold;
+        line-height: 2.5; /* Ajusta la altura de línea para centrar verticalmente */
+    }
+    .container-botones {
+        display: flex; /* Utilizamos flexbox para alinear horizontalmente */
+        align-items: center; /* Alinea verticalmente los elementos al centro */
+        justify-content: flex-end; /* Alinea los elementos a la derecha */
+        width: 100%; /* Ocupa todo el ancho disponible */
+    }
+
+    .container-botones > * { /* Espacio entre elementos */
+        margin-left: 5px; /* Margen a la izquierda de 5px para separar */
+    }
+
+    .container-botones > *:first-child { /* Quita el margen al primer elemento */
+        margin-left: 0;
+    }
+    </style>
+<style>
+    .task-item {
+        transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+    }
+    
+    .task-item:hover {
+        background-color: #f0f0f0; /* Light gray background on hover */
+        transform: scale(1.02); /* Slightly scale up on hover */
+        cursor: pointer; /* Indicate interactivity */
+    }
+    
+    .task-item {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+    .task-item:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.02);
+    cursor: pointer;
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2); /* Sombra más intensa al pasar el mouse */
+}
+
+.card-header {
+    background-color: #ebb609; /* Cambia este valor por el color deseado */
+}
+
+.btn-common {
+    width: 80px; /* Ancho fijo */
+    height: 30px; /* Altura fija (ajusta este valor) */
+    padding: 5px 10px;
+    font-size: 0.8em; /* Tamaño de fuente (ajustado) */
+    text-align: center;
+    background-color: #ffc107;
+    color: hsl(0, 0%, 0%);
+    border-radius: 10px;
+    display: inline-flex; /* Usar flexbox para centrar verticalmente */
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
+    font-weight: bold;
+    border: none; /* Eliminar borde predeterminado */
+    transition: all 0.2s ease; /* Transición suave para el hover */
+}
+
+
+
+.estado-terminado {
+    background-color: #eaf9e6; /* Color de fondo suave */
+    color: #28a745; /* Color de texto verde */
+    border: none; /* Elimina los bordes */
+    padding: 5px 10px; /* Ajusta el padding */
+    border-radius: 10px; /* Bordes redondeados */
+    font-weight: bold; /* Texto en negrita */
+    cursor: default; /* Cambia el cursor a default */
+}
+.btn-danger {
+    background-color: #f30b0b;
+    border-color: #dc3545; /* Mantén este color para el contorno */
+    border: 2px solid #dc3545; /* Añade el contorno */
+    padding: 5px 10px; /* Ajusta el padding si es necesario */
+    border-radius: 10px; /* Ajusta el radio del borde si lo deseas */
+    transition: all 0.3s ease; /* Transición suave para el hover */
+}
+
+btn-danger:hover {
+    background-color: #c90909; /* Color de fondo más oscuro al pasar el mouse */
+    border-color: #dc3545; /* Mantén el color del contorno al pasar el mouse */
+    border: 2px solid #dc3545;
+    transform: scale(1.05); /* Escala ligeramente al pasar el mouse (opcional) */
+    cursor: pointer; /* Cambia el cursor a pointer al pasar el mouse */
+}
+    </style>
+</head>
+<body class="container py-4">
+
+    <div class="text-center mb-4">
+        <h1 class="text-primary">Tareas de {{ funcionario }}</h1>
+    </div>
+
+    <!-- Lista de Tareas -->
+    <div class="card shadow">
+        <div class="card-header custom-header" style="background-color: #CEF2B3; color: rgb(5, 5, 5);">
+            <h5 class="mb-0">Lista de Tareas</h5>
+        </div>
+        <div class="card-body">
+            {% if tareas %}
+                <ul class="list-group">
+                    {% for tarea in tareas %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center task-item">
+                            <span>
+                                <strong>{{ tarea.descripcion }}</strong><br>
+                                <span>Fecha de entrega: {{ tarea.fecha_entrega|date:"d M Y" }}</span><br>
+                                
+                            </span>
+                            <div class="container-botones">
+                                <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-sm btn-warning btn-common">✏️ Editar</a>
+                                {% if user.is_superuser %}
+                                    <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-sm btn-danger"onclick="confirmarEliminacion(event, this)" data-tarea-id="{{ tarea.id }}">️ Eliminar</a>
+                                {% endif %}
+                                <strong class="estado-terminado">
+                                    ✔️ Terminado
+                                </strong>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <ul class="pagination">
+                    {% if tareas.has_previous %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ tareas.previous_page_number }}" aria-label="Anterior">Anterior</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for i in tareas.paginator.page_range %}
+                        <li class="page-item {% if tareas.number == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+                    
+                    {% if tareas.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ tareas.next_page_number }}" aria-label="Siguiente">Siguiente</a>
+                        </li>
+                        
+                    {% endif %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No hay tareas asignadas a este funcionario.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-danger text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="bi bi-trash-fill text-danger fs-1"></i>
+                    <p class="mt-3 fs-5">¿Estás seguro de que quieres eliminar esta tarea?</p>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <a href="#" id="confirmarEliminarBtn" class="btn btn-danger px-4 rounded-pill">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</ul>
+
+
+    <!-- Botón para Volver -->
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{% url 'index' %}" class="btn btn-secondary">🔙 Volver</a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmarEliminacion(event, element) {
+            event.preventDefault();  // Evita la navegación automática
+            let tareaId = element.getAttribute("data-tarea-id");
+            let eliminarUrl = `{% url 'eliminar_tarea' 0 %}`.replace("0", tareaId);
+            
+            // Establecer la URL en el botón de confirmación
+            document.getElementById("confirmarEliminarBtn").setAttribute("href", eliminarUrl);
+            
+            // Mostrar el modal
+            let modal = new bootstrap.Modal(document.getElementById("confirmarEliminacionModal"));
+            
+            modal.show();
+        }
+    </script>
+    
+
+
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal SECPLA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset y estilos base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      color: #1f2937;
+      background-color: white;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Contenedor principal */
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Encabezado */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      height: 6rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo {
+      height: 6rem;
+      width: auto;
+    }
+
+    .site-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    /* Contenido principal */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .page-title {
+      font-size: 1.875rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      letter-spacing: -0.025em;
+    }
+
+    /* Contenedor de departamentos */
+    .departments-container {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Botones de navegación */
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+      color: #4b5563;
+      border-radius: 9999px;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .nav-button:hover {
+      background-color: #f9fafb;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .prev-button {
+      left: -1rem;
+    }
+
+    .next-button {
+      right: -1rem;
+    }
+
+    /* Grid de departamentos */
+    .departments-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .departments-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Tarjetas de departamento */
+    .department-card {
+      height: 100%;
+      perspective: 1000px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .card-inner {
+      height: 100%;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .department-card:hover .card-inner {
+      transform: rotateY(5deg) rotateX(-5deg) scale(1.05);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .icon-container {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .department-title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+
+    .department-description {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .access-button {
+      padding: 0.5rem 1.5rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+      color: white;
+      width: 100%;
+    }
+
+    .access-button:hover {
+      transform: scale(1.05);
+    }
+
+    .access-button:active {
+      transform: scale(0.95);
+    }
+
+    /* Paginación */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+      gap: 0.5rem;
+    }
+
+    .page-dot {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 9999px;
+      background-color: #d1d5db;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .page-dot:hover {
+      background-color: #9ca3af;
+    }
+
+    .page-dot.active {
+      background-color: #1f2937;
+      transform: scale(1.25);
+    }
+
+    /* Pie de página */
+    footer {
+      position: relative;
+      z-index: 10;
+      background-color: #1f2937;
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.875rem;
+    }
+
+    /* Burbujas de fondo */
+    .background-bubbles {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -10;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 9999px;
+      background-color: rgba(241, 245, 249, 0.3);
+      backdrop-filter: blur(30px);
+      filter: blur(50px);
+    }
+
+    /* Animaciones */
+    @keyframes float {
+      0% {
+        transform: translate(-50%, -50%);
+      }
+      50% {
+        transform: translate(calc(-50% + 50px), calc(-50% + 50px));
+      }
+      100% {
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-bubbles" id="bubbles-container"></div>
+
+  <header>
+    <div class="container header-content">
+      <div class="logo-container">
+        <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_0Cnp6ZH.png" alt="Logo SECPLA" class="logo">
+        <h1 class="site-title">Portal SECPLA</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2 class="page-title">Acceso a Plataformas por Departamento</h2>
+
+      <div class="departments-container">
+        <button id="prev-button" class="nav-button prev-button" aria-label="Página anterior">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+        </button>
+
+        <div id="departments-grid" class="departments-grid"></div>
+
+        <button id="next-button" class="nav-button next-button" aria-label="Página siguiente">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+
+      <div id="pagination" class="pagination"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="current-year"></span> SECPLA - Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    // Datos de los departamentos
+    const departments = [
+      {
+        id: "planificacion",
+        name: "Departamento Sistema de Informacíon Geografica",
+        description: "Accede a la intranet del Departamento SIG",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M13 17V9"/><path d="M18 17V5"/><path d="M8 17v-3"/></svg>`,
+        color: "#3b82f6",
+        url: "https://departamento1.secpla.cl",
+      },
+      {
+        id: "comunitario",
+        name: "Departamento de Estudios y Pre Inversiones",
+        description: "Accede a la intranet del Departamento de Inversiones",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+        color: "#ef4444",
+        url: "https://departamento2.secpla.cl",
+      },
+      {
+        id: "obras",
+        name: "Departamento de Asesoria Urbana",
+        description: "Accede a la intranet del Departamento de Asesoria Urbana",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-2"/><path d="M10 16h4"/><path d="M10 19h4"/><path d="M10 8h4"/><path d="M10 5h4"/></svg>`,
+        color: "#14b8a6",
+        url: "https://departamento3.secpla.cl",
+      },
+      {
+        id: "proyectos",
+        name: "Departamento de Planificacíon",
+        description: "Accede a la intranet del Departamento de Planificación.",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.663 17h4.673M12 12v-1M8.5 8.5a3.5 3.5 0 1 1 7 0v1.5"/><path d="M17 18a5 5 0 0 0-10 0"/><path d="M12 3v1M3 12h1M21 12h-1M18.5 5.5l-1 1M4.5 19.5l1-1M19.5 19.5l-1-1M4.5 5.5l1 1"/></svg>`,
+        color: "#eab308",
+        url: "https://departamento4.secpla.cl",
+      },
+      {
+        id: "administrativo",
+        name: "Departamento de Presupuesto",
+        description: "Accede a la intranet del Departamento de Presupuesto.",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>`,
+        color: "#a855f7",
+        url: "https://departamento5.secpla.cl",
+      },
+      {
+        id: "medioambiente",
+        name: "Departamento  ",
+        description: "Accede a la intranet del Departamento ",
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>`,
+        color: "#22c55e",
+        url: "https://departamento6.secpla.cl",
+      },
+    ];
+
+    // Estado
+    let currentPage = 0;
+    const itemsPerPage = 3;
+    const totalPages = Math.ceil(departments.length / itemsPerPage);
+
+    // Elementos DOM
+    const departmentsGrid = document.getElementById('departments-grid');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    const pagination = document.getElementById('pagination');
+    const bubblesContainer = document.getElementById('bubbles-container');
+    const currentYearElement = document.getElementById('current-year');
+
+    // Establecer el año actual en el footer
+    currentYearElement.textContent = new Date().getFullYear();
+
+    // Crear burbujas de fondo
+    function createBubbles() {
+      for (let i = 0; i < 15; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        
+        const size = Math.random() * 300 + 100;
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        const delay = Math.random() * 10;
+        const duration = Math.random() * 30 + 20;
+        
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        bubble.style.left = `${left}%`;
+        bubble.style.top = `${top}%`;
+        bubble.style.transform = 'translate(-50%, -50%)';
+        bubble.style.animation = `float ${duration}s ease-in-out infinite`;
+        bubble.style.animationDelay = `${delay}s`;
+        
+        bubblesContainer.appendChild(bubble);
+      }
+    }
+
+    // Renderizar departamentos para la página actual
+    function renderDepartments() {
+      const startIndex = currentPage * itemsPerPage;
+      const visibleDepartments = departments.slice(startIndex, startIndex + itemsPerPage);
+      
+      // Limpiar departamentos actuales
+      departmentsGrid.innerHTML = '';
+      
+      // Agregar nuevos departamentos con animación
+      visibleDepartments.forEach(dept => {
+        const card = document.createElement('a');
+        card.className = 'department-card fade-in';
+        card.href = dept.url;
+        
+        card.innerHTML = `
+          <div class="card-inner" style="border-top: 4px solid ${dept.color}">
+            <div class="icon-container" style="background-color: ${dept.color}20">
+              <div style="color: ${dept.color}">${dept.icon}</div>
+            </div>
+            <h3 class="department-title">${dept.name}</h3>
+            <p class="department-description">${dept.description}</p>
+            <button class="access-button" style="background-color: ${dept.color}">Acceder</button>
+          </div>
+        `;
+        
+        departmentsGrid.appendChild(card);
+      });
+      
+      // Actualizar puntos de paginación
+      updatePagination();
+    }
+
+    // Actualizar puntos de paginación
+    function updatePagination() {
+      pagination.innerHTML = '';
+      
+      for (let i = 0; i < totalPages; i++) {
+        const dot = document.createElement('button');
+        dot.className = `page-dot ${i === currentPage ? 'active' : ''}`;
+        dot.setAttribute('aria-label', `Ir a página ${i + 1}`);
+        dot.addEventListener('click', () => goToPage(i));
+        pagination.appendChild(dot);
+      }
+    }
+
+    // Funciones de navegación
+    function nextPage() {
+      currentPage = (currentPage + 1) % totalPages;
+      renderDepartments();
+    }
+
+    function prevPage() {
+      currentPage = (currentPage - 1 + totalPages) % totalPages;
+      renderDepartments();
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderDepartments();
+    }
+
+    // Event listeners
+    prevButton.addEventListener('click', prevPage);
+    nextButton.addEventListener('click', nextPage);
+
+    // Inicializar
+    createBubbles();
+    renderDepartments();
+  </script>
+</body>
+</html>

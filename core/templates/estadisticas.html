@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+  
+</head>
+
+<style>
+    :root {
+         --primary: #2563eb;
+         --primary-glow: rgba(37, 99, 235, 0.3);
+         --secondary: #10b981;
+         --secondary-glow: rgba(16, 185, 129, 0.3);
+         --accent: #f59e0b;
+         --accent-glow: rgba(245, 158, 11, 0.3);
+         --highlight: #ec4899;
+         --highlight-glow: rgba(236, 72, 153, 0.3);
+         --background: #000000;
+         --card-bg: #111111;
+         --card-hover: #1a1a1a;
+         --text: #f3f4f6;
+         --text-secondary: #9ca3af;
+         --border: #00b7c7;
+         --header-bg: #d1d5db;
+         --header-text: #111827;
+         --metric-text: #e6ff00;
+     }
+     
+     * {
+         margin: 0;
+         padding: 0;
+         box-sizing: border-box;
+     }
+     
+     body {
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+         background-color: var(--background);
+         color: var(--text);
+         height: 100vh;
+         width: 100vw;
+         overflow: hidden;
+         position: fixed;
+     }
+     
+     .header {
+         background-color: var(--header-bg);
+         color: var(--header-text);
+         width: 100%;
+         height: 60px;
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         padding: 0 1.5rem;
+         box-shadow: 0 2px 10px rgba(0, 0, 0, 0);
+         position: relative;
+         z-index: 100;
+     }
+     
+     .header-title {
+         display: flex;
+         align-items: center;
+         gap: 1rem;
+     }
+     
+     .header-logo {
+         width: 130px;
+         height: auto;
+         object-fit: contain;
+         transition: transform 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     .header-logo:hover {
+         transform: scale(1.05); /* Añadido: efecto de escala al pasar el ratón */
+     }
+     
+     .header-text {
+         font-size: 1.5rem;
+         font-weight: 600;
+         color: var(--header-text);
+         transition: color 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     .header-text:hover {
+         color: var(--primary); /* Añadido: cambio de color al pasar el ratón */
+     }
+     
+     .header-actions {
+         display: flex;
+         align-items: center;
+         gap: 1rem;
+     }
+     
+     .header-icon {
+         width: 40px;
+         height: 40px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         color: var(--header-text);
+         font-size: 1.5rem;
+         transition: transform 0.3s ease, color 0.3s ease;
+     }
+     
+     .header-icon-1:hover {
+         transform: scale(1.1);
+         color: var(--primary);
+     }
+     .header-icon-1 {
+         width: 40px;
+         height: 40px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         color: var(--header-text);
+         font-size: 1.5rem;
+         transition: transform 0.3s ease, color 0.3s ease;
+     }
+     
+     .header-icon:hover {
+         transform: scale(1.1);
+         color: var(--primary);
+     }
+
+     .dashboard-container {
+         position: static;
+         top: 60px;
+         left: 0;
+         width: 100%;
+         height: calc(100% - 85px);
+         padding: 0.75rem;
+         display: grid;
+         grid-template-rows: auto 1fr;
+         gap: 0.75rem;
+     }
+     
+     .panels-container {
+         display: grid;
+         grid-template-columns: repeat(4, 1fr);
+         gap: 0.75rem;
+     }
+     
+     .panel {
+         background-color: var(--card-bg);
+         border: 1px solid var(--border);
+         border-radius: 0.25rem;
+         padding: 1rem;
+         display: flex;
+         flex-direction: column;
+         position: relative;
+         overflow: hidden;
+         height: 160px; /* Ligeramente más grande */
+         transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* Añadido: transiciones para animaciones */
+     }
+     
+     /* Añadido: efecto de elevación y brillo al pasar el ratón */
+     .panel:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 20px rgba(0, 183, 199, 0.2);
+         background-color: var(--card-hover);
+     }
+     
+     .panel-title {
+         font-size: 1.6rem;
+         font-weight: 600;
+         color: var(--metric-text);
+         margin-bottom: 0.5rem;
+         transition: transform 0.3s ease, color 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre el título */
+     .panel:hover .panel-title {
+         transform: scale(1.05);
+         color: #ffffff;
+     }
+     
+     .panel-content {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         flex: 1;
+         
+     }
+
+     .panel-content-1 {
+         display: flex;
+         align-items: center;
+         justify-content: flex-end;
+         flex: 1;
+         
+     }
+     
+     .panel-icon {
+         font-size: 3.5rem;
+         color: rgba(255, 255, 255, 0.7);
+         margin-right: 1.5rem;
+         transition: transform 0.3s ease, color 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre el icono */
+     .panel:hover .panel-icon {
+         transform: scale(1.1) rotate(5deg);
+         color: var(--metric-text);
+     }
+
+     .panel-icon-1 {
+         font-size: 3.5rem;
+         color: rgba(255, 255, 255, 0.7);
+         margin-right: 1.5rem;
+         transition: transform 0.3s ease, color 0.3s ease; /* Añadido: transición para animación */
+         margin-top:-10%;
+         margin-left:40%
+         
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre el icono */
+     .panel:hover .panel-icon-1 {
+         transform: scale(1.1) rotate(5deg);
+         color: var(--metric-text);
+     }
+     
+     .panel-value {
+         font-size: 4.5rem;
+         font-weight: bold;
+         line-height: 1.5;
+         color: var(--metric-text);
+         line-height: 1;
+         transition: transform 0.3s ease, text-shadow 0.3s ease; /* Añadido: transición para animación */
+     }
+
+     .panel-value-1 {
+    font-size: 4.5rem;
+    font-weight: bold;
+    line-height: 1.5;
+    color: var(--metric-text);
+    line-height: 1;
+    transition: transform 0.3s ease, text-shadow 0.3s ease; /* Añadido: transición para animación */
+    text-align: right; /* Añadido: alinea el texto a la derecha */
+}
+
+     
+     /* Añadido: efecto al pasar el ratón sobre el valor */
+     .panel:hover .panel-value {
+         transform: scale(1.05);
+         text-shadow: 0 0 10px var(--metric-text);
+     }
+     
+     .panel-description {
+         font-size: 0.9rem;
+         color: rgba(255, 255, 255, 0.7);
+         position: absolute;
+         bottom: 0.5rem;
+         right: 1rem;
+         transition: opacity 0.3s ease, transform 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre la descripción */
+     .panel:hover .panel-description {
+         opacity: 1;
+         transform: translateY(-2px);
+         color: #ffffff;
+     }
+     
+     .panel-update {
+         font-size: 0.7rem;
+         color: rgba(255, 255, 255, 0.5);
+         position: absolute;
+         bottom: 0.5rem;
+         left: 1rem;
+         transition: opacity 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre la actualización */
+     .panel:hover .panel-update {
+         opacity: 0.8;
+     }
+     
+     .graficos-container {
+         display: grid;
+         grid-template-columns: repeat(3, 1fr);
+         gap: 0.75rem;
+         height: 100%;
+     }
+     
+     .grafico-container {
+         background-color: var(--card-bg);
+         border: 1px solid var(--border);
+         border-radius: 0.25rem;
+         padding: 1rem;
+         position: relative;
+         height: 100%;
+         width: 100%;
+         overflow: hidden;
+         transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto de elevación al pasar el ratón */
+     .grafico-container:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 20px rgba(0, 183, 199, 0.2);
+     }
+     
+     .grafico-titulo {
+         position: absolute;
+         top: 0.5rem;
+         left: 0;
+         width: 100%;
+         text-align: center;
+         font-size: 1.2rem;
+         font-weight: 600;
+         color: var(--metric-text);
+         z-index: 10;
+         transition: transform 0.3s ease, color 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre el título del gráfico */
+     .grafico-container:hover .grafico-titulo {
+         transform: scale(1.05);
+         color: #ffffff;
+     }
+     
+     canvas {
+         position: absolute;
+         top: 2.5rem;
+         left: 0;
+         width: 100% !important;
+         height: calc(100% - 2.5rem) !important;
+         transition: filter 0.3s ease; /* Añadido: transición para animación */
+     }
+     
+     /* Añadido: efecto al pasar el ratón sobre el canvas */
+     .grafico-container:hover canvas {
+         filter: brightness(1.1);
+     }
+     
+     /* Tooltip personalizado */
+     .tooltip {
+         position: absolute;
+         background-color: rgba(0, 0, 0, 0.8);
+         color: white;
+         padding: 8px 12px;
+         border-radius: 4px;
+         font-size: 0.8rem;
+         pointer-events: none;
+         opacity: 0;
+         transition: opacity 0.3s ease, transform 0.3s ease; /* Añadido: transición para animación */
+         z-index: 1000;
+         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+         max-width: 200px;
+         transform: translateY(10px); /* Añadido: posición inicial para animación */
+     }
+     
+     /* Añadido: efecto al mostrar el tooltip */
+     .tooltip.visible {
+         opacity: 1;
+         transform: translateY(0);
+     }
+     
+     .tooltip-title {
+         font-weight: bold;
+         margin-bottom: 4px;
+         color: var(--metric-text);
+     }
+     
+     .tooltip-value {
+         font-size: 1.1rem;
+         margin-bottom: 4px;
+     }
+     
+     .tooltip-description {
+         font-size: 0.75rem;
+         color: var(--text-secondary);
+     }
+     
+     /* Animación de carga */
+     .loading-bar {
+         position: absolute;
+         bottom: 0;
+         left: 0;
+         height: 3px;
+         width: 0%;
+         background: linear-gradient(90deg, var(--primary), var(--secondary));
+         transition: width 5s linear;
+         opacity: 0;
+     }
+     
+     .loading-active {
+         width: 100%;
+         opacity: 1;
+     }
+     
+     /* Animación de selección */
+     .selected {
+         animation: pulse 1.5s infinite;
+     }
+     
+     @keyframes pulse {
+         0% {
+             box-shadow: 0 0 0 0 var(--primary-glow);
+         }
+         70% {
+             box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+         }
+         100% {
+             box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+         }
+     }
+     
+     /* Añadido: animación de rebote */
+     @keyframes bounce {
+         0%, 100% {
+             transform: translateY(0);
+         }
+         50% {
+             transform: translateY(-10px);
+         }
+     }
+     
+     /* Añadido: animación de rotación */
+     @keyframes rotate {
+         0% {
+             transform: rotate(0deg);
+         }
+         100% {
+             transform: rotate(360deg);
+         }
+     }
+     
+     /* Añadido: animación de brillo */
+     @keyframes glow {
+         0%, 100% {
+             text-shadow: 0 0 5px var(--metric-text);
+         }
+         50% {
+             text-shadow: 0 0 20px var(--metric-text), 0 0 30px var(--metric-text);
+         }
+     }
+     
+     @media (max-width: 1200px) {
+         .panels-container {
+             grid-template-columns: repeat(2, 1fr);
+             grid-template-rows: repeat(4, auto);
+         }
+         
+         .graficos-container {
+             grid-template-columns: repeat(2, 1fr);
+             grid-template-rows: repeat(2, 1fr);
+         }
+         
+         .grafico-container:last-child {
+             grid-column: span 2;
+         }
+     }
+     
+     @media (max-width: 768px) {
+         body {
+             position: relative;
+             overflow: auto;
+             height: auto;
+         }
+         
+         .dashboard-container {
+             position: relative;
+             height: auto;
+             grid-template-rows: auto auto;
+         }
+         
+         .panels-container {
+             grid-template-columns: 1fr;
+             grid-template-rows: repeat(8, auto);
+         }
+         
+         .graficos-container {
+             grid-template-columns: 1fr;
+             grid-template-rows: repeat(3, 300px);
+             height: auto;
+         }
+         
+         .grafico-container {
+             height: 300px;
+         }
+         
+         .grafico-container:last-child {
+             grid-column: span 1;
+         }
+     }
+     .grafico-titulo {
+         font-size: 24px; /* Aumenta el tamaño de la fuente */
+         font-weight: bold; /* Si quieres que el texto sea más grueso */
+         color: #E3FF00; /* Puedes cambiar el color si lo deseas */
+     }
+
+     .panel-toggle {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap
+}
+
+.toggle-buttons {
+    display: flex;
+    flex-direction: column; /* Coloca los elementos uno encima del otro */
+    gap: 0.5rem; /* Espacio vertical entre los botones */
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.toggle-button {
+    background-color: var(--card-hover);
+    color: var(--text-secondary);
+    border: none;
+    padding: 0.15rem 0.15rem;
+    border-radius: 2.15rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    max-width: 120px;
+}
+
+.toggle-button:hover {
+    background-color: var(--border);
+    color: var(--text);
+}
+
+.toggle-button.active {
+    background-color: var(--primary);
+    color: var(--text);
+    font-weight: bold;
+    max-width: 120px;
+}
+
+.toggle-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#toggle-title {
+    flex-grow: 1;
+}
+
+.arrow-container {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100; /* Aumentamos el z-index a 100 */
+}
+
+#mostrar-nuevos-paneles {
+    font-size: 2em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #ddd;
+    outline: none;
+}
+
+#grafico-semanal-container {
+    position: relative; /* Establece el contexto para el posicionamiento absoluto */
+    /* Otros estilos que ya tengas para el contenedor del gráfico semanal */
+    padding-top: 30px; /* Ajusta según sea necesario */
+    padding-left: 100px; /* Ajusta según sea necesario */
+    /* ... otros estilos específicos para este gráfico ... */
+}
+
+#grafico-semanal-container .grafico-titulo {
+    /* Tus estilos actuales para el título del gráfico semanal */
+    text-align: center;
+}
+
+#grafico-semanal-container .filtro-container {
+    position: absolute;
+    top: 5px; /* Ajusta la posición */
+    left: 10px; /* Ajusta la posición */
+    z-index: 15; /* Asegura que esté por encima del gráfico */
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#grafico-semanal-container .filtro-container label {
+    margin-right: 5px;
+    color: white;
+}
+
+#grafico-semanal-container #anio-filtro {
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+
+ </style>
+
+<body>
+    <!-- Nuevo encabezado tipo panel -->
+    <header class="header" style="height: 105px; display: flex; align-items: center; padding: 0 20px; border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); transition: box-shadow 0.3s ease;">
+        <div class="header-title">
+            <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_o3Axkqz.png" alt="Logo SIG" class="header-logo" style="width: 100px; height: auto; margin-right: 10px;">
+            <h1 class="header-text" style="font-size: 2em;">Cuadro Reportes Solicitudes SIG</h1>
+        </div>
+        <div class="header-actions" style="display: flex; align-items: center;">
+            <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_FX3dvNU.png" alt="Logo SIG" class="header-logo" style="width: 250px; height: auto;">
+            <a href="/menu" class="header-icon" title="Ir al sistema SIG">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+        </div>
+    </header>
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="style.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <script src="script.js" defer></script> </head>
+    <body>
+        <div class="dashboard-container">
+            <div class="panels-container" id="paneles-original">
+                <div class="panel panel-toggle" data-description="Selector de vistas de Visitas o Archivos">
+                    <div class="panel-title">
+                        <span id="toggle-title">Visitas </span>
+                        <div class="toggle-buttons">
+                            <button class="toggle-button active" data-view="visitas">Plataforma</button>
+                            <button class="toggle-button" data-view="archivos">Mapa digital</button>
+                        </div>
+                    </div>
+                    <div class="panel-content-1" id="toggle-content">
+                        <div class="panel-inner-content"> <i class="fas fa-eye panel-icon-1"></i>
+                            <div class="panel-value-1" id="visitas_departamentosig">Cargando...</div>
+                        </div>
+                    </div>
+                    <div class="panel-description" id="toggle-description-visitas">Número total de visitas al sitio</div>
+                    <div class="panel-content-1 hidden" id="archivos-content">
+                        <div class="panel-inner-content"> <i class="fas fa-eye panel-icon-1"></i>
+                            <div class="panel-value-1" id="mapa2">Cargando...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel" data-description="Cantidad total de archivos disponibles en el sistema">
+                    <div class="panel-title">Archivos</div>
+                    <div class="panel-content">
+                        <i class="fas fa-file-archive panel-icon"></i>
+                        <div class="panel-value" id="archivos">Cargando...</div>
+                    </div>
+                    <div class="panel-description">Cad, Kmz, Shape</div>
+                    <div class="panel-update">Última actualización: hace 10 segundos</div>
+                </div>
+                <div class="panel" data-description="Número de planos impresos en el sistema">
+                    <div class="panel-title">Planos Impresos</div>
+                    <div class="panel-content">
+                        <i class="fas fa-print panel-icon"></i>
+                        <div class="panel-value" id="planos_impresos">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Última actualización: hace 10 segundos</div>
+                </div>
+                <div class="panel" data-description="Número de planos digitales en el sistema">
+                    <div class="panel-title">Planos Digitales</div>
+                    <div class="panel-content">
+                        <i class="fas fa-desktop panel-icon"></i>
+                        <div class="panel-value" id="planos_digitales">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Última actualización: hace 10 segundos</div>
+                </div>
+                <div class="panel" data-description="Número de plataformas integradas con el sistema">
+                    <div class="panel-title">Plataformas Integradas</div>
+                    <div class="panel-content">
+                        <i class="fas fa-server panel-icon"></i>
+                        <div class="panel-value" id="plataformas">Cargando...</div>
+                        <div class="panel-description">Mapa Web-StoryMaps-Dashboard</div>
+                    </div>
+                </div>
+                <div class="panel" data-description="Número total de productos disponibles">
+                    <div class="panel-title">Estudios y otros </div>
+                    <div class="panel-content">
+                        <i class="fas fa-box-open panel-icon"></i>
+                        <div class="panel-value" id="productos">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Última actualización: hace 10 segundos</div>
+                </div>
+                <div class="panel" data-description="Total de elementos registrados">
+                    <div class="panel-title">Trabajos Finalizados</div>
+                    <div class="panel-content">
+                        <i class="fas fa-list-ol panel-icon"></i>
+                        <div class="panel-value" id="total">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Última actualización: hace 10 segundos</div>
+                </div>
+                <div class="panel" data-description="ID más alto registrado en el sistema">
+                    <div class="panel-title">Solicitudes Ingresadas</div>
+                    <div class="panel-content">
+                        <i class="fas fa-key panel-icon"></i>
+                        <div class="panel-value" id="id_mas_alto">Cargando...</div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="arrow-container">
+                <button id="mostrar-nuevos-paneles" style="font-size: 2em; cursor: pointer;">&raquo;</button>
+            </div>
+    
+            <div class="panels-container" id="paneles-nuevo" style="display: none;">
+                <div class="panel" data-description="Número total de productos disponibles">
+                    <div class="panel-title">  Desarrollo Web </div>
+                    <div class="panel-content">
+                        <i class="fas fa-code panel-icon"></i>
+                        <div class="panel-value" id="soporteweb12">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Solicitudes de Desarrollo</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">Soporte WEB</div>
+                    <div class="panel-content">
+                        <i class="fas fa-life-ring panel-icon"></i>
+                        <div class="panel-value" id="soporteweb123">Cargando...</div>
+                        <div class="panel-update">Soporte Entregado</div>
+                    </div>
+                    <div class="panel-description"></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">Promedio de Solicitudes</div>
+                    <div class="panel-content">
+                        <i class="fas fa-chart-line panel-icon"></i>
+                        <div class="panel-value" id="promedios_de_solicitudes">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Solicitudes por Semana</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">Tiempo de Respuesta</div>
+                    <div class="panel-content">
+                        <i class="fas fa-clock panel-icon"></i>
+                        <div class="panel-value" id="TR_formateado">Cargando...</div>
+                    </div>
+                    <div class="panel-update">Promedio</div>
+                </div>
+                
+            </div>
+    
+            <div class="graficos-container">
+                <div class="grafico-container">
+                    <div class="grafico-titulo">Total de Trabajos Realizados</div>
+                    <canvas id="miGrafico"></canvas>
+                    <div class="loading-bar" id="loading-bar-1"></div>
+                </div>
+                <div class="grafico-container">
+                    <div class="grafico-titulo">Cantidad de Trabajos x Dirección</div>
+                    <canvas id="miGraficoDirecciones"></canvas>
+                    <div class="loading-bar" id="loading-bar-2"></div>
+                </div>
+                <div class="grafico-container">
+                    <div class="grafico-titulo">Visitas por Dirección</div>
+                    <canvas id="miGraficoDepartamentos"></canvas>
+                    <div class="loading-bar" id="loading-bar-3"></div>
+                </div>
+            </div>
+    
+            <div class="graficos-container" id="graficos-nuevos" style="display: none;">
+                
+                
+                <div id="grafico-semanal-container" class="grafico-container">
+                    <div class="filtro-container">
+                        <label for="anio-filtro">Filtrar por:</label>
+                        <select id="anio-filtro">
+                            <option value="todos">Todos</option>
+                        </select>
+                    </div>
+                    <div class="grafico-titulo">Solicitudes por Semana</div>
+                    <canvas id="miGraficoSemanal"></canvas>
+                    <div class="loading-bar" id="loading-bar-4"></div>
+                </div>
+                <div style="flex-grow: 1; display: flex; align-items: center;">
+                    <img src="https://departamentosig.munivalpo.cl/media/assets/imagen_sig/None/adjunto_OlmW8pu.png" alt="Imagen Adicional" style="max-width: 150%; max-height: 770px; margin-left: 200px;">
+                </div>
+            </div>
+    
+            <div class="tooltip" id="tooltip">
+                <div class="tooltip-title" id="tooltip-title"></div>
+                <div class="tooltip-value" id="tooltip-value"></div>
+                <div class="tooltip-description" id="tooltip-description"></div>
+            </div>
+        </div>
+    
+    
+    <script>
+        
+        // Configuración global de Chart.js para tema oscuro
+        Chart.defaults.color = '#f3f4f6';
+        Chart.defaults.borderColor = '#374151';
+        
+        // Crear tooltip personalizado
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTitle = document.getElementById('tooltip-title');
+        const tooltipValue = document.getElementById('tooltip-value');
+        const tooltipDescription = document.getElementById('tooltip-description');
+        
+        // Función para mostrar tooltip
+        function showTooltip(e, title, value, description) {
+            tooltipTitle.textContent = title;
+            tooltipValue.textContent = value;
+            tooltipDescription.textContent = description;
+            
+            tooltip.style.left = e.pageX + 10 + 'px';
+            tooltip.style.top = e.pageY + 10 + 'px';
+            tooltip.style.opacity = 1;
+            tooltip.classList.add('visible'); // Añadido: clase para animación
+        }
+        
+        // Función para ocultar tooltip
+        function hideTooltip() {
+            tooltip.classList.remove('visible'); // Añadido: quitar clase para animación
+            setTimeout(() => {
+                tooltip.style.opacity = 0;
+            }, 300);
+        }
+        
+        // Agregar eventos de tooltip a los contadores
+        const contadores = document.querySelectorAll('.contador-container');
+        contadores.forEach(contador => {
+            contador.addEventListener('mouseenter', (e) => {
+                const title = contador.querySelector('.contador-descripcion').textContent;
+                const value = contador.querySelector('.contador-numero').textContent;
+                const description = contador.getAttribute('data-description');
+                showTooltip(e, title, value, description);
+            });
+            
+            contador.addEventListener('mousemove', (e) => {
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY + 10 + 'px';
+            });
+            
+            contador.addEventListener('mouseleave', hideTooltip);
+            
+            // Agregar efecto de clic
+            contador.addEventListener('click', function() {
+                // Eliminar clase selected de todos los contadores
+                contadores.forEach(c => c.classList.remove('selected'));
+                // Agregar clase selected al contador actual
+                this.classList.add('selected');
+                
+                // Quitar la clase después de 3 segundos
+                setTimeout(() => {
+                    this.classList.remove('selected');
+                }, 3000);
+            });
+        });
+        
+        // Añadido: Agregar eventos de hover a los paneles
+        const paneles = document.querySelectorAll('.panel');
+        paneles.forEach(panel => {
+            panel.addEventListener('mouseenter', (e) => {
+                const description = panel.getAttribute('data-description');
+                if (description) {
+                    showTooltip(e, panel.querySelector('.panel-title').textContent, 
+                               panel.querySelector('.panel-value').textContent, 
+                               description);
+                }
+            });
+            
+            panel.addEventListener('mousemove', (e) => {
+                if (panel.getAttribute('data-description')) {
+                    tooltip.style.left = e.pageX + 10 + 'px';
+                    tooltip.style.top = e.pageY + 10 + 'px';
+                }
+            });
+            
+            panel.addEventListener('mouseleave', hideTooltip);
+            
+            // Añadido: efecto de clic para paneles
+            panel.addEventListener('click', function() {
+                // Eliminar clase selected de todos los paneles
+                paneles.forEach(p => p.classList.remove('selected'));
+                // Agregar clase selected al panel actual
+                this.classList.add('selected');
+                
+                // Quitar la clase después de 3 segundos
+                setTimeout(() => {
+                    this.classList.remove('selected');
+                }, 3000);
+            });
+        });
+        
+        const numerosFijos = {
+            numero_fijo_archivos: 10,
+            numero_fijo_planos_impresos: 20,
+            numero_fijo_planos_digitales: 30,
+            numero_fijo_plataformas: 40,
+            numero_fijo_productos: 50,
+            numero_fijo_visitas: 100, 
+        };
+
+        let miGraficoDirecciones = null;
+        let activeBar = null;
+
+        
+
+        // Reemplazar la función generarGraficoDirecciones completa con esta versión mejorada:
+
+        function generarGraficoDirecciones(datos) {
+    // Ordenar los datos de mayor a menor según la cantidad
+    const datosOrdenados = datos.slice().sort((a, b) => b.cantidad - a.cantidad);
+
+    const labels = datosOrdenados.map(dato => dato.label);
+    const cantidades = datosOrdenados.map(dato => dato.cantidad);
+
+    const ctx = document.getElementById('miGraficoDirecciones').getContext('2d');
+
+    if (miGraficoDirecciones) {
+        miGraficoDirecciones.destroy();
+        miGraficoDirecciones = null;
+    }
+
+    const azul = 'rgb(0, 119, 255)';
+
+    miGraficoDirecciones = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: cantidades,
+                backgroundColor: azul,
+                borderColor: azul,
+                borderWidth: 1,
+                hoverBackgroundColor: azul,
+                hoverBorderColor: '#ffffff',
+                hoverBorderWidth: 2
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 10,
+                    cornerRadius: 4,
+                    displayColors: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    formatter: function(value, context) {
+                        return value.toLocaleString();
+                    },
+                    font: {
+                        weight: 'bold',
+                        color: 'yellow'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return '• ' + labels[index];
+                        }
+                    }
+                },
+                x: {
+                    type: 'logarithmic',
+                    grid: {
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (value === 0) {
+                                return '0';
+                            }
+                            const logValue = Math.log10(value);
+                            if (Number.isInteger(logValue)) {
+                                return value.toLocaleString();
+                            }
+                            return '';
+                        },
+                        min: 0,
+                        max: Math.max(...cantidades)
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 40,
+                    top: 10,
+                    bottom: 10
+                }
+            },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+
+                    const dataset = miGraficoDirecciones.data.datasets[0];
+                    dataset.backgroundColor = azul;
+                    dataset.borderColor = azul;
+                    dataset.backgroundColor[index] = azul;
+                    dataset.borderColor[index] = '#ffffff';
+                    dataset.borderWidth = Array(dataset.data.length).fill(1);
+                    dataset.borderWidth[index] = 2;
+
+                    miGraficoDirecciones.update();
+
+                    const label = miGraficoDirecciones.data.labels[index];
+                    const value = miGraficoDirecciones.data.datasets[0].data[index];
+                    alert(`${label}: ${value.toLocaleString()}\nHas seleccionado esta dirección para ver más detalles.`);
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+        let miGraficoDepartamentos = null;
+        
+        function generarGraficoDepartamentos(datos) {
+    // Ordenar los datos de mayor a menor según la cantidad
+    const datosOrdenados = datos.slice().sort((a, b) => b.cantidad - a.cantidad);
+
+    const labels = datosOrdenados.map(dato => dato.label);
+    const cantidades = datosOrdenados.map(dato => dato.cantidad);
+
+    const ctx = document.getElementById('miGraficoDepartamentos').getContext('2d');
+
+    if (miGraficoDepartamentos) {
+        miGraficoDepartamentos.destroy();
+        miGraficoDepartamentos = null;
+    }
+
+    const barColor = 'rgb(0, 119, 255)';
+
+    miGraficoDepartamentos = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: cantidades,
+                backgroundColor: barColor,
+                borderColor: barColor,
+                borderWidth: 1,
+                hoverBackgroundColor: barColor,
+                hoverBorderColor: '#ffffff',
+                hoverBorderWidth: 2
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 10,
+                    cornerRadius: 4,
+                    displayColors: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    formatter: function(value) {
+                        return value >= 1000 ? value.toLocaleString() : value;
+                    },
+                    font: {
+                        weight: 'bold',
+                        color: 'yellow'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return '• ' + labels[index];
+                        }
+                    }
+                },
+                x: {
+                    type: 'logarithmic',
+                    grid: {
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (value === 0) {
+                                return '0';
+                            }
+                            const logValue = Math.log10(value);
+                            if (Number.isInteger(logValue)) {
+                                return value.toLocaleString();
+                            }
+                            return '';
+                        },
+                        min: 0,
+                        max: Math.max(...cantidades)
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 40,
+                    top: 10,
+                    bottom: 10
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+        
+        
+
+let datosAnteriores = null; // Almacenamos los datos anteriores aquí
+    let chartSemanal = null; // Variable para almacenar la instancia del gráfico semanal
+
+    function actualizarEstadisticas() {
+        console.log("Actualizando estadísticas...");
+
+        // Mostrar barras de carga
+        document.getElementById('loading-bar-1').classList.add('loading-active');
+        document.getElementById('loading-bar-2').classList.add('loading-active');
+        document.getElementById('loading-bar-3').classList.add('loading-active');
+        document.getElementById('loading-bar-4').classList.add('loading-active');
+
+        const numerosFijos = {
+            archivos: 251,
+            planos_impresos: 295,
+            planos_digitales: 6391,
+            plataformas: 228,
+            productos: 18,
+            total: 0,
+            visitas: 7740,
+            mapa2: 0
+        };
+        const queryString = new URLSearchParams(numerosFijos).toString();
+        fetch(`/datos_estadisticas/?${queryString}`)
+            .then(response => {
+                console.log("Respuesta recibida:", response);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Datos recibidos:", data);
+
+                // Comparar los datos
+                if (!sonDatosIguales(datosAnteriores, data)) {
+                    // Los datos son diferentes, actualizar todo
+                    datosAnteriores = data; // Actualizar los datos anteriores
+
+                    // Actualizar contadores con animación (si las funciones existen)
+                    if (typeof animateCounter === 'function') {
+                        animateCounter('archivos', data.archivos);
+                        animateCounter('planos_impresos', data.planos_impresos);
+                        animateCounter('planos_digitales', data.planos_digitales);
+                        animateCounter('plataformas', data.plataformas);
+                        animateCounter('productos', data.productos);
+                        animateCounter('id_mas_alto', data.id_mas_alto);
+                        animateCounter('total', data.total);
+                        animateCounter('visitas_departamentosig', data.visitas_departamentosig);
+                        animateCounter('mapa2', data.mapa2); // Asegúrate de tener esta línea
+                        animateCounter('soporteweb12', data.soporteweb12);
+                        animateCounter('soporteweb123', data.soporteweb123);
+                        animateCounter('promedios_de_solicitudes', data.promedios_de_solicitudes);
+                        animateCounter('TR_formateado', data.TR_formateado);
+                        
+                        
+
+                    }
+
+                    // Actualizar gráficos (si las funciones existen)
+                    if (typeof generarGrafico === 'function') {
+                        generarGrafico(data.datos_grafico, 'miGrafico');
+                    }
+                    if (typeof generarGraficoDirecciones === 'function') {
+                        generarGraficoDirecciones(data.datos_grafico_direcciones, 'miGraficoDirecciones');
+                    }
+                    if (typeof generarGraficoDepartamentos === 'function') {
+                        generarGraficoDepartamentos(data.datos_grafico_departamentos, 'miGraficoDepartamentos');
+                    }
+                    generarGraficoSemanal(data.datos_para_grafico_semanal);
+
+                } else {
+                    console.log("Datos sin cambios, no se actualiza.");
+                }
+
+                // Ocultar barras de carga después de la actualización (o no actualización)
+                setTimeout(() => {
+                    document.getElementById('loading-bar-1').classList.remove('loading-active');
+                    document.getElementById('loading-bar-2').classList.remove('loading-active');
+                    document.getElementById('loading-bar-3').classList.remove('loading-active');
+                    document.getElementById('loading-bar-4').classList.remove('loading-active');
+                }, 500);
+            })
+            .catch(error => {
+                console.error("Error al obtener datos:", error);
+
+                // Datos de ejemplo para visualización en caso de error
+                const datosEjemplo = [
+                    { label: 'Semana 1', data: 10 },
+                    { label: 'Semana 2', data: 15 },
+                    { label: 'Semana 3', data: 8 },
+                    { label: 'Semana 4', data: 22 }
+                ];
+
+                // Generar gráficos de ejemplo en caso de error
+                if (typeof generarGrafico === 'function') {
+                    generarGrafico([
+                        { label: 'Categoría 1', cantidad: 25 },
+                        { label: 'Categoría 2', cantidad: 40 },
+                        { label: 'Categoría 3', cantidad: 15 },
+                        { label: 'Categoría 4', cantidad: 30 }
+                    ], 'miGrafico');
+                    generarGraficoDirecciones([
+                        { label: 'Dir 1', cantidad: 30 },
+                        { label: 'Dir 2', cantidad: 20 },
+                        { label: 'Dir 3', cantidad: 50 }
+                    ], 'miGraficoDirecciones');
+                    generarGraficoDepartamentos([
+                        { label: 'Dep 1', cantidad: 15 },
+                        { label: 'Dep 2', cantidad: 35 },
+                        { label: 'Dep 3', cantidad: 25 }
+                    ], 'miGraficoDepartamentos');
+                }
+                generarGraficoSemanal({
+                    labels: datosEjemplo.map(d => d.label),
+                    data: datosEjemplo.map(d => d.data)
+                });
+
+                // Ocultar barras de carga después del error
+                setTimeout(() => {
+                    document.getElementById('loading-bar-1').classList.remove('loading-active');
+                    document.getElementById('loading-bar-2').classList.remove('loading-active');
+                    document.getElementById('loading-bar-3').classList.remove('loading-active');
+                    document.getElementById('loading-bar-4').classList.remove('loading-active');
+                }, 500);
+            });
+    }
+
+     // Declaración global de chartSemanal
+    let datosGraficoSemanalOriginal; // Guardaremos todos los datos aquí
+
+   function generarGraficoSemanal(data) {
+    const ctx = document.getElementById('miGraficoSemanal');
+    
+    if (!ctx) {
+        console.error('No se encontró el elemento canvas');
+        return;
+    }
+
+    if (window.chartSemanal) {
+        window.chartSemanal.destroy();
+    }
+
+    // Configuración mejorada para muchos puntos
+    const pointInteractionStyles = {
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        pointHitRadius: 100,  // Incrementado significativamente
+        pointBackgroundColor: '#ff0000',
+        pointHoverBackgroundColor: '#0000ff',
+        pointBorderWidth: 2,
+        pointBorderColor: '#ffffff'
+    };
+
+    window.chartSemanal = new Chart(ctx.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Solicitudes',
+                data: data.data,
+                borderColor: 'rgba(255, 0, 0, 1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1,
+                ...pointInteractionStyles
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',  // Cambiado a 'index' para mayor precisión
+                    intersect: false,
+                    position: 'nearest',
+                    callbacks: {
+                        label: (context) => `${context.dataset.label}: ${context.parsed.y}`,
+                        title: (context) => context[0].label
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',  // Modo index es mejor para muchos puntos
+                intersect: false,
+                axis: 'xy'  // Detección en ambos ejes
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Número de Solicitudes'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Semana'
+                    },
+                    grid: {
+                        display: false  // Mejorar legibilidad con muchos puntos
+                    }
+                }
+            },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const label = data.labels[index];
+                    const value = data.data[index];
+                    
+                    // Animación mejorada
+                    const originalColors = window.chartSemanal.data.datasets[0].pointBackgroundColor;
+                    window.chartSemanal.data.datasets[0].pointBackgroundColor = 
+                        window.chartSemanal.data.datasets[0].data.map((_, i) => 
+                            i === index ? '#00ff00' : originalColors[i]);
+                    
+                    window.chartSemanal.update();
+                    
+                    console.log(`Dato seleccionado: ${label} - ${value} solicitudes`);
+                    
+                    setTimeout(() => {
+                        window.chartSemanal.data.datasets[0].pointBackgroundColor = originalColors;
+                        window.chartSemanal.update();
+                    }, 1000);
+                }
+            }
+        }
+    });
+}
+
+    async function cargarDatosIniciales() {
+    try {
+        const response = await fetch('/datos_estadisticas/'); // Ajusta la URL si es diferente
+        const data = await response.json();
+        datosGraficoSemanalOriginal = data.datos_para_grafico_semanal;
+        generarOpcionesAnio(datosGraficoSemanalOriginal.labels);
+        filtrarYGraficarPorAnio('todos'); // Mostrar todos los datos al cargar
+    } catch (error) {
+        console.error("Error al cargar los datos:", error);
+    }
+}
+
+
+    function generarOpcionesAnio(labels) {
+    const selectAnio = document.getElementById('anio-filtro');
+    const años = new Set();
+    labels.forEach(label => {
+        const año = label.split('/')[2]; // Extraer el año del formato dd/mm/aaaa
+        años.add(año);
+    });
+
+    años.forEach(año => {
+        const option = document.createElement('option');
+        option.value = año;
+        option.textContent = año;
+        selectAnio.appendChild(option);
+    });
+}
+
+    function filtrarDatosPorAnio(anio) {
+    if (anio === 'todos') {
+        return datosGraficoSemanalOriginal;
+    } else {
+        const labelsFiltrados = [];
+        const dataFiltrada = [];
+        datosGraficoSemanalOriginal.labels.forEach((label, index) => {
+            if (label.endsWith('/' + anio)) {
+                labelsFiltrados.push(label);
+                dataFiltrada.push(datosGraficoSemanalOriginal.data[index]);
+            }
+        });
+        return { labels: labelsFiltrados, data: dataFiltrada };
+    }
+}
+
+    function filtrarYGraficarPorAnio(anioSeleccionado) {
+        const datosFiltrados = filtrarDatosPorAnio(anioSeleccionado);
+        generarGraficoSemanal(datosFiltrados);
+    }
+
+    // Evento para detectar cambios en el selector de año
+    document.getElementById('anio-filtro').addEventListener('change', function() {
+        filtrarYGraficarPorAnio(this.value);
+    });
+
+    // Cargar los datos iniciales al cargar la página
+    cargarDatosIniciales();
+
+function sonDatosIguales(datos1, datos2) {
+    if (datos1 === null || datos2 === null) {
+        return datos1 === datos2; // Si ambos son null, son iguales
+    }
+
+    // Comparación profunda de los datos (puedes necesitar ajustarla según tu estructura de datos)
+    return JSON.stringify(datos1) === JSON.stringify(datos2);
+}
+
+        
+        // Función para animar contadores
+        function animateCounter(id, targetValue) {
+            const element = document.getElementById(id);
+            const currentValue = parseInt(element.textContent) || 0;
+            const duration = 1000; // duración de la animación en ms
+            const steps = 20; // número de pasos para la animación
+            const increment = (targetValue - currentValue) / steps;
+            let currentStep = 0;
+            
+            const timer = setInterval(() => {
+                currentStep++;
+                const newValue = Math.floor(currentValue + (increment * currentStep));
+                element.textContent = newValue;
+                
+                if (currentStep >= steps) {
+                    clearInterval(timer);
+                    element.textContent = targetValue;
+                    
+                    // Añadido: efecto de brillo al completar la animación
+                    element.style.animation = 'glow 1s ease-in-out';
+                    setTimeout(() => {
+                        element.style.animation = '';
+                    }, 1000);
+                }
+            }, duration / steps);
+        }
+
+        
+        let miGrafico = null; // Definir la variable en un ámbito global
+
+        function generarGrafico(datos) {
+    // Ordenar los datos de mayor a menor según la cantidad
+    const datosOrdenados = datos.slice().sort((a, b) => b.cantidad - a.cantidad);
+
+    const labels = datosOrdenados.map(dato => dato.label);
+    const cantidades = datosOrdenados.map(dato => dato.cantidad);
+
+    const canvas = document.getElementById('miGrafico');
+    if (!canvas) {
+        console.error("Canvas with ID 'miGrafico' not found.");
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+
+    if (miGrafico) {
+        console.log("Destruyendo miGrafico...");
+        miGrafico.destroy();
+        miGrafico = null;
+        console.log("miGrafico destruido.");
+    }
+
+    const barColor = 'rgb(0, 119, 255)';
+
+    miGrafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: cantidades,
+                backgroundColor: barColor,
+                borderColor: barColor,
+                borderWidth: 1,
+                hoverBackgroundColor: barColor,
+                hoverBorderColor: '#ffffff',
+                hoverBorderWidth: 2
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 10,
+                    cornerRadius: 4,
+                    displayColors: false
+                },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    formatter: function(value) {
+                        return value >= 1000 ? value.toLocaleString() : value;
+                    },
+                    font: {
+                        weight: 'bold',
+                        color: 'yellow'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return '• ' + labels[index];
+                        }
+                    }
+                },
+                x: {
+                    type: 'logarithmic',
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (value === 0) {
+                                return '0';
+                            }
+                            const logValue = Math.log10(value);
+                            if (Number.isInteger(logValue)) {
+                                return value.toLocaleString();
+                            }
+                            return '';
+                        },
+                        min: 0,
+                        max: Math.max(...cantidades)
+                    }
+                }
+            },
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 40,
+                    top: 10,
+                    bottom: 10
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+}
+       
+        // Iniciar actualización de datos
+        actualizarEstadisticas();
+        setInterval(actualizarEstadisticas, 5000);
+        
+        // Agregar interactividad a los contenedores de gráficos
+        const graficoContainers = document.querySelectorAll('.grafico-container');
+        graficoContainers.forEach(container => {
+            container.addEventListener('mouseenter', () => {
+                container.style.zIndex = '10';
+                // Añadido: efecto de escala suave al pasar el ratón
+                container.style.transform = 'translateY(-5px) scale(1.01)';
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                container.style.zIndex = '1';
+                // Añadido: restaurar escala al salir
+                container.style.transform = '';
+            });
+        });
+        
+        // Función para detectar clics fuera de los elementos seleccionados
+        document.addEventListener('click', (e) => {
+            // Si el clic no fue en un contador o en un gráfico, quitar todas las selecciones
+            if (!e.target.closest('.contador-container') && !e.target.closest('canvas')) {
+                document.querySelectorAll('.selected').forEach(el => {
+                    el.classList.remove('selected');
+                });
+            }
+        });
+        
+        // Añadido: Agregar efecto de animación a los iconos de los paneles
+        document.querySelectorAll('.panel-icon').forEach(icon => {
+            icon.addEventListener('mouseenter', () => {
+                icon.style.animation = 'rotate 1s ease-in-out';
+            });
+            
+            icon.addEventListener('mouseleave', () => {
+                icon.style.animation = '';
+            });
+        });
+        
+        document.querySelectorAll('.panel-value').forEach(value => {
+            value.addEventListener('mouseenter', () => {
+                value.style.animation = 'glow 1.5s infinite';
+            });
+            
+            value.addEventListener('mouseleave', () => {
+                value.style.animation = '';
+            });
+        });
+        
+       
+        const header = document.querySelector('.header');
+        header.addEventListener('mouseenter', () => {
+            header.style.boxShadow = '0 4px 20px rgba(0, 183, 199, 0.3)';
+        });
+        
+        header.addEventListener('mouseleave', () => {
+            header.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const toggleButtons = document.querySelectorAll('.toggle-button');
+    const visitasContent = document.getElementById('toggle-content');
+    const archivosContent = document.getElementById('archivos-content');
+    const visitasValueElement = document.getElementById('visitas_departamentosig'); // ID actualizada
+    const archivosValueElement = document.getElementById('archivos'); // ID actualizada
+    const toggleTitle = document.getElementById('toggle-title');
+    const toggleUpdateVisitas = document.getElementById('toggle-update-visitas');
+    const toggleDescriptionVisitas = document.getElementById('toggle-description-visitas');
+    const toggleUpdateArchivos = document.getElementById('toggle-update-archivos');
+    const toggleDescriptionArchivos = document.getElementById('toggle-description-archivos');
+    const soporteweb12 = document.getElementById('soporteweb12-content');
+    const soporteweb12ValueElement = document.getElementById('soporteweb12'); // ID actualizada
+    const soporteweb123 = document.getElementById('soporteweb12-content');
+    const soporteweb123ValueElement = document.getElementById('soporteweb12'); // ID actualizada
+
+    let currentView = 'visitas'; // Vista inicial
+
+    function updateToggleButtonPanel(data) {
+        if (data && typeof data.visitas_departamentosig !== 'undefined' && typeof data.archivos !== 'undefined') {
+            visitasValueElement.textContent = data.visitas_departamentosig;
+            archivosValueElement.textContent = data.archivos;
+
+            if (currentView === 'visitas') {
+                toggleTitle.textContent = 'Visitas';
+                visitasContent.classList.remove('hidden');
+                archivosContent.classList.add('hidden');
+            } else if (currentView === 'archivos') {
+                toggleTitle.textContent = 'Archivos';
+                visitasContent.classList.add('hidden');
+                archivosContent.classList.remove('hidden');
+            }
+        }
+    }
+
+    document.addEventListener('datosActualizados', (event) => {
+        updateToggleButtonPanel(event.detail);
+    });
+
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const view = this.getAttribute('data-view');
+
+            toggleButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            currentView = view;
+
+            if (view === 'visitas') {
+                toggleTitle.textContent = 'Visitas';
+                visitasContent.classList.remove('hidden');
+                archivosContent.classList.add('hidden');
+            } else if (view === 'archivos') {
+                toggleTitle.textContent = 'Visitas';
+                visitasContent.classList.add('hidden');
+                archivosContent.classList.remove('hidden');
+            }
+        });
+    });
+
+    const initialActiveButton = document.querySelector('.toggle-button.active[data-view]');
+    if (initialActiveButton) {
+        currentView = initialActiveButton.getAttribute('data-view');
+        if (currentView === 'archivos') {
+            toggleTitle.textContent = 'Archivos';
+            visitasContent.classList.add('hidden');
+            archivosContent.classList.remove('hidden');
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const panelesOriginal = document.getElementById('paneles-original');
+    const panelesNuevo = document.getElementById('paneles-nuevo');
+    const botonMostrarNuevosPaneles = document.getElementById('mostrar-nuevos-paneles');
+    const graficosOriginales = document.querySelector('.graficos-container:not(#graficos-nuevos)');
+    const graficosNuevos = document.getElementById('graficos-nuevos');
+    const flechaDerecha = '&raquo;';
+    const flechaIzquierda = '&laquo;';
+
+    botonMostrarNuevosPaneles.addEventListener('click', function() {
+        if (panelesOriginal.style.display !== 'none') {
+            panelesOriginal.style.display = 'none';
+            panelesNuevo.style.display = 'grid';
+            graficosOriginales.style.display = 'none';
+            graficosNuevos.style.display = 'grid';
+            botonMostrarNuevosPaneles.innerHTML = flechaIzquierda; // Usando innerHTML para la flecha izquierda
+        } else {
+            panelesOriginal.style.display = 'grid';
+            panelesNuevo.style.display = 'none';
+            graficosOriginales.style.display = 'grid';
+            graficosNuevos.style.display = 'none';
+            botonMostrarNuevosPaneles.innerHTML = flechaDerecha; // Usando innerHTML para la flecha derecha
+        }
+    });
+});
+    </script>
+
+    
+</body>
+</html>

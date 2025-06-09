@@ -1,0 +1,201 @@
+/* =========================================
+   General Styles
+========================================= */
+body {
+    background-color: var(--mint-green) !important;
+    font-family: var(--primary-font) !important;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--oxford-blue) !important;
+}
+
+/* =========================================
+   Navbar Styles con Neumorfismo
+========================================= */
+.navbar-custom {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    background-color: var(--tea-green-v2);
+    /* Fondo adaptado */
+    box-shadow:
+        8px 8px 16px #A1D6A3,
+        /* Sombra externa oscura adaptada */
+        -8px -8px 16px #E6F6D5;
+    /* Sombra externa clara adaptada */
+    transition: all 0.3s ease;
+    font-family: var(--complementary-font), sans-serif;
+}
+
+/* Hover Effect para la Navbar */
+.navbar-custom:hover {
+    box-shadow:
+        6px 6px 12px #A1D6A3,
+        /* Sombra externa oscura adaptada al hover */
+        -6px -6px 12px #E6F6D5;
+    /* Sombra externa clara adaptada al hover */
+}
+
+/* =========================================
+   Dropdown Menu con Neumorfismo
+========================================= */
+.navbar-custom .dropdown-menu {
+    border-radius: 15px;
+    background-color: var(--tea-green-v2);
+    /* Fondo adaptado */
+    box-shadow:
+        6px 6px 12px #A1D6A3,
+        /* Sombra externa oscura adaptada */
+        -6px -6px 12px #E6F6D5;
+    /* Sombra externa clara adaptada */
+    font-family: var(--complementary-font), sans-serif;
+}
+
+/* Estilos para los Ítems del Dropdown */
+.navbar-custom .dropdown-item {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    transition: background-color 0.3s ease;
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    font-family: var(--complementary-font), sans-serif;
+}
+
+/* Hover Effect para los Ítems del Dropdown */
+.navbar-custom .dropdown-item:hover {
+    background-color: var(--tea-green);
+    /* Utiliza Tea Green para el fondo al hover */
+    color: var(--oxford-blue) !important;
+    /* Mantener el color de texto */
+}
+
+/* =========================================
+   Active Nav Link con Neumorfismo
+========================================= */
+.navbar-custom .nav-link.active {
+    background-color: var(--sky-blue);
+    /* Utiliza Sky Blue para resaltar */
+    color: var(--oxford-blue) !important;
+    /* Color de texto para resaltar el enlace activo */
+    font-weight: bold;
+    /* Negrita para el enlace activo */
+    border-radius: 10px;
+    /* Bordes redondeados */
+    box-shadow:
+        inset 4px 4px 8px #A1D6A3,
+        /* Sombra interna oscura adaptada */
+        inset -4px -4px 8px #E6F6D5;
+    /* Sombra interna clara adaptada */
+    font-family: var(--complementary-font), sans-serif;
+}
+
+/* =========================================
+   Estilos Generales para Texto en Navbar
+========================================= */
+
+/* Cambiar el color del texto de la marca de la navbar */
+.navbar-custom .navbar-brand {
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    transition: color 0.3s ease;
+    font-family: var(--complementary-font-2), sans-serif;
+    font-size: 2.25rem;
+    /* margin-bottom: 0.6rem; */
+}
+
+/* Cambiar el color de los enlaces de la navbar */
+.navbar-custom .nav-link {
+    color: var(--oxford-blue) !important;
+    /* Asegura que el texto usa OXFORD BLUE */
+    transition: color 0.3s ease;
+    font-family: var(--complementary-font-2), sans-serif;
+    font-size: 1.9rem;
+}
+
+/* Hover Effect para los Enlaces de la Navbar */
+.navbar-custom .nav-link:hover {
+    color: var(--tiffany-blue);
+    /* Utiliza Tiffany Blue para el color al pasar el cursor */
+    /* font-family: var(--complementary-font), sans-serif; */
+}
+
+/* Mantener el color al pasar el cursor en nav-link */
+.nav-link:focus,
+.nav-link:hover {
+    color: #5e6f53 !important;
+}
+
+/* Hover Effect para la Marca de la Navbar */
+.navbar-custom .navbar-brand:hover {
+    color: var(--tiffany-blue);
+    /* Utiliza Tiffany Blue para el color al pasar el cursor */
+}
+
+.container_new{
+    display: flex;
+    align-items: center;
+}
+    
+
+
+.enviado{
+    display: flex;
+    width: 50px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+    font-family: sans-serif;
+    text-decoration: none;
+    color: #333;
+    border: 2px solid #333;
+    letter-spacing: 2px;
+    text-align: center;
+    position: relative;
+    transition: all .35s;
+    border-radius: 13px;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+
+  .enviado span {
+    display: flex;
+    position: inherit;
+    z-index: 2;
+    align-items: center;
+    /* justify-content: space-around; */
+}
+
+.enviado svg {
+    display: flex;
+    position: inherit;
+    z-index: 2;
+    align-items: center;
+    /* justify-content: space-around; */
+}
+
+.enviado:after{
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  border-radius: 10px;
+
+  background: #0f52a9;
+  transition: all .35s;
+}
+
+.enviado:hover{
+  color: #fff;
+}
+
+.enviado:hover:after{
+      border-radius: 10px;
+
+  width: 100%;
+}

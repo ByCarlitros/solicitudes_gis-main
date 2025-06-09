@@ -1,0 +1,59 @@
+{% load static %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Departamento SIG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="/media/assets/image/iconoSIG.ico" />
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/iniciar.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/base.css' %}" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+  </head>
+
+
+
+  <body>
+    <div style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+      <img src= "/media/assets/image/version-negativo-caluga-logoSIG.png" height="200" alt="Caluga Administrativa" />
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh;">
+      <video autoplay loop muted style="object-fit: cover; width: 100%; height: 100%;">
+        <source src="/media/assets/video/mundop.mp4" type="video/mp4" />
+        Tu navegador no soporta el elemento de video.
+      </video>
+    </div>
+
+
+
+
+    <div class="containerTitle">
+      <div class="container-centered-2 mt-3">
+        <h4 class="section-subtitle">Departamento</h4>
+        <h1 class="font-medium section-title">Sistema de Información Geográfica</h1>
+        <h2 class="section-subtitle">Ilustre Municipalidad de Valparaíso</h2>
+        <h6 class="section-subtitle">SECPLA</h6>
+      </div>
+      
+      <div class="container-centered mt-1">
+        <button class="button-grey" onclick="window.location.href='menu/'">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          Entrar
+        </button>
+      </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+  </body>
+</html>
