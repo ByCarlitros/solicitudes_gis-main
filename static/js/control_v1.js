@@ -71,61 +71,36 @@ document.addEventListener('DOMContentLoaded', function () {
             ]
         };
 
-        const datosPorcentuales = {
-            labels: labels,
-            datasets: [
-                {
-                    label: "Carga de trabajo (%)",
-                    data: trabajo_porcentual_propio,
-                    backgroundColor: "rgba(3, 28, 143, 0.58)",
-                    borderColor: "rgb(17, 86, 235)",
-                    borderWidth: 1
-                },
-                {
-                    label: "Carga de trabajo Como Apoyo (%)",
-                    data: trabajo_porcentual_apoyo,
-                    backgroundColor: "rgba(14, 174, 6, 0.53)",
-                    borderColor: "rgb(14, 104, 9)",
-                    borderWidth: 1
-                }
-            ]
-        };
+        
 
-        // Inicializar el gráfico con datos absolutos
-        let currentChart = new Chart(ctx1, {
+        const chart = new Chart(ctx1, {
             type: "bar",
             data: datosAbsolutos,
             options: {
                 responsive: true,
                 scales: {
-                    x: { stacked: true },
-                    y: { stacked: true, beginAtZero: true }
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        type: 'logarithmic',
+                        stacked: true,
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function (value) {
+                                return Number(value.toString());
+                            }
+                        }
+                    }
                 },
-                plugins: { legend: { display: true }, tooltip: { enabled: true } }
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { enabled: true }
+                }
             }
         });
 
-        // Agregar el evento para alternar entre gráficos
-        document.getElementById("toggleChart").addEventListener("click", function () {
-            let currentData = currentChart.data === datosAbsolutos ? datosPorcentuales : datosAbsolutos;
-
-            currentChart.destroy(); // Destruir el gráfico actual
-            currentChart = new Chart(ctx1, {
-                type: "bar",
-                data: currentData,
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: { stacked: true },
-                        y: { stacked: true, beginAtZero: true }
-                    },
-                    plugins: { legend: { display: true }, tooltip: { enabled: true } }
-                }
-            });
-
-            // Cambiar el texto del botón
-            this.textContent = this.textContent === "Ver Gráfico Porcentual" ? "Ver Gráfico Absoluto" : "Ver Gráfico Porcentual";
-        });
+        
     }
 
 

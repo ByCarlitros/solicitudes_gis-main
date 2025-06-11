@@ -415,7 +415,16 @@ h1.text-primary {
 
 
   </style>
-
+    <style>
+    .btn-outline-success:hover {
+        background-color: #198754;
+        color: white;
+    }
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+</style>
     </style>
 </head>
 
@@ -436,6 +445,9 @@ h1.text-primary {
           <li class="nav-link">
             <a class="nav-link" href="/tareas/">Tareas SIG</a>
           </li>
+          <li class="nav-link">
+              <a class="nav-link" href="#">Consolidado</a>
+            </li>
           <li class="nav-link">
             <a class="nav-link" href="{% url 'control' %}">Estadísticas</a>
           </li>
@@ -496,12 +508,10 @@ h1.text-primary {
   </nav>
 
 
-<div class="container py-4"> 
-
+<div class="container py-4">
     <div class="text-center mb-4">
-        <h1 class="text-primary"> ✏️ Tareas SIG</h1>
+        <h1 class="text-primary">✏️ Tareas SIG</h1>
     </div>
-
 
     <div class="mb-4 d-flex align-items-center gap-2">
         <select id="funcionarioSelect" class="form-select" data-url="{% url 'tareas_por_funcionario' 0 %}">
@@ -511,95 +521,114 @@ h1.text-primary {
             {% endfor %}
         </select>
         {% if request.user.is_superuser %}
-        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#agregarTareaModal">
-            ➕ Agregar Tarea
+        <button type="button" class="btn btn-outline-success btn-sm border-2 px-3 py-2 rounded-pill me-2" 
+                data-bs-toggle="modal" data-bs-target="#agregarTareaModal"
+                style="transition: all 0.3s;">
+            <i class="fas fa-plus me-1"></i> Agregar Tarea
         </button>
         {% endif %}
-        <button type="button" id="verTareasBtn" class="btn btn-primary btn-sm">Tareas completadas</button>
+        <button type="button" id="verTareasBtn" 
+                class="btn btn-outline-primary btn-sm border-2 px-3 py-2 rounded-pill"
+                style="transition: all 0.3s;">
+            <i class="fas fa-check-circle me-1"></i> Tareas Completadas
+        </button>
     </div>
     
-    <div class="card shadow mb-4">
+    <div class="card shadow mb-3">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Lista de Tareas </h5>
+            <h5 class="mb-0">Lista de Tareas</h5>
         </div>
         <div class="card-body" id="listaTareas">
             {% if tareas %}
+            <div class="row mb-3 d-none d-md-flex table-header" style="background-color: #e9ecef; padding: 12px 15px; border-radius: 4px; font-weight: bold;">
+                <div class="col-md-3">Detalles</div>
+                <div class="col-md-4">Apoyos</div>
+                <div class="col-md-2 text-center">Estado</div>
+                <div class="col-md-3 text-end">Acciones</div>
+            </div>
+            
             <ul class="list-group">
                 {% for tarea in tareas %}
-                <li class="list-group-item d-flex justify-content-between align-items-center task-item" data-tarea-id="{{ tarea.id }}">
-                    <div class="col-3">
-                        <span>
+                <li class="list-group-item task-item" data-tarea-id="{{ tarea.id }}" style="padding: 1rem;">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 mb-2 mb-md-0">
                             <strong>{{ tarea.descripcion }}</strong> - {{ tarea.funcionario.nombre }}<br>
-                            Fecha de Creación: {{ tarea.fecha_creacion|date:"d-m-Y" }} <br>
-                            Fecha de Entrega: {{ tarea.fecha_entrega|date:"d-m-Y" }}<br>
-                            <span style="font-weight: bold; color: #333;">Prioridad:</span> 
-                            <span class="{% if tarea.prioridad == 'alta' %}text-danger{% elif tarea.prioridad == 'media' %}text-warning{% else %}text-success{% endif %}">
+                            <small class="text-muted">
+                                Creación: {{ tarea.fecha_creacion|date:"d-m-Y" }}<br>
+                                Entrega: {{ tarea.fecha_entrega|date:"d-m-Y" }}
+                            </small><br>
+                            <span class="badge {% if tarea.prioridad == 'alta' %}bg-danger{% elif tarea.prioridad == 'media' %}bg-warning{% else %}bg-success{% endif %}">
                                 {{ tarea.get_prioridad_display }}
-                            </span><br>
-                        </span>
-                    </div>
-                    <div class="justify-content-center text-align-start" style="width: 250px;">
-                        <strong>Apoyo(s):</strong>
-                        {% if tarea.apoyo.all %}
-                            <ul class="apoyo-lista">
-                                {% for apoyo in tarea.apoyo.all %}
-                                    <li class="apoyo-item">
-                                        <strong>{{ apoyo.nombre }}:</strong> {{ apoyo.descripcion|default:"No disponible" }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span>No hay funcionarios de apoyo.</span>
-                        {% endif %}
-                    </div>
-                    <div>
-                        <strong style="color: green; font-weight: bold;">En Proceso</strong>
-                    </div>
-                    <div>
-                        <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-sm btn-warning">✏️ Editar</a>
-                        {% if request.user.is_superuser %}
-                        <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-sm btn-danger"onclick="confirmarEliminacion(event, this)" data-tarea-id="{{ tarea.id }}">️ Eliminar</a>
-                    </a>
-                            <button type="button" class="btn btn-sm btn-success completar-tarea" data-tarea-id="{{ tarea.id }}">✅ Completar</button>
-                        {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="col-md-4 mb-2 mb-md-0">
+                            {% if tarea.apoyo.all %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for apoyo in tarea.apoyo.all %}
+                                        <li class="mb-1">
+                                            <span class="badge bg-secondary">{{ apoyo.nombre }}</span>
+                                            <small class="text-muted">{{ apoyo.descripcion|default:"Sin descripción"|truncatechars:30 }}</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <span class="text-muted">Sin apoyos asignados</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-2 text-center mb-2 mb-md-0">
+                            <span class="badge bg-info">En Proceso</span>
+                        </div>
+                        
+                        <div class="col-md-3 text-md-end">
+                            <div class="d-flex flex-wrap gap-1 justify-content-end">
+                                <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-sm btn-warning">✏️ Editar</a>
+                                {% if request.user.is_superuser %}
+                                <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-sm btn-danger" onclick="confirmarEliminacion(event, this)" data-tarea-id="{{ tarea.id }}">🗑️ Eliminar</a>
+                                <button type="button" class="btn btn-sm btn-success completar-tarea" data-tarea-id="{{ tarea.id }}">✅ Completar</button>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </li>
-
-                
                 {% endfor %}
-            </ul>
-            <ul class="pagination">
-                {% if tareas.has_previous %}
-                    
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ tareas.previous_page_number }}" aria-label="Anterior">Anterior</a>
-                    </li>
-                {% endif %}
-                
-                {% for i in tareas.paginator.page_range %}
-                    <li class="page-item {% if tareas.number == i %}active{% endif %}">
-                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                    </li>
-                {% endfor %}
-                
-                {% if tareas.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ tareas.next_page_number }}" aria-label="Siguiente">Siguiente</a>
-                    </li>
-                    
-                {% endif %}
             </ul>
             {% else %}
             <p class="text-muted text-center">⚠️ No hay tareas registradas.</p>
             {% endif %}
         </div>
     </div>
+
+    {% if tareas %}
+    <nav aria-label="Paginación de tareas" class="mb-3">
+        <ul class="pagination justify-content-center">
+            {% if tareas.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ tareas.previous_page_number }}" aria-label="Anterior">Anterior</a>
+            </li>
+            {% endif %}
+            
+            {% for i in tareas.paginator.page_range %}
+            <li class="page-item {% if tareas.number == i %}active{% endif %}">
+                <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if tareas.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ tareas.next_page_number }}" aria-label="Siguiente">Siguiente</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
     <div class="text-center mb-4 col">
-        <a href="/solicitude_llegadas" class="btn btn-primary btn-sm ">Volver</a>
+        <a href="/solicitude_llegadas" class="btn btn-primary btn-sm">Volver</a>
     </div>
     
-    <div id="pagination-container"></div>
-    
+    <!-- Modal Agregar Tarea -->
     <div class="modal fade" id="agregarTareaModal" tabindex="-1" aria-labelledby="agregarTareaModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content rounded-4 shadow border-0">
@@ -610,65 +639,39 @@ h1.text-primary {
                 <div class="modal-body p-4 pt-0">
                     <form method="post" id="tareaForm" action="{% url 'agregar_tarea' %}">
                         {% csrf_token %}
-    
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control rounded-3 border-0 bg-light input-personalizado" id="descripcion" placeholder="Descripción" name="{{ form.descripcion.html_name }}" required>
-                            <label for="descripcion" class="text-secondary label-personalizado">Descripción</label>
-                            {% if form.descripcion.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.descripcion.errors }}
-                                </div>
-                            {% endif %}
+                            <input type="text" class="form-control rounded-3 border-0 bg-light" id="descripcion" placeholder="Descripción" name="{{ form.descripcion.html_name }}" required>
+                            <label for="descripcion" class="text-secondary">Descripción</label>
                         </div>
-    
                         <div class="form-floating mb-3">
-                            <select class="form-control rounded-3 border-0 bg-light select-personalizado" id="funcionario" name="{{ form.funcionario.html_name }}" required>
+                            <select class="form-control rounded-3 border-0 bg-light" id="funcionario" name="{{ form.funcionario.html_name }}" required>
                                 <option value="">Seleccionar funcionario</option>
                                 {% for funcionario in funcionarios %}
                                     <option value="{{ funcionario.id }}">{{ funcionario.nombre }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="funcionario" class="text-secondary label-personalizado">Funcionario</label>
-                            {% if form.funcionario.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.funcionario.errors }}
-                                </div>
-                            {% endif %}
+                            <label for="funcionario" class="text-secondary">Funcionario</label>
                         </div>
-    
                         <div class="mb-3">
-                            <label for="{{ form.apoyo.id_for_label }}" class="form-label text-secondary label-personalizado">Apoyo(s) (puedes seleccionar varios):</label>
+                            <label for="{{ form.apoyo.id_for_label }}" class="form-label text-secondary">Apoyo(s):</label>
                             {{ form.apoyo }}
                         </div>
-    
                         <div class="form-floating mb-3">
-                            <input type="date" class="form-control rounded-3 border-0 bg-light input-personalizado" id="fecha_entrega" placeholder="Fecha de Entrega" name="{{ form.fecha_entrega.html_name }}" required>
-                            <label for="fecha_entrega" class="text-secondary label-personalizado">Fecha de Entrega</label>
-                            {% if form.fecha_entrega.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.fecha_entrega.errors }}
-                                </div>
-                            {% endif %}
+                            <input type="date" class="form-control rounded-3 border-0 bg-light" id="fecha_entrega" placeholder="Fecha de Entrega" name="{{ form.fecha_entrega.html_name }}" required>
+                            <label for="fecha_entrega" class="text-secondary">Fecha de Entrega</label>
                         </div>
-    
                         <div class="form-floating mb-3">
-                            <select class="form-control rounded-3 border-0 bg-light select-personalizado" id="prioridad" name="{{ form.prioridad.html_name }}" required>
+                            <select class="form-control rounded-3 border-0 bg-light" id="prioridad" name="{{ form.prioridad.html_name }}" required>
                                 <option value="">Seleccionar prioridad</option>
                                 <option value="alta">Alta</option>
                                 <option value="media">Media</option>
                                 <option value="baja">Baja</option>
                             </select>
-                            <label for="prioridad" class="text-secondary label-personalizado">Prioridad</label>
-                            {% if form.prioridad.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.prioridad.errors }}
-                                </div>
-                            {% endif %}
+                            <label for="prioridad" class="text-secondary">Prioridad</label>
                         </div>
-    
                         <div class="modal-footer border-top-0 p-4">
-                            <button type="button" class="btn btn-secondary rounded-3 me-2 boton-secundario" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary rounded-3 boton-primario">Guardar</button>
+                            <button type="button" class="btn btn-secondary rounded-3 me-2" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary rounded-3">Guardar</button>
                         </div>
                     </form>
                 </div>
@@ -676,32 +679,33 @@ h1.text-primary {
         </div>
     </div>
     
+    <!-- Modal Confirmar Eliminación -->
     <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header bg-danger text-white rounded-top-4">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h5>
+                    <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <i class="bi bi-trash-fill text-danger fs-1"></i>
+                    <i class="fas fa-trash-alt text-danger fs-1"></i>
                     <p class="mt-3 fs-5">¿Estás seguro de que quieres eliminar esta tarea?</p>
                     <p class="text-muted">Esta acción no se puede deshacer.</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
                     <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle"></i> Cancelar
+                        Cancelar
                     </button>
                     <a href="#" id="confirmarEliminarBtn" class="btn btn-danger px-4 rounded-pill">
-                        <i class="bi bi-trash"></i> Eliminar
+                        Eliminar
                     </a>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- Modal Tarea Completada -->
     <div class="modal fade" id="tareaCompletadaModal" tabindex="-1" aria-labelledby="tareaCompletadaModalLabel" aria-hidden="true">
-    
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -717,6 +721,7 @@ h1.text-primary {
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

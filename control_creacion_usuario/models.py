@@ -1,5 +1,6 @@
 from django.db import models
 import os
+from django.contrib.auth.models import User
 
 def content_file_name_adjunto(instance, filename):
     ext = filename.split('.')[-1]
@@ -8,14 +9,17 @@ def content_file_name_adjunto(instance, filename):
     return os.path.join(folder, filename)
 
 
+
+
 class Imagen_sig(models.Model):
     id = models.BigAutoField(primary_key=True, unique=True)
-
     archivo_adjunto = models.ImageField(upload_to=content_file_name_adjunto, blank=True, null=True)
-    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)# NUEVO CAMPO
+
     class Meta:
         verbose_name = "Imagen_sig"
         verbose_name_plural = "Imagenes_sig"
+
 
 def content_file_name_adjunto_pdf(instance, filename):
     ext = filename.split('.')[-1]

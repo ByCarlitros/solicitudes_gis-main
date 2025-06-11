@@ -3,6 +3,23 @@
 
 {% block custom_css %}
   <link href="{% static 'css/gestion_imagen.css' %}" rel="stylesheet" />
+  <style>
+    .button-imagen-container {
+      display: flex;
+      gap: 0.3rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .button-imagen-container button,
+    .button-imagen-container form button {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+      border-radius: 0.4rem;
+      height: 2rem; /* Más delgado verticalmente */
+      line-height: 1.2rem;
+      min-width: 70px;
+    }
+  </style>
 {% endblock %}
 
 {% block main_content %}
@@ -18,18 +35,10 @@
                 <h2 class="section-subtitle">Instrucciones de uso:</h2>
                 <div class="data-box">
                   <ol class="font-light">
-                    <li>
-                      <strong>Archivo adjunto:</strong> Solo sirve para guardar la previa de la imagen.
-                    </li>
-                    <li>
-                      <strong>Botón "Subir nueva imagen":</strong> Ese botón sube la imagen al servidor.
-                    </li>
-                    <li>
-                      <strong>Copia URL:</strong> Sirve para copiar la dirección de la imagen.
-                    </li>
-                    <li>
-                      <strong>Eliminar imagen:</strong> Ese botón es para eliminar la imagen.
-                    </li>
+                    <li><strong>Archivo adjunto:</strong> Solo sirve para guardar la previa de la imagen.</li>
+                    <li><strong>Botón "Subir nueva imagen":</strong> Ese botón sube la imagen al servidor.</li>
+                    <li><strong>Copia URL:</strong> Sirve para copiar la dirección de la imagen.</li>
+                    <li><strong>Eliminar imagen:</strong> Ese botón es para eliminar la imagen.</li>
                   </ol>
                 </div>
               </div>
@@ -43,7 +52,7 @@
                 <form id="imageForm" method="post" enctype="multipart/form-data">
                   {% csrf_token %}
                   {{ form.as_p }}
-                  <div style="margin-inline: auto;max-width: 50%;overflow: hidden;max-height: 11rem;">
+                  <div style="margin-inline: auto; max-width: 50%; overflow: hidden; max-height: 11rem;">
                     <img id="previewImage" src="#" alt="Vista previa de la imagen" class="img-thumbnail" style="display: none;" />
                   </div>
                   <button type="submit" class="btn-neumorphic green white-bg">Subir nueva imagen</button>
@@ -53,14 +62,42 @@
           </div>
         </div>
 
+        <!-- Filtro de usuario -->
         <div class="flex-row-dashboard fill-available">
           <div class="flex-column-gap fill-available">
             <div class="info-box p-1 fill-available">
+              <form method="get" class="mb-3">
+                <label for="usuario">Filtrar por usuario:</label>
+                <select name="usuario" id="usuario" class="form-select" onchange="this.form.submit()">
+                  <option value="">Todos</option>
+                  {% for usuario in usuarios %}
+                    <option value="{{ usuario.id }}" {% if usuario_filtrado == usuario.id|stringformat:"s" %}selected{% endif %}>
+                      {{ usuario.username }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </form>
+
+              <h2>
+                Imágenes de:
+                {% if usuario_filtrado %}
+                  {% for usuario in usuarios %}
+                    {% if usuario.id|stringformat:"s" == usuario_filtrado %}
+                      {{ usuario.username }}
+                    {% endif %}
+                  {% endfor %}
+                {% else %}
+                  Todos
+                {% endif %}
+              </h2>
+
               <div class="row flex-container">
                 {% for imagen in page_obj %}
                   {% if imagen.archivo_adjunto %}
                     <div class="card h-100">
-                      <a href="{{ imagen.archivo_adjunto.url }}"><img src="{{ imagen.archivo_adjunto.url }}" class="card-img-top" alt="Imagen" /></a>
+                      <a href="{{ imagen.archivo_adjunto.url }}">
+                        <img src="{{ imagen.archivo_adjunto.url }}" class="card-img-top" alt="Imagen" />
+                      </a>
                       <div class="button-imagen-container">
                         <button class="btn-neumorphic blue tea-green-bg" onclick="copiarURL('{{ imagen.archivo_adjunto.url }}')">Copiar URL</button>
                         <form action="{% url 'eliminar_imagen' imagen.id %}" method="post" class="mb-0">
@@ -68,39 +105,44 @@
                           <button type="submit" class="btn-neumorphic red tea-green-bg">Eliminar</button>
                         </form>
                       </div>
+                      {% if not usuario_filtrado %}
+                        <p class="text-center mt-1" style="font-size: 0.9rem; color: #444;">
+                          De: {{ imagen.usuario.username }}
+                        </p>
+                      {% endif %}
                     </div>
                   {% endif %}
+                {% empty %}
+                  <p>No hay imágenes disponibles.</p>
                 {% endfor %}
               </div>
 
-              <div>
-                <!-- Paginación -->
-                <nav aria-label="Paginación">
-                  <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                      <li class="page-item">
-                        <a class="page-link btn-neumorphic green white-bg me-2" href="?page=1">&laquo; Primero</a>
-                      </li>
-                      <li class="page-item">
-                        <a class="page-link btn-neumorphic green white-bg me-2" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                      </li>
-                    {% endif %}
-
-                    <li class="page-item disabled">
-                      <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+              <!-- Paginación -->
+              <nav aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                  {% if page_obj.has_previous %}
+                    <li class="page-item">
+                      <a class="page-link btn-neumorphic green white-bg me-2" href="?{% if usuario_filtrado %}usuario={{ usuario_filtrado }}&{% endif %}page=1">&laquo; Primero</a>
                     </li>
+                    <li class="page-item">
+                      <a class="page-link btn-neumorphic green white-bg me-2" href="?{% if usuario_filtrado %}usuario={{ usuario_filtrado }}&{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                  {% endif %}
 
-                    {% if page_obj.has_next %}
-                      <li class="page-item">
-                        <a class="page-link btn-neumorphic green white-bg ms-2" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-                      </li>
-                      <li class="page-item">
-                        <a class="page-link btn-neumorphic green white-bg ms-2" href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
-                      </li>
-                    {% endif %}
-                  </ul>
-                </nav>
-              </div>
+                  <li class="page-item disabled">
+                    <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                  </li>
+
+                  {% if page_obj.has_next %}
+                    <li class="page-item">
+                      <a class="page-link btn-neumorphic green white-bg ms-2" href="?{% if usuario_filtrado %}usuario={{ usuario_filtrado }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link btn-neumorphic green white-bg ms-2" href="?{% if usuario_filtrado %}usuario={{ usuario_filtrado }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </nav>
             </div>
           </div>
         </div>

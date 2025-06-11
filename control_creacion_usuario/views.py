@@ -401,22 +401,51 @@ def logout(request):
     auth_logout(request)
     return redirect('control')
 
-def Gestion_imagen(request):
-    if request.method == 'POST':
-        form = ImagenForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('Gestion_imagen')  # Redirige a la misma vista después de guardar la imagen
-    else:
-        form = ImagenForm()
+from django.core.paginator import Paginator
 
-    # Obtener todas las imágenes
-    imagenes = Imagen_sig.objects.all()
-    paginator = Paginator(imagenes, 6)  # Muestra 6 imágenes por página
+
+
+def Gestion_imagen(request):
+    usuarios = User.objects.all().order_by('username')  # lista para el filtro
+
+    usuario_id = request.GET.get('usuario')
+    imagenes = Imagen_sig.objects.all().order_by('-id')
+
+    nombre_usuario = "Todos"
+    usuario_filtrado = None
+
+    if usuario_id:
+        try:
+            usuario_filtrado = int(usuario_id)
+            imagenes = imagenes.filter(usuario_id=usuario_filtrado)
+            usuario_obj = User.objects.get(id=usuario_filtrado)
+            nombre_usuario = usuario_obj.username
+        except (User.DoesNotExist, ValueError):
+            usuario_filtrado = None
+            nombre_usuario = "Desconocido"
+
+    paginator = Paginator(imagenes, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'Gestion_imagen.html', {'form': form, 'imagenes': imagenes,'page_obj': page_obj})
+    if request.method == 'POST':
+        form = ImagenForm(request.POST, request.FILES)
+        if form.is_valid():
+            imagen = form.save(commit=False)
+            imagen.usuario = request.user
+            imagen.save()
+            return redirect('Gestion_imagen')  # O usa el nombre correcto de tu url
+    else:
+        form = ImagenForm()
+
+    context = {
+        'usuarios': usuarios,
+        'usuario_filtrado': usuario_filtrado,
+        'nombre_usuario': nombre_usuario,
+        'page_obj': page_obj,
+        'form': form,
+    }
+    return render(request, 'Gestion_imagen.html', context)
 
 @csrf_exempt
 def actualizar_estado_solicitud(request):
