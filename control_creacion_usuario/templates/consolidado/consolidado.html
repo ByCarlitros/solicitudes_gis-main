@@ -1,0 +1,320 @@
+{% extends 'core/Slide.html' %}
+{% load static %}
+
+{% block main_content %}
+
+{% block custom_css %}
+<style>
+    .row > * {
+        padding: calc(var(--bs-gutter-x)* .5);
+    }
+
+    #tabla_registro {
+        width: 90%;
+        font-family: "Roboto Condensed";
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 14px;
+        text-align: left;
+        border: 1px solid #ddd;
+        table-layout: fixed;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+        word-wrap: break-word;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+
+    th {
+        background-color: #0f52a9;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    th:nth-child(1) { width: 90px; }
+    th:nth-child(2) { width: 90px; }
+    th:nth-child(3) { width: 110px; }
+    th:nth-child(4) { width: 130px; }
+    th:nth-child(5) { width: 130px; }
+    th:nth-child(6) { width: 180px; }
+    th:nth-child(7) { width: 120px; }
+    th:nth-child(8) { width: 190px; }
+    th:nth-child(9) { width: 300px; }
+    th:nth-child(10) { width: 100px; }
+    th:nth-child(11) { width: 100px; }
+    th:nth-child(12) { width: 100px; }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    @media screen and (max-width: 768px) {
+        table {
+            font-size: 12px;
+        }
+        th, td {
+            padding: 8px;
+            width: auto;
+        }
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .pagination-container .page-link {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .pagination-container .page-link:hover {
+        background-color: #1a5da4;
+        color: white;
+    }
+
+    .pagination-container .page-link.active {
+        background-color: #1a5da4;
+        color: white;
+        font-weight: bold;
+    }
+</style>
+{% endblock custom_css %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
+<script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+<link rel="stylesheet" href="{% static 'css/table.css' %}" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=text_snippet" />
+
+<section class="d-flex justify-content-center">
+    <div class="row">
+        <div class="col" style="display: flex;justify-content: center;flex-wrap: wrap;">
+            <div class="container_new">
+                {% if request.user.is_superuser %}
+                    <div class="container" style="margin: 1rem; width: auto;">
+                        <div class="wrapper">
+                            <a class="enviado" href="#" data-bs-toggle="modal" data-bs-target="#agregarSolicitudModal">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="container" style="margin: 1rem; width: auto;">
+                    <div id="paginacion" class="pagination-container"></div>
+                </div>
+
+                <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
+                    <input type="text" id="buscador-id" class="form-control" placeholder="Buscar por ID..." style="max-width: 250px;">
+                    <select id="filtro-anio" name="filtro-anio" class="form-select">
+                        <option value="">Todos</option>
+                        {% for anio in anios %}
+                            <option value="{{ anio }}">{{ anio }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="toast-container position-fixed top-0 end-0 p-3">
+                <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">📌 La tabla ha sido actualizada</div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+            
+            <table id="tabla_registro" class="display table-custom">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre Usuario</th>
+                        <th>Nombre Archivo</th>
+                        <th>Fuente</th>
+                        <th>Lugar</th>
+                        <th>Fecha Subida</th>
+                        <th>Fecha Actualización</th>
+                        <th>Validado por</th>
+                        <th>Estado</th>
+                        <th>Días desde Actualización</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr data-anio="{{ solicitud.fecha_actualizacion|date:'Y' }}">
+                        <td>{{ solicitud.id }}</td>
+                        <td>{{ solicitud.nombre_usuario }}</td>
+                        <td>{{ solicitud.nombre_archivo }}</td>
+                        <td>{{ solicitud.fuente }}</td>
+                        <td>{{ solicitud.lugar }}</td>
+                        <td>{{ solicitud.fecha_subida|date:"Y-m-d" }}</td>
+                        <td>{{ solicitud.fecha_actualizacion|date:"Y-m-d" }}</td>
+                        <td>{{ solicitud.validado_por }}</td>
+                        <td>{{ solicitud.get_estado_display }}</td>
+                        <td>
+                            <span class="dias-estado" data-fecha="{{ solicitud.fecha_actualizacion|date:'Y-m-d' }}"></span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="10" class="text-center">No hay solicitudes disponibles</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para agregar solicitud -->
+    <div class="modal fade" id="agregarSolicitudModal" tabindex="-1" aria-labelledby="agregarSolicitudModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarSolicitudModalLabel">Agregar Solicitud</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nombre_usuario" class="form-label">Nombre Usuario</label>
+                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre_archivo" class="form-label">Nombre Archivo</label>
+                            <input type="text" class="form-control" id="nombre_archivo" name="nombre_archivo" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="fuente" class="form-label">Fuente</label>
+                            <input type="text" class="form-control" id="fuente" name="fuente" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="lugar" class="form-label">Lugar</label>
+                            <input type="text" class="form-control" id="lugar" name="lugar" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_actualizacion" class="form-label">Fecha de Actualización</label>
+                            <input type="datetime-local" class="form-control" id="fecha_actualizacion" name="fecha_actualizacion" value="{{ today }}" />
+                        </div>
+                        <input type="hidden" name="estado" value="1" />
+                        <input type="hidden" name="validado_por" value="Ninguno" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Subir Solicitud</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="exitoModal" tabindex="-1" aria-labelledby="exitoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exitoModalLabel">¡Solicitud Subida con Éxito!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    La solicitud ha sido subida exitosamente.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="background-color: var(--color-accent); border-color: var(--color-accent);">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% if solicitud_exitosa %}
+<script>
+    const exitoModal = new bootstrap.Modal(document.getElementById('exitoModal'));
+    exitoModal.show();
+</script>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const elementos = document.querySelectorAll('.dias-estado');
+
+    elementos.forEach(el => {
+        const fechaStr = el.getAttribute('data-fecha');
+        if (!fechaStr) return;
+
+        const fechaActualizacion = new Date(fechaStr);
+        const hoy = new Date();
+
+        // Normalizar horas para que la diferencia sea solo por días
+        const utcFecha = Date.UTC(fechaActualizacion.getFullYear(), fechaActualizacion.getMonth(), fechaActualizacion.getDate());
+        const utcHoy = Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+        const diferenciaMs = utcHoy - utcFecha;
+
+        const dias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+        el.innerText = `${dias} día${dias !== 1 ? 's' : ''}`;
+
+        // Asignar color según regla
+        // verde: más de 7 días
+        // amarillo: menos de 7 días (>=1 y <7)
+        // naranja: exactamente 0 días (hoy)
+        // rojo: pasado plazo (más de 7 días)
+
+        if (dias > 7) {
+            el.style.color = 'red';
+        } else if (dias === 7) {
+            el.style.color = 'orange';
+        } else if (dias >= 1 && dias < 7) {
+            el.style.color = 'yellowgreen';
+        } else if (dias === 0) {
+            el.style.color = 'green';
+        }
+    });
+
+    // --- FILTRO por ID y año combinado ---
+    const inputBuscar = document.getElementById('buscador-id');
+    const selectAnio = document.getElementById('filtro-anio');
+    const tabla = document.getElementById('tabla_registro').getElementsByTagName('tbody')[0];
+    const filas = tabla.getElementsByTagName('tr');
+
+    function filtrarTabla() {
+        const textoBuscar = inputBuscar.value.trim();
+        const anioFiltro = selectAnio.value;
+
+        for (let fila of filas) {
+            // Omitir fila "empty" si existe
+            if(fila.querySelector('td').getAttribute('colspan')) continue;
+
+            const id = fila.cells[0].textContent.trim();
+            const anioFila = fila.getAttribute('data-anio');
+
+            const cumpleId = id.includes(textoBuscar);
+            const cumpleAnio = anioFiltro === "" || anioFila === anioFiltro;
+
+            if (cumpleId && cumpleAnio) {
+                fila.style.display = "";
+            } else {
+                fila.style.display = "none";
+            }
+        }
+    }
+
+    inputBuscar.addEventListener('input', filtrarTabla);
+    selectAnio.addEventListener('change', filtrarTabla);
+});
+</script>
+
+{% endblock %}

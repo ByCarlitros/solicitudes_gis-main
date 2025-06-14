@@ -1406,3 +1406,95 @@ def obtener_nota(request):
 
     except ProtocoloSolicitud.DoesNotExist:
         return JsonResponse({"error": "Protocolo no encontrado"}, status=404)
+
+
+from django.shortcuts import render
+from django.utils.timezone import now, is_naive, make_aware
+from datetime import datetime
+from .models import Solicitud
+from django.db.models.functions import ExtractYear
+
+def capitalize_words(texto):
+    return ' '.join(p.capitalize() for p in texto.split())
+
+def vista_consolidada(request):
+    mensaje_exito = ""
+    mensaje_error = ""
+
+    if request.method == "POST" and "solicitud_id" in request.POST:
+        solicitud_id = request.POST.get("solicitud_id")
+        try:
+            solicitud = Solicitud.objects.get(id=solicitud_id)
+        except Solicitud.DoesNotExist:
+            mensaje_error = "Solicitud no encontrada."
+        else:
+            comentario = capitalize_words(request.POST.get("comentario", "").strip())
+            fecha_actualizacion_str = request.POST.get("fecha_actualizacion", "").strip()
+            validado_por = capitalize_words(request.POST.get("validado_por", "").strip())
+
+            if not comentario or not fecha_actualizacion_str or not validado_por:
+                mensaje_error = "Debe completar todos los campos para actualizar."
+            else:
+                try:
+                    fecha_actualizacion = datetime.strptime(fecha_actualizacion_str, '%Y-%m-%dT%H:%M')
+                    if is_naive(fecha_actualizacion):
+                        fecha_actualizacion = make_aware(fecha_actualizacion)
+                except (ValueError, TypeError):
+                    mensaje_error = "Formato de fecha no válido."
+                else:
+                    solicitud.comentario = comentario
+                    solicitud.fecha_actualizacion = fecha_actualizacion
+                    solicitud.validado_por = validado_por
+                    solicitud.save()
+                    mensaje_exito = "Solicitud actualizada correctamente."
+
+    elif request.method == "POST":
+        nombre_usuario = capitalize_words(request.POST.get("nombre_usuario", "").strip())
+        nombre_archivo = capitalize_words(request.POST.get("nombre_archivo", "").strip())
+        fuente = capitalize_words(request.POST.get("fuente", "").strip())
+        lugar = capitalize_words(request.POST.get("lugar", "").strip())
+        fecha_actualizacion_str = request.POST.get("fecha_actualizacion", "").strip()
+        validado_por = capitalize_words(request.POST.get("validado_por", "Ninguno").strip())
+        estado = request.POST.get("estado", 1)
+
+        if not (nombre_usuario and nombre_archivo and fuente and lugar and fecha_actualizacion_str):
+            mensaje_error = "Debe completar todos los campos para crear una solicitud."
+        else:
+            try:
+                fecha_actualizacion = datetime.strptime(fecha_actualizacion_str, '%Y-%m-%dT%H:%M')
+                if is_naive(fecha_actualizacion):
+                    fecha_actualizacion = make_aware(fecha_actualizacion)
+            except (ValueError, TypeError):
+                mensaje_error = "Formato de fecha no válido."
+            else:
+                Solicitud.objects.create(
+                    nombre_usuario=nombre_usuario,
+                    nombre_archivo=nombre_archivo,
+                    fuente=fuente,
+                    lugar=lugar,
+                    fecha_actualizacion=fecha_actualizacion,
+                    validado_por=validado_por,
+                    estado=estado,
+                    fecha_subida=now(),
+                )
+                mensaje_exito = "Solicitud creada correctamente."
+
+    solicitudes = Solicitud.objects.all()
+    for solicitud in solicitudes:
+        delta = solicitud.fecha_actualizacion - now()
+        dias_restantes = delta.days
+        solicitud.dias_restantes = dias_restantes
+        solicitud.dias_restantes_abs = abs(dias_restantes)
+
+    # Extraemos los años únicos de las solicitudes, ordenados descendente
+    anios_qs = Solicitud.objects.annotate(anio=ExtractYear('fecha_actualizacion')).values_list('anio', flat=True).distinct().order_by('-anio')
+    anios = list(anios_qs)
+
+    context = {
+        "solicitudes": solicitudes,
+        "mensaje_exito": mensaje_exito,
+        "mensaje_error": mensaje_error,
+        "today": now().strftime("%Y-%m-%dT%H:%M"),
+        "anios": anios,
+    }
+    return render(request, "consolidado/consolidado.html", context)
