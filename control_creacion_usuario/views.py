@@ -116,51 +116,50 @@ def Historial_Visitas(request):
     'historial': Historial,
     }
     return render(request,'Historial_Visitas.html',data)
-
+from django.http import JsonResponse
+from django.db.models.functions import ExtractYear
+from django.utils.timezone import now
 @login_required(login_url='/login/')
-def solicitude_llegadas(request, dia_p=None):
-    minutos = 0
-    hora = 0
-    usuarios = User.objects.all()
 
-    # Filtrar las solicitudes según el usuario
+def solicitude_llegadas(request):
+    usuarios = User.objects.all()
+    filtro_anio = request.GET.get('anio')
+    filtro_id = request.GET.get('id', '').strip()
+
+    # Obtener solicitudes base según usuario
     if request.user.is_superuser:
         solicitudes = ProtocoloSolicitud.objects.all()
     else:
         solicitudes = ProtocoloSolicitud.objects.filter(profesional=request.user)
 
-    # Agregar información adicional sobre número de designios y días restantes
+    # Filtrar por año si existe filtro
+    if filtro_anio:
+        solicitudes = solicitudes.filter(fecha_L__year=filtro_anio)
+
+    # Filtrar por ID si existe filtro
+    if filtro_id:
+        solicitudes = solicitudes.filter(id__icontains=filtro_id)
+
+    # Generar datos de solicitudes con info extra
     solicitudes_data = []
     for solicitud in solicitudes:
-        # Obtener el número de designios asociados a la solicitud
         numero_designios = Registro_designio.objects.filter(protocolo=solicitud).count()
 
-        # Calcular los días restantes hasta la fecha límite
         if solicitud.fecha_T:
             dias_restantes = "Trabajo terminado"
-
-            # solicitud.fecha_L el la fecha limite de la entrega 
         elif solicitud.fecha_L:
-            # Calcular la diferencia en segundos
             total_segundos = (solicitud.fecha_L - now()).total_seconds()
 
-            if total_segundos < 0:  # Si el tiempo ya pasó
+            if total_segundos < 0:
                 total_segundos = abs(total_segundos)
                 dias_pasados = int(total_segundos // (24 * 3600))
                 horas_pasadas = int((total_segundos % (24 * 3600)) // 3600)
                 minutos_pasados = int((total_segundos % 3600) // 60)
-
-                if dias_pasados > 0 or horas_pasadas > 0 or minutos_pasados > 0:
-                    dias_restantes = f"Pasada por {dias_pasados} días, {horas_pasadas} horas y {minutos_pasados} minutos"
-                else:
-                    dias_restantes = "El tiempo límite ha pasado recientemente"
-            else:  # Tiempo restante
-                # Calcular días hábiles restantes
+                dias_restantes = f"Pasada por {dias_pasados} días, {horas_pasadas} horas y {minutos_pasados} minutos"
+            else:
                 dias_habiles_restantes = calcular_dias_habiles(now().date(), solicitud.fecha_L.date())
                 horas_restantes = int((total_segundos % (24 * 3600)) // 3600)
                 minutos_restantes = int((total_segundos % 3600) // 60)
-                
-
                 if dias_habiles_restantes > 1:
                     dias_restantes = f"Te quedan {dias_habiles_restantes-1} días hábiles"
                 elif horas_restantes > 0:
@@ -170,22 +169,34 @@ def solicitude_llegadas(request, dia_p=None):
         else:
             dias_restantes = "Sin fecha límite"
 
-        # Agregar los datos al listado de solicitudes
+        # Manejo seguro del campo "solicitante"
+        solicitante_obj = getattr(solicitud, 'solicitante', None)
+        solicitante_nombre = solicitante_obj.username if solicitante_obj else ''
+
         solicitudes_data.append({
-            'solicitud': solicitud,
+            'id': solicitud.id,
+            'orden_trabajo': getattr(solicitud, 'orden_trabajo', ''),
+            'solicitante': solicitante_nombre,
+            'fecha_llegada': solicitud.fecha_L.strftime('%Y-%m-%d') if solicitud.fecha_L else '',
+            'departamento': getattr(solicitud, 'departamento', ''),
             'numero_designios': numero_designios,
-            'dias_restantes': dias_restantes
+            'dias_restantes': dias_restantes,
+            # Puedes seguir agregando más campos aquí
         })
-    insumos = Insumo.objects.all()
 
-    data = {
-        'OPCIONES': OPCIONES,
-        'Solicitudes': solicitudes_data,  # Lista con la información adicional
-        'Usuarios': usuarios,
-        'insumos': insumos,  # Lista de usuarios
-    }
+    # Extraer años para el filtro dinámico
+    if request.user.is_superuser:
+        años = ProtocoloSolicitud.objects.annotate(year=ExtractYear('fecha_L')).values_list('year', flat=True).distinct()
+    else:
+        años = ProtocoloSolicitud.objects.filter(profesional=request.user).annotate(year=ExtractYear('fecha_L')).values_list('year', flat=True).distinct()
 
-    return render(request, 'solicitude_llegadas.html', data,)
+    años = sorted([a for a in años if a is not None], reverse=True)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'solicitudes': solicitudes_data})
+
+    return render(request, 'solicitude_llegadas.html', {'anios': años})
+
 
 def calcular_dias_habiles(fecha_inicio, fecha_fin):
     dias_habiles = 0

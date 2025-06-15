@@ -142,17 +142,14 @@ tr:nth-child(even) {
                 <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
                     <input type="text" id="buscador-id" class="form-control" placeholder="Buscar por ID..." style="max-width: 250px;">
 
-                    <select id="filtro-anio" class="form-control" style="max-width: 200px;">
-                        <option value="">Filtrar por año...</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <!-- Agrega más años si lo necesitas -->
+                    <select id="filtro-anio" name="filtro-anio" class="form-select" style="max-width: 200px;">
+                        <option value="">Todos</option>
+                        {% for anio in anios %}
+                            <option value="{{ anio }}">{{ anio }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
-
-
             <div class="toast-container position-fixed top-0 end-0 p-3">
                 <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
@@ -389,7 +386,12 @@ tr:nth-child(even) {
 
                 if (anioSeleccionado) {
                     solicitudesFiltradas = solicitudesOrdenadas.filter(function(item) {
-                        return item.fecha && item.fecha.startsWith(anioSeleccionado);
+                        if (!item.fecha) return false;
+
+                        const fechaObj = new Date(item.fecha);
+                        const anio = fechaObj.getFullYear();
+
+                        return anio.toString() === anioSeleccionado;
                     });
                 }
 

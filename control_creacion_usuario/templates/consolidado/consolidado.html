@@ -114,12 +114,12 @@
                 {% endif %}
 
                 <div class="container" style="margin: 1rem; width: auto;">
-                    <div id="paginacion" class="pagination-container"></div>
+                    <div id="paginacion" class="pagination-container d-flex justify-content-center gap-2"></div>
                 </div>
 
                 <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
                     <input type="text" id="buscador-id" class="form-control" placeholder="Buscar por ID..." style="max-width: 250px;">
-                    <select id="filtro-anio" name="filtro-anio" class="form-select">
+                    <select id="filtro-anio" name="filtro-anio" class="form-select" style="max-width: 150px;">
                         <option value="">Todos</option>
                         {% for anio in anios %}
                             <option value="{{ anio }}">{{ anio }}</option>
@@ -353,8 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const date = new Date(fecha_actualizacion);
             if (!isNaN(date)) {
-                // Formato local compatible para datetime-local input (sin zona)
-                // Para datetime-local se necesita "YYYY-MM-DDTHH:mm"
                 const isoLocal = date.toISOString().slice(0,16);
                 document.getElementById('editar_fecha_actualizacion').value = isoLocal;
             } else {
@@ -480,19 +478,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Filtro por ID y año
+    // Variables para paginación
+    const rowsPerPage = 10;
+    let currentPage = 1;
+
+    // Elementos DOM para paginación y filtros
     const inputBuscar = document.getElementById('buscador-id');
     const selectAnio = document.getElementById('filtro-anio');
     const tabla = document.getElementById('tabla_registro')?.getElementsByTagName('tbody')[0];
     if (!tabla) return;
-    const filas = tabla.getElementsByTagName('tr');
+    const filas = Array.from(tabla.getElementsByTagName('tr'));
 
-    function filtrarTabla() {
+    // Función para filtrar filas
+    function filtrarFilas() {
         const textoBuscar = inputBuscar.value.trim();
         const anioFiltro = selectAnio.value;
 
-        for (let fila of filas) {
-            if (fila.querySelector('td').hasAttribute('colspan')) continue;
+        return filas.filter(fila => {
+            if (fila.querySelector('td').hasAttribute('colspan')) return false; // fila vacía "No hay solicitudes"
 
             const id = fila.cells[0].textContent.trim();
             const anioFila = fila.getAttribute('data-anio');
@@ -500,15 +503,87 @@ document.addEventListener('DOMContentLoaded', () => {
             const cumpleId = id.includes(textoBuscar);
             const cumpleAnio = anioFiltro === "" || anioFila === anioFiltro;
 
-            fila.style.display = (cumpleId && cumpleAnio) ? "" : "none";
-        }
+            return cumpleId && cumpleAnio;
+        });
     }
 
-    inputBuscar.addEventListener('input', filtrarTabla);
-    selectAnio.addEventListener('change', filtrarTabla);
+    // Función para mostrar página
+    function mostrarPagina(pagina) {
+        const filasFiltradas = filtrarFilas();
+        const totalPaginas = Math.ceil(filasFiltradas.length / rowsPerPage) || 1;
+
+        if (pagina < 1) pagina = 1;
+        if (pagina > totalPaginas) pagina = totalPaginas;
+        currentPage = pagina;
+
+        // Ocultar todas las filas primero
+        filas.forEach(fila => fila.style.display = 'none');
+
+        // Mostrar solo las filas de la página actual
+        const inicio = (pagina - 1) * rowsPerPage;
+        const fin = inicio + rowsPerPage;
+        filasFiltradas.slice(inicio, fin).forEach(fila => fila.style.display = '');
+
+        renderizarPaginacion(totalPaginas);
+    }
+
+    // Función para renderizar botones de paginación
+    function renderizarPaginacion(totalPaginas) {
+        const contenedor = document.getElementById('paginacion');
+        contenedor.innerHTML = '';
+
+        // Botón Anterior
+        const btnAnterior = document.createElement('button');
+        btnAnterior.className = 'btn btn-sm btn-outline-primary';
+        btnAnterior.textContent = 'Anterior';
+        btnAnterior.disabled = currentPage === 1;
+        btnAnterior.addEventListener('click', () => mostrarPagina(currentPage - 1));
+        contenedor.appendChild(btnAnterior);
+
+        // Botones de páginas (máximo 5 botones, centrados)
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPaginas, startPage + 4);
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const btnPagina = document.createElement('button');
+            btnPagina.className = 'btn btn-sm ' + (i === currentPage ? 'btn-primary' : 'btn-outline-primary');
+            btnPagina.textContent = i;
+            btnPagina.addEventListener('click', () => mostrarPagina(i));
+            contenedor.appendChild(btnPagina);
+        }
+
+        // Botón Siguiente
+        const btnSiguiente = document.createElement('button');
+        btnSiguiente.className = 'btn btn-sm btn-outline-primary';
+        btnSiguiente.textContent = 'Siguiente';
+        btnSiguiente.disabled = currentPage === totalPaginas;
+        btnSiguiente.addEventListener('click', () => mostrarPagina(currentPage + 1));
+        contenedor.appendChild(btnSiguiente);
+    }
+
+    // Cuando cambian los filtros, volver a mostrar página 1
+    function filtrosYPaginacionHandler() {
+        mostrarPagina(1);
+    }
+
+    inputBuscar.addEventListener('input', filtrosYPaginacionHandler);
+    selectAnio.addEventListener('change', filtrosYPaginacionHandler);
+
+    // Inicializar
+    mostrarPagina(1);
 });
 </script>
 
+<!-- DataTables CSS Bootstrap 5 -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+<!-- DataTables JS y jQuery (necesario) -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
 
 
