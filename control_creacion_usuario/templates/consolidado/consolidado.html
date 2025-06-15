@@ -136,7 +136,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <table id="tabla_registro" class="display table-custom">
                 <thead>
                     <tr>
@@ -163,7 +163,13 @@
                         <td>{{ solicitud.fecha_subida|date:"Y-m-d" }}</td>
                         <td>{{ solicitud.fecha_actualizacion|date:"Y-m-d" }}</td>
                         <td>{{ solicitud.validado_por }}</td>
-                        <td>{{ solicitud.get_estado_display }}</td>
+                        <td>
+                            <select class="form-select form-select-sm estado-dropdown" data-id="{{ solicitud.id }}">
+                                {% for key, val in solicitud.ESTADO_CHOICES %}
+                                    <option value="{{ key }}" {% if solicitud.estado == key %}selected{% endif %}>{{ val }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
                         <td>
                             <span class="dias-estado" data-fecha="{{ solicitud.fecha_actualizacion|date:'Y-m-d' }}"></span>
                         </td>
@@ -219,75 +225,266 @@
         </div>
     </div>
 
-    <!-- Modal de éxito -->
-    <div class="modal fade" id="exitoModal" tabindex="-1" aria-labelledby="exitoModalLabel" aria-hidden="true">
+    <!-- Modal para editar solicitud -->
+    <div class="modal fade" id="editarSolicitudModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exitoModalLabel">¡Solicitud Subida con Éxito!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    La solicitud ha sido subida exitosamente.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="background-color: var(--color-accent); border-color: var(--color-accent);">Aceptar</button>
-                </div>
+                <form method="post" id="formEditarSolicitud" action="">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Solicitud</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="editar_solicitud_id" name="solicitud_id" />
+                        <div class="mb-3">
+                            <label>Usuario</label>
+                            <input type="text" class="form-control" id="editar_nombre_usuario" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label>Archivo</label>
+                            <input type="text" class="form-control" id="editar_nombre_archivo" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fuente</label>
+                            <input type="text" class="form-control" id="editar_fuente" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label>Lugar</label>
+                            <input type="text" class="form-control" id="editar_lugar" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label>Fecha Solicitud</label>
+                            <input type="text" class="form-control" id="editar_fecha_subida" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editar_fecha_actualizacion">Fecha Actualización</label>
+                            <input type="datetime-local" class="form-control" name="fecha_actualizacion" id="editar_fecha_actualizacion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Estado</label>
+                            <select class="form-select" id="editar_estado" name="estado" required>
+                                <option value="1">En revisión</option>
+                                <option value="2">Aprobado</option>
+                                <option value="3">Rechazado</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Validado Por</label>
+                            <input type="text" class="form-control" id="editar_validado_por" name="validado_por" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Comentario</label>
+                            <textarea class="form-control" id="editar_comentario" name="comentario" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Actualizar Solicitud</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-</section>
+        <!-- Modal de Éxito -->
+    <div class="modal fade" id="modalActualizacionExitosa" tabindex="-1" aria-labelledby="modalActualizacionExitosaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+        <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="modalActualizacionExitosaLabel">✅ Actualización Exitosa</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+            La solicitud ha sido actualizada correctamente.
+        </div>
+        </div>
+    </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-{% if solicitud_exitosa %}
-<script>
-    const exitoModal = new bootstrap.Modal(document.getElementById('exitoModal'));
-    exitoModal.show();
-</script>
-{% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const elementos = document.querySelectorAll('.dias-estado');
+    const dropdowns = document.querySelectorAll('.estado-dropdown');
+    let estadoOriginal = null;
+    let dropdownActual = null;
+
+    const modalEl = document.getElementById('editarSolicitudModal');
+    const modalEditar = new bootstrap.Modal(modalEl);
+    const modalExitoEl = document.getElementById('modalActualizacionExitosa');
+    const modalExito = new bootstrap.Modal(modalExitoEl);
+    const form = document.getElementById('formEditarSolicitud');
+
+    dropdowns.forEach(dropdown => {
+        dropdown.addEventListener('focus', () => {
+            estadoOriginal = dropdown.value;
+            dropdownActual = dropdown;
+        });
+        dropdown.addEventListener('mousedown', () => {
+            estadoOriginal = dropdown.value;
+            dropdownActual = dropdown;
+        });
+
+        dropdown.addEventListener('change', function () {
+            const fila = this.closest('tr');
+            if (!fila) return;
+
+            const celdas = fila.querySelectorAll('td');
+            if (celdas.length < 8) return;
+
+            const id = celdas[0].innerText.trim();
+            const usuario = celdas[1].innerText.trim();
+            const archivo = celdas[2].innerText.trim();
+            const fuente = celdas[3].innerText.trim();
+            const lugar = celdas[4].innerText.trim();
+            const fecha_subida = celdas[5].innerText.trim();
+            const fecha_actualizacion = celdas[6].innerText.trim();
+            const validado_por = celdas[7].innerText.trim();
+            const estadoSeleccionado = this.value;
+
+            document.getElementById('editar_solicitud_id').value = id;
+            document.getElementById('editar_nombre_usuario').value = usuario;
+            document.getElementById('editar_nombre_archivo').value = archivo;
+            document.getElementById('editar_fuente').value = fuente;
+            document.getElementById('editar_lugar').value = lugar;
+            document.getElementById('editar_fecha_subida').value = fecha_subida;
+
+            const date = new Date(fecha_actualizacion);
+            if (!isNaN(date)) {
+                // Formato local compatible para datetime-local input (sin zona)
+                // Para datetime-local se necesita "YYYY-MM-DDTHH:mm"
+                const isoLocal = date.toISOString().slice(0,16);
+                document.getElementById('editar_fecha_actualizacion').value = isoLocal;
+            } else {
+                document.getElementById('editar_fecha_actualizacion').value = "";
+            }
+
+            document.getElementById('editar_estado').value = estadoSeleccionado;
+            document.getElementById('editar_validado_por').value = validado_por || '';
+            document.getElementById('editar_comentario').value = '';
+
+            form.action = `/actualizar_estado/${id}/`;
+
+            modalEditar.show();
+        });
+    });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const id = document.getElementById('editar_solicitud_id').value;
+        const estado = document.getElementById('editar_estado').value;
+        const fecha = document.getElementById('editar_fecha_actualizacion').value;
+        const validado = document.getElementById('editar_validado_por').value.trim();
+        const comentario = document.getElementById('editar_comentario').value;
+
+        if (!estado || !fecha || !validado) {
+            alert('Por favor, completa los campos obligatorios.');
+            return;
+        }
+
+        fetch(`/actualizar_estado/${id}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                estado: estado,
+                fecha_actualizacion: fecha,
+                validado_por: validado,
+                comentario: comentario
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || 'Error desconocido');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (dropdownActual) {
+                dropdownActual.value = estado;
+            }
+
+            modalEditar.hide();
+
+            const mensajeExito = modalExitoEl.querySelector('.modal-body');
+            if (mensajeExito) {
+                mensajeExito.innerText = '✅ La solicitud fue actualizada correctamente.';
+            }
+
+            setTimeout(() => {
+                modalExito.show();
+            }, 300);
+
+            setTimeout(() => {
+                modalExito.hide();
+                location.reload();
+            }, 2300);
+        })
+        .catch(error => {
+            console.error('Error al actualizar la solicitud:', error);
+            alert('Hubo un error al actualizar la solicitud: ' + error.message);
+        });
+    });
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        if (dropdownActual && estadoOriginal !== null) {
+            dropdownActual.value = estadoOriginal;
+        }
+        dropdownActual = null;
+        estadoOriginal = null;
+    });
+
+    // Colorea y muestra días desde fecha en elementos con clase .dias-estado (usando data-fecha)
+    const elementos = document.querySelectorAll(".dias-estado");
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
 
     elementos.forEach(el => {
-        const fechaStr = el.getAttribute('data-fecha');
-        if (!fechaStr) return;
+        const fechaTexto = el.getAttribute('data-fecha');
+        if (!fechaTexto) {
+            el.innerText = 'Fecha no disponible';
+            el.style.color = 'gray';
+            return;
+        }
+        const fechaActualizacion = new Date(fechaTexto);
+        if (isNaN(fechaActualizacion)) {
+            el.innerText = 'Fecha inválida';
+            el.style.color = 'gray';
+            return;
+        }
 
-        const fechaActualizacion = new Date(fechaStr);
-        const hoy = new Date();
+        fechaActualizacion.setHours(0,0,0,0);
 
-        // Normalizar horas para que la diferencia sea solo por días
-        const utcFecha = Date.UTC(fechaActualizacion.getFullYear(), fechaActualizacion.getMonth(), fechaActualizacion.getDate());
-        const utcHoy = Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-        const diferenciaMs = utcHoy - utcFecha;
+        const diffMs = fechaActualizacion - hoy;
+        const dias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-        const dias = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
-        el.innerText = `${dias} día${dias !== 1 ? 's' : ''}`;
-
-        // Asignar color según regla
-        // verde: más de 7 días
-        // amarillo: menos de 7 días (>=1 y <7)
-        // naranja: exactamente 0 días (hoy)
-        // rojo: pasado plazo (más de 7 días)
+        el.innerText = `${Math.abs(dias)} día${Math.abs(dias) !== 1 ? 's' : ''}`;
 
         if (dias > 7) {
-            el.style.color = 'red';
-        } else if (dias === 7) {
-            el.style.color = 'orange';
-        } else if (dias >= 1 && dias < 7) {
-            el.style.color = 'yellowgreen';
-        } else if (dias === 0) {
             el.style.color = 'green';
+        } else if (dias === 7) {
+            el.style.color = 'yellowgreen';
+        } else if (dias >= 1 && dias < 7) {
+            el.style.color = 'orange';
+        } else if (dias === 0) {
+            el.style.color = 'orange';
+        } else {
+            el.style.color = 'red';
         }
     });
 
-    // --- FILTRO por ID y año combinado ---
+    // Filtro por ID y año
     const inputBuscar = document.getElementById('buscador-id');
     const selectAnio = document.getElementById('filtro-anio');
-    const tabla = document.getElementById('tabla_registro').getElementsByTagName('tbody')[0];
+    const tabla = document.getElementById('tabla_registro')?.getElementsByTagName('tbody')[0];
+    if (!tabla) return;
     const filas = tabla.getElementsByTagName('tr');
 
     function filtrarTabla() {
@@ -295,8 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const anioFiltro = selectAnio.value;
 
         for (let fila of filas) {
-            // Omitir fila "empty" si existe
-            if(fila.querySelector('td').getAttribute('colspan')) continue;
+            if (fila.querySelector('td').hasAttribute('colspan')) continue;
 
             const id = fila.cells[0].textContent.trim();
             const anioFila = fila.getAttribute('data-anio');
@@ -304,11 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cumpleId = id.includes(textoBuscar);
             const cumpleAnio = anioFiltro === "" || anioFila === anioFiltro;
 
-            if (cumpleId && cumpleAnio) {
-                fila.style.display = "";
-            } else {
-                fila.style.display = "none";
-            }
+            fila.style.display = (cumpleId && cumpleAnio) ? "" : "none";
         }
     }
 
@@ -316,5 +508,13 @@ document.addEventListener('DOMContentLoaded', () => {
     selectAnio.addEventListener('change', filtrarTabla);
 });
 </script>
+
+
+
+
+</section>
+
+
+
 
 {% endblock %}

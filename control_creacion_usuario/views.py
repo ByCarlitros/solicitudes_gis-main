@@ -1413,6 +1413,7 @@ from django.utils.timezone import now, is_naive, make_aware
 from datetime import datetime
 from .models import Solicitud
 from django.db.models.functions import ExtractYear
+from django.utils.dateparse import parse_datetime
 
 def capitalize_words(texto):
     return ' '.join(p.capitalize() for p in texto.split())
@@ -1422,6 +1423,7 @@ def vista_consolidada(request):
     mensaje_error = ""
 
     if request.method == "POST" and "solicitud_id" in request.POST:
+        # Edición de solicitud existente
         solicitud_id = request.POST.get("solicitud_id")
         try:
             solicitud = Solicitud.objects.get(id=solicitud_id)
@@ -1446,9 +1448,10 @@ def vista_consolidada(request):
                     solicitud.fecha_actualizacion = fecha_actualizacion
                     solicitud.validado_por = validado_por
                     solicitud.save()
-                    mensaje_exito = "Solicitud actualizada correctamente."
+                    return redirect("vista_consolidada")
 
     elif request.method == "POST":
+        # Creación de nueva solicitud
         nombre_usuario = capitalize_words(request.POST.get("nombre_usuario", "").strip())
         nombre_archivo = capitalize_words(request.POST.get("nombre_archivo", "").strip())
         fuente = capitalize_words(request.POST.get("fuente", "").strip())
@@ -1477,8 +1480,9 @@ def vista_consolidada(request):
                     estado=estado,
                     fecha_subida=now(),
                 )
-                mensaje_exito = "Solicitud creada correctamente."
+                return redirect("vista_consolidada")
 
+    # Preparar datos para GET
     solicitudes = Solicitud.objects.all()
     for solicitud in solicitudes:
         delta = solicitud.fecha_actualizacion - now()
@@ -1486,7 +1490,6 @@ def vista_consolidada(request):
         solicitud.dias_restantes = dias_restantes
         solicitud.dias_restantes_abs = abs(dias_restantes)
 
-    # Extraemos los años únicos de las solicitudes, ordenados descendente
     anios_qs = Solicitud.objects.annotate(anio=ExtractYear('fecha_actualizacion')).values_list('anio', flat=True).distinct().order_by('-anio')
     anios = list(anios_qs)
 
@@ -1498,3 +1501,36 @@ def vista_consolidada(request):
         "anios": anios,
     }
     return render(request, "consolidado/consolidado.html", context)
+
+
+@csrf_exempt
+def actualizar_estado(request, id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            nuevo_estado = data.get("estado")
+            nueva_fecha_str = data.get("fecha_actualizacion")
+            validado_por = data.get("validado_por", "").strip()
+            comentario = data.get("comentario", "").strip()
+
+            solicitud = Solicitud.objects.get(id=id)
+            nueva_fecha = parse_datetime(nueva_fecha_str)
+            if not nueva_fecha:
+                return JsonResponse({"error": "Fecha de actualización inválida."}, status=400)
+
+            # Aplica capitalize_words para normalizar texto
+            validado_por = capitalize_words(validado_por)
+            comentario = capitalize_words(comentario)
+
+            solicitud.estado = nuevo_estado
+            solicitud.fecha_actualizacion = nueva_fecha
+            solicitud.validado_por = validado_por
+            solicitud.comentario = comentario
+            solicitud.save()
+
+            return JsonResponse({"mensaje": "Estado actualizado correctamente."})
+        except Solicitud.DoesNotExist:
+            return JsonResponse({"error": "Solicitud no encontrada."}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Método no permitido"}, status=405)

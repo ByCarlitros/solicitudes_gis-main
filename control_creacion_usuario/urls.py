@@ -40,4 +40,6 @@ urlpatterns = [
 
     # ✅ Nueva vista consolidada
     path("vista_consolidada/", views.vista_consolidada, name="vista_consolidada"),
+    path('actualizar_estado/<int:id>/', views.actualizar_estado, name='actualizar_estado'),
+
 ]
