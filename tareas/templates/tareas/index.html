@@ -562,7 +562,7 @@ h1.text-primary {
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-1 flex-wrap">
-                                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-warning btn-sm rounded-pill">✏️ Editar</a>
+                                    <a href="{% url 'editar_tarea' tarea.id %}" class="btn btn-warning btn-sm rounded-pill">✏️</a>
                                     {% if request.user.is_superuser %}
                                     <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger btn-sm rounded-pill" onclick="confirmarEliminacion(event, this)" data-tarea-id="{{ tarea.id }}">🗑️</a>
                                     <button type="button" class="btn btn-success btn-sm rounded-pill completar-tarea" data-tarea-id="{{ tarea.id }}">✅</button>
