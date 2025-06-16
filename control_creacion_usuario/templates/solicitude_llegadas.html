@@ -440,14 +440,14 @@ tr:nth-child(even) {
                     var btnEmail = puedeEnviarCorreo
                         ? `<a href="#" class="email-link" style="text-decoration: none;" data-bs-toggle="modal" data-bs-target="#dynamicEmailModal" data-id="${item.id}" data-correo="${correo_destinatario}">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="acciones" style="fill: ${colorCorreo};">
-                                    <path d="M48 64C21.5 64 0 85.5 0 112..."/>
+                                    <path d="M502.3 190.8L327.4 338.4c-21.5 18.4-54.3 18.4-75.8 0L9.7 190.8C3.8 186.5 0 179.7 0 172.3V136c0-26.5 21.5-48 48-48h416c26.5 0 48 21.5 48 48v36.3c0 7.4-3.8 14.2-9.7 18.5zM0 215.4v230.3c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V215.4L352.6 363.1c-35.8 30.7-88.4 30.7-124.2 0L0 215.4z"/>
                                 </svg>
-                            </a>`
+                        </a>`
                         : `<a href="#" class="email-link disabled" style="text-decoration: none; cursor: not-allowed; pointer-events: none;">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="acciones" style="fill: grey;">
-                                    <path d="M48 64C21.5 64 0 85.5 0 112..."/>
+                                    <path d="M502.3 190.8L327.4 338.4c-21.5 18.4-54.3 18.4-75.8 0L9.7 190.8C3.8 186.5 0 179.7 0 172.3V136c0-26.5 21.5-48 48-48h416c26.5 0 48 21.5 48 48v36.3c0 7.4-3.8 14.2-9.7 18.5zM0 215.4v230.3c0 26.5 21.5 48 48 48h416c26.5 0 48-21.5 48-48V215.4L352.6 363.1c-35.8 30.7-88.4 30.7-124.2 0L0 215.4z"/>
                                 </svg>
-                            </a>`;
+                        </a>`;
                     // Botón de Vista Previa con atributos `data-*` para pasar datos al modal
                     var btnPreview = `
                         <a style="text-decoration: none; position:relative;" href="#" class="preview-link" 
@@ -519,7 +519,7 @@ tr:nth-child(even) {
                         <td>${item.nombre_solicitante}</td>
                         <td>${item.fecha}</td>
                         <td>${item.departamento}</td>
-                        <td>${btnEmail}${btnPreview}${btnPreview}${btnRegistroPreview}</td>
+                        <td>${btnPreview}${btnDescargar}${btnEmail}${btnRegistroPreview}</td>
                         <td>${selectEstado}</td>
                         <td>${selectLimite}</td>
                         <td>${selectProfesional}${btnAgregar}</td>
