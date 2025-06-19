@@ -15,7 +15,7 @@
       padding: 0.3rem 0.6rem;
       font-size: 0.85rem;
       border-radius: 0.4rem;
-      height: 2rem; /* Más delgado verticalmente */
+      height: 2rem;
       line-height: 1.2rem;
       min-width: 70px;
     }
@@ -28,7 +28,6 @@
       <div class="flex-row-content p-1">
         <div class="info-gestion-box">
           <div class="flex-row-dashboard fill-available">
-            <!-- Instrucciones de Uso -->
             <div class="flex-column-gap fill-available">
               <h1 class="section-title">Gestión de Imágenes</h1>
               <div class="info-box p-1 fill-available">
@@ -46,7 +45,6 @@
           </div>
 
           <div class="flex-row-dashboard fill-available">
-            <!-- Formulario de Subida de Imágenes -->
             <div class="flex-column-gap fill-available">
               <div class="info-box p-1 fill-available">
                 <form id="imageForm" method="post" enctype="multipart/form-data">
@@ -62,19 +60,16 @@
           </div>
         </div>
 
-        <!-- Filtro de usuario -->
         <div class="flex-row-dashboard fill-available">
           <div class="flex-column-gap fill-available">
             <div class="info-box p-1 fill-available">
               <form method="get" class="mb-3">
                 <label for="usuario">Filtrar por usuario:</label>
-                <select name="usuario" id="usuario" class="form-select" onchange="this.form.submit()">
-                  <option value="">Todos</option>
-                  {% for usuario in usuarios %}
-                    <option value="{{ usuario.id }}" {% if usuario_filtrado == usuario.id|stringformat:"s" %}selected{% endif %}>
-                      {{ usuario.username }}
+                <select name="usuario" id="usuario" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="{{ request.user.id }}" {% if usuario_filtrado == request.user.id|stringformat:"s" %}selected{% endif %}>
+                        {{ request.user.username }}
                     </option>
-                  {% endfor %}
                 </select>
               </form>
 
@@ -117,7 +112,6 @@
                 {% endfor %}
               </div>
 
-              <!-- Paginación -->
               <nav aria-label="Paginación">
                 <ul class="pagination justify-content-center">
                   {% if page_obj.has_previous %}
@@ -153,4 +147,17 @@
 
 {% block custom_js %}
   <script src="{% static 'js/gestion_imagen.js' %}"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectUsuario = document.getElementById("usuario");
+        selectUsuario.addEventListener("change", function() {
+            const selectedValue = this.value;
+            const url = new URL(window.location.href);
+            url.searchParams.set("usuario", selectedValue);
+            url.searchParams.delete("page");
+            window.location.href = url.href;
+        });
+    });
+  </script>
 {% endblock %}

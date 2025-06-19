@@ -414,17 +414,16 @@ def logout(request):
 
 from django.core.paginator import Paginator
 
-
-
 def Gestion_imagen(request):
-    usuarios = User.objects.all().order_by('username')  # lista para el filtro
+    usuarios = User.objects.all().order_by('username')  # Para el filtro
 
     usuario_id = request.GET.get('usuario')
     imagenes = Imagen_sig.objects.all().order_by('-id')
 
-    nombre_usuario = "Todos"
     usuario_filtrado = None
+    nombre_usuario = "Todos"
 
+    # Filtrar imágenes por usuario si se pasó usuario_id válido
     if usuario_id:
         try:
             usuario_filtrado = int(usuario_id)
@@ -435,28 +434,37 @@ def Gestion_imagen(request):
             usuario_filtrado = None
             nombre_usuario = "Desconocido"
 
+    # Paginación: 6 imágenes por página
     paginator = Paginator(imagenes, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Manejo del formulario de subida de imagen
     if request.method == 'POST':
         form = ImagenForm(request.POST, request.FILES)
         if form.is_valid():
             imagen = form.save(commit=False)
             imagen.usuario = request.user
             imagen.save()
-            return redirect('Gestion_imagen')  # O usa el nombre correcto de tu url
+            # Redirige manteniendo el filtro actual y en la primera página para evitar inconsistencias
+            redirect_url = 'Gestion_imagen'
+            # Construimos la URL con query string para mantener filtro
+            query_params = ''
+            if usuario_filtrado:
+                query_params = f'?usuario={usuario_filtrado}'
+            return redirect(f"{redirect_url}{query_params}")
     else:
         form = ImagenForm()
 
     context = {
         'usuarios': usuarios,
-        'usuario_filtrado': usuario_filtrado,
+        'usuario_filtrado': str(usuario_filtrado) if usuario_filtrado else '',
         'nombre_usuario': nombre_usuario,
         'page_obj': page_obj,
         'form': form,
     }
     return render(request, 'Gestion_imagen.html', context)
+
 
 @csrf_exempt
 def actualizar_estado_solicitud(request):
