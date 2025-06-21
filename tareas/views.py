@@ -85,25 +85,6 @@ from django.http import HttpResponseRedirect
 from .forms import TareaForm
 from .models import Tarea
 
-def editar_tarea(request, tarea_id):
-    tarea = get_object_or_404(Tarea, id=tarea_id)
-    
-    if request.method == 'POST':
-        # Se intenta obtener 'next' del POST, para saber a dónde redirigir
-        next_url = request.POST.get('next', '/')
-        form = TareaForm(request.POST, instance=tarea)
-        if form.is_valid():
-            form.save()
-            # Redirige a la URL guardada en 'next'
-            return HttpResponseRedirect(next_url)
-    else:
-        # En la solicitud GET, se intenta obtener 'next' de la query string o del HTTP_REFERER
-        next_url = request.GET.get('next', request.META.get('HTTP_REFERER', '/'))
-        form = TareaForm(instance=tarea)
-    
-    return render(request, 'tareas/editar_tarea.html', {'form': form, 'next_url': next_url})
-
-
 def eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, id=tarea_id)
     tarea.delete()
@@ -172,3 +153,27 @@ from .serializers import TareaSerializer
 class TareaList(generics.ListAPIView):
     queryset = Tarea.objects.all()  # O la consulta que necesites
     serializer_class = TareaSerializer
+
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
+
+@require_GET
+def cargar_formulario_editar_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    form = TareaForm(instance=tarea)
+    form_html = render_to_string('tareas/formulario_editar_tarea_modal.html', {'form': form}, request)
+    return JsonResponse({'form_html': form_html})
+
+def editar_tarea(request, tarea_id):
+    tarea = get_object_or_404(Tarea, id=tarea_id)
+    if request.method == 'POST':
+        form = TareaForm(request.POST, instance=tarea)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True, 'redirect_url': reverse('index')})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+    return HttpResponseBadRequest('Método no permitido')
+
+

@@ -438,6 +438,17 @@ h1.text-primary {
     white-space: nowrap;
   }
 </style>
+<style>
+    .wrapper .enviado {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .wrapper .enviado:hover {
+        transform: translateY(-2px);
+    }
+</style>
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -503,29 +514,57 @@ h1.text-primary {
   </nav>
 
 
-<!-- Encabezado fuera del container principal -->
-<div class="px-4 py-3 d-flex flex-wrap justify-content-between align-items-center gap-3 bg-white border-bottom shadow-sm rounded-4 mb-4">
-    <h2 class="text-primary m-0"><i class="fas fa-tasks me-2"></i>Tareas SIG</h2>
 
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-        <select id="funcionarioSelect" class="form-select form-select-sm rounded-pill" data-url="{% url 'tareas_por_funcionario' 0 %}" style="min-width: 220px;">
-            <option value="">Seleccione un funcionario</option>
+<div class="container_new">
+    <!-- Contenedor para botón de agregar (superuser) -->
+    {% if request.user.is_superuser %}
+    <div class="container" style="margin: 1rem; width: auto;">
+        <div class="wrapper">
+            <a class="enviado" href="#" data-bs-toggle="modal" data-bs-target="#agregarTareaModal">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Contenedor para selector y botón de completadas -->
+    <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
+        <select id="funcionarioSelect" class="form-select" style="max-width: 220px;" data-url="{% url 'tareas_por_funcionario' 0 %}">
+            <option value="">Seleccionar funcionario</option>
             {% for funcionario in funcionarios %}
             <option value="{{ funcionario.id }}">{{ funcionario }}</option>
             {% endfor %}
         </select>
 
-        {% if request.user.is_superuser %}
-        <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#agregarTareaModal">
-            <i class="fas fa-plus me-1"></i> Agregar
-        </button>
-        {% endif %}
-
-        <button type="button" id="verTareasBtn" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-            <i class="fas fa-check-circle me-1"></i> Completadas
-        </button>
+        <div class="wrapper">
+            <a id="verTareasBtn" class="enviado" href="#">
+                <i class="fas fa-check-circle"></i>
+            </a>
+        </div>
     </div>
 </div>
+
+<style>
+    .wrapper .enviado {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background-color: #f8f9fa;
+        border-radius: 50%;
+        color: #0d6efd;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+    }
+    .wrapper .enviado:hover {
+        background-color: #e9ecef;
+        transform: translateY(-1px);
+    }
+    .wrapper .enviado i {
+        font-size: 0.9rem;
+    }
+</style>
 
 <div class="d-flex justify-content-center">
   <div class="card shadow mb-3" style="width: 98%; max-width: 1750px;">
@@ -584,7 +623,7 @@ h1.text-primary {
               </td>
               <td class="col-1 px-1">
                 <div class="d-flex justify-content-center gap-1 flex-wrap">
-                  <a href="#" class="btn btn-warning btn-sm rounded-pill py-1 px-1" data-bs-toggle="modal" data-bs-target="#modalEditarTarea">✏️</a>
+                  <a href="#" class="btn btn-warning btn-sm rounded-pill py-1 px-1 btn-editar-tarea" data-tarea-id="{{ tarea.id }}">✏️</a>
                   {% if request.user.is_superuser %}
                   <a href="{% url 'eliminar_tarea' tarea.id %}" class="btn btn-danger btn-sm rounded-pill py-1 px-1" onclick="confirmarEliminacion(event, this)" data-tarea-id="{{ tarea.id }}">🗑️</a>
                   <button type="button" class="btn btn-success btn-sm rounded-pill py-1 px-1 completar-tarea" data-tarea-id="{{ tarea.id }}">✅</button>
@@ -663,38 +702,32 @@ h1.text-primary {
         </div>
     </div>
     <!-- Modal Editar Tarea -->
-    <div class="modal fade" id="modalEditarTarea" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-        <div class="modal-header bg-warning text-white">
-            <h5 class="modal-title" id="modalEditarLabel">Editar Tarea</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+    <div class="modal fade" id="modalEditarTarea" tabindex="-1" aria-labelledby="modalEditarTareaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
 
-        <div class="modal-body">
-            <form id="formEditarTarea" method="post">
-            {% csrf_token %}
-            <!-- Aquí puedes volver a renderizar el formulario dinámico o traer los campos por AJAX si lo deseas -->
+      <div class="modal-header bg-warning text-white justify-content-between align-items-center">
+        <h5 class="modal-title mx-auto" id="modalEditarTareaLabel" style="font-family: 'Poppins', sans-serif; font-weight: bold; font-size: 1.8rem;">
+          Editar Tarea
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
 
-            {% for field in form %}
-                <div class="mb-3">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <div class="text-danger">{{ field.errors.0 }}</div>
-                {% endif %}
-                </div>
-            {% endfor %}
-            
-            <div class="text-end">
-                <button type="submit" class="btn btn-success">Guardar Cambios</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            </div>
-            </form>
+      <div class="modal-body p-4" id="contenidoModalEditar">
+        <!-- Aquí se cargará el formulario por AJAX -->
+        <div class="form-container text-center">
+          <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
         </div>
-        </div>
+      </div>
+
     </div>
-    </div>
+  </div>
+</div>
+
+
+
 
     <!-- Modal Confirmar Eliminación -->
     <div class="modal fade" id="confirmarEliminacionModal" tabindex="-1" aria-hidden="true">
@@ -744,6 +777,68 @@ h1.text-primary {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll(".btn-editar-tarea").forEach(function(boton) {
+    boton.addEventListener("click", function(evento) {
+      evento.preventDefault();
+
+      const tareaId = this.dataset.tareaId;
+      const urlForm = `/tareas/ajax/editar-tarea/${tareaId}/`;
+
+      const modalBody = document.getElementById("contenidoModalEditar");
+      modalBody.innerHTML = `<div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                  <span class="visually-hidden">Cargando...</span>
+                                </div>
+                              </div>`;
+      const modal = new bootstrap.Modal(document.getElementById("modalEditarTarea"));
+      modal.show();
+
+      fetch(urlForm)
+        .then(response => {
+          if (!response.ok) throw new Error("Error al cargar formulario");
+          return response.json();
+        })
+        .then(data => {
+          modalBody.innerHTML = data.form_html;
+
+          const form = modalBody.querySelector("#formEditarTarea");
+
+          form.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            fetch(`/tareas/ajax/guardar-edicion-tarea/${tareaId}/`, {
+              method: "POST",
+              body: formData,
+            })
+            .then(res => {
+              if (!res.ok) throw new Error("Error en respuesta");
+              return res.json();
+            })
+            .then(resp => {
+              if (resp.success) {
+                bootstrap.Modal.getInstance(document.getElementById("modalEditarTarea")).hide();
+                window.location.href = resp.redirect_url || '/tareas/';
+              } else {
+                // Mostrar errores en el formulario si tienes un manejador para eso
+                alert("Error al guardar: " + JSON.stringify(resp.errors));
+              }
+            })
+            .catch(() => alert("Error en la petición"));
+          });
+        })
+        .catch(() => {
+          modalBody.innerHTML = `<div class="alert alert-danger">Error al cargar el formulario.</div>`;
+        });
+    });
+  });
+});
+
+</script>
 
     <script>
 
@@ -798,13 +893,9 @@ function loadTasks(urlWithParam, page = 1) {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            console.log("Respuesta de la API:", data);
             listaTareas.empty();
             paginationContainer.empty();
 
-            console.log("ALGO PASO AQUI")
-
-            
             const tasksPerPage = 10;
             let isServerPagination = (data.count !== undefined);
             let totalTasks = isServerPagination ? data.count : ((data.results || data.tareas || data).length);
@@ -813,81 +904,48 @@ function loadTasks(urlWithParam, page = 1) {
             let tareas = [];
 
             if (isServerPagination) {
-                // Si hay paginación en el servidor, usamos los resultados
                 tareas = data.results || [];
             } else {
-                // Si no hay paginación en el servidor, hacemos el slice de la lista
                 let taskList = (data.results || data.tareas || data) || [];
                 let startIndex = (page - 1) * tasksPerPage;
-                let endIndex = startIndex + tasksPerPage;
-
-                // Asegúrate de que el índice de corte no se pase más allá del tamaño de la lista
-                endIndex = Math.min(endIndex, taskList.length);
-
+                let endIndex = Math.min(startIndex + tasksPerPage, taskList.length);
                 tareas = taskList.slice(startIndex, endIndex);
             }
 
-            
-            console.log(tareas.length);
-            if (Array.isArray(data)) {
-            data.forEach((tarea, index) => {
-                console.log(`Tarea ${index + 1}:`, tarea); // Muestra cada tarea
-                console.log(`Apoyo en tarea ${index + 1}:`, tarea.apoyo); // Muestra el campo apoyo de cada tarea
-                
-                if (Array.isArray(tarea.apoyo)) {
-                    console.log(`Apoyo (en tarea ${index + 1}) es un array:`, tarea.apoyo);
-                } else {
-                    console.log(`Apoyo (en tarea ${index + 1}) NO es un array:`, tarea.apoyo);
-                }
-            });
-        } else {
-            console.error("Los datos no contienen un array de tareas.");
-        }
-    
             if (tareas.length > 0) {
                 let tareasHtml = '<ul class="list-group">';
                 tareas.forEach(tarea => {
-                    let editarUrl = `/tareas/editar_tarea/${tarea.id}/`;
                     tareasHtml += `
                         <li class="list-group-item d-flex justify-content-between align-items-center task-item" data-tarea-id="${tarea.id}">
                             <div class="col-3">
-                            
-                                <span>
                                 <strong>${tarea.descripcion}</strong> - ${tarea.funcionario__nombre}<br>
-                                fecha de Creación: ${new Date(tarea.fecha_creacion + "T00:00:00").toLocaleDateString()} <br>
-                                fecha de Entrega: ${new Date(tarea.fecha_entrega.split("T")[0] + "T00:00:00").toLocaleDateString()}<br>
-                                <span style="font-weight: bold; color: #333;">Prioridad:</span> 
+                                Fecha de Creación: ${new Date(tarea.fecha_creacion + "T00:00:00").toLocaleDateString()}<br>
+                                Fecha de Entrega: ${new Date(tarea.fecha_entrega.split("T")[0] + "T00:00:00").toLocaleDateString()}<br>
+                                <strong>Prioridad:</strong> 
                                 <span class="${tarea.prioridad === 'alta' ? 'text-danger' : (tarea.prioridad === 'media' ? 'text-warning' : 'text-success')}">
                                     ${tarea.prioridad}
-                                </span><br>
-                                
+                                </span>
                             </div>
-                            <div class="justify-content-center text-align-start" style="width: 250px;">
-                            <strong>Apoyo(s):</strong>
-                            
-       ${tarea.apoyo?.length > 0 ? `
-  <ul class="apoyo-lista"> 
-    ${tarea.apoyo.map(apoyo => `
-      <li class="apoyo-item">
-        <strong>${apoyo.nombre}:</strong> ${apoyo.descripcion || 'No disponible'}
-      </li>
-    `).join('')}
-  </ul>
-` : '<span>No hay funcionarios de apoyo.</span>'}
-</div>
-<div>
-                    <strong style="color: green; font-weight: bold;">En Proceso</strong>
-                </div>
-                            </span>
-                             <div>
-                                <a href="${editarUrl}" class="btn btn-sm btn-warning">✏️ Editar</a>
-                            {% if user.is_superuser %}
-                                <button type="button" class="btn btn-sm btn-danger eliminar-tarea">❌ Eliminar</button>
-                                <button type="button" class="btn btn-sm btn-success completar-tarea" data-tarea-id="${tarea.id}">✅ Completar</button>
-                            </div>
-                            {% endif %}
-                        </li>
 
+                            <div class="justify-content-center text-align-start" style="width: 250px;">
+                                <strong>Apoyo(s):</strong>
+                                ${tarea.apoyo?.length > 0 ? `
+                                    <ul class="apoyo-lista">
+                                        ${tarea.apoyo.map(apoyo => `
+                                            <li class="apoyo-item">
+                                                <strong>${apoyo.nombre}:</strong> ${apoyo.descripcion || 'No disponible'}
+                                            </li>
+                                        `).join('')}
+                                    </ul>` 
+                                : '<span>No hay funcionarios de apoyo.</span>'}
+                            </div>
+
+                            <div><strong style="color: green; font-weight: bold;">En Proceso</strong></div>
+
+                            <div>
+                                <button class="btn btn-sm btn-warning btn-editar-tarea" data-tarea-id="${tarea.id}">✏️ Editar</button>
+                            </div>
+                        </li>
                     `;
                 });
                 tareasHtml += '</ul>';
@@ -914,6 +972,55 @@ function loadTasks(urlWithParam, page = 1) {
                     }
                 });
             }
+
+            // Enganchar los botones de editar
+            document.querySelectorAll(".btn-editar-tarea").forEach(function(boton) {
+                boton.addEventListener("click", function(evento) {
+                    evento.preventDefault();
+                    const tareaId = this.dataset.tareaId;
+                    const url = `/tareas/ajax/editar-tarea/${tareaId}/`;
+
+                    const modalBody = document.getElementById("contenidoModalEditar");
+                    modalBody.innerHTML = `<div class="text-center">
+                                              <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                              </div>
+                                            </div>`;
+                    const modal = new bootstrap.Modal(document.getElementById("modalEditarTarea"));
+                    modal.show();
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            modalBody.innerHTML = data.form_html;
+
+                            const form = document.getElementById('formEditarTarea');
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+
+                                const formData = new FormData(form);
+                                const actionUrl = `/tareas/ajax/guardar-edicion-tarea/${tareaId}/`;
+
+                                fetch(actionUrl, {
+                                    method: 'POST',
+                                    body: formData,
+                                    headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        const modalInstance = bootstrap.Modal.getInstance(document.getElementById("modalEditarTarea"));
+                                        modalInstance.hide();
+                                        loadTasks(urlWithParam);
+                                    } else {
+                                        alert("Error al guardar.");
+                                    }
+                                });
+                            });
+                        });
+                });
+            });
+
         },
         error: function(error) {
             console.error("Error al cargar tareas:", error);
@@ -921,6 +1028,7 @@ function loadTasks(urlWithParam, page = 1) {
         }
     });
 }
+
 
 // ✅ Ahora esta función puede acceder a loadTasks()
 $(document).on('click', '.eliminar-tarea', function(e) {
@@ -986,88 +1094,79 @@ $(document).on('click', '.eliminar-tarea', function(e) {
     });
 
 
-$(document).on('click', '.completar-tarea', function() {
-    let tareaId = $(this).data('tarea-id');
-    let $tareaItem = $(this).closest('.task-item');
+    $(document).on('click', '.completar-tarea', function() {
+        let tareaId = $(this).data('tarea-id');
+        let $tareaItem = $(this).closest('.task-item');
 
-    $.ajax({
-        url: `/tareas/completar_tarea/${tareaId}/`, 
-        type: 'GET',
-        data: {
-            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val() 
-        },
-        success: function(response) {
-            // Eliminar la tarea completada de la lista
+        $.ajax({
+            url: `/tareas/completar_tarea/${tareaId}/`, 
+            type: 'GET',
+            data: {
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val() 
+            },
+            success: function(response) {
+                // Eliminar la tarea completada de la lista
 
-            // Mostrar el modal de tarea completada
-            $('#tareaCompletadaModal').modal('show');
+                // Mostrar el modal de tarea completada
+                $('#tareaCompletadaModal').modal('show');
 
-            // Acción cuando el modal se cierra
-            $('#closeTareaCompletadaModal').click(function() {
-                $('#tareaCompletadaModal').modal('hide');
+                // Acción cuando el modal se cierra
+                $('#closeTareaCompletadaModal').click(function() {
+                    $('#tareaCompletadaModal').modal('hide');
 
-                // Obtener el funcionario seleccionado
-                let funcionarioId = $('#funcionarioSelect').val();
-                
-                // Verificar si se seleccionó un funcionario
-                if (funcionarioId) {
-                    // Crear la URL base con el funcionario seleccionado
-                    let baseUrl = $('#funcionarioSelect').data('url');
-                    let jsonUrl = baseUrl.replace('0', funcionarioId) + 'json/';
+                    // Obtener el funcionario seleccionado
+                    let funcionarioId = $('#funcionarioSelect').val();
+                    
+                    // Verificar si se seleccionó un funcionario
+                    if (funcionarioId) {
+                        // Crear la URL base con el funcionario seleccionado
+                        let baseUrl = $('#funcionarioSelect').data('url');
+                        let jsonUrl = baseUrl.replace('0', funcionarioId) + 'json/';
 
-                    // Realizar una nueva solicitud AJAX para obtener las tareas filtradas por el funcionario
-                    $.ajax({
-                        url: jsonUrl,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            $tareaItem.fadeOut(300, function() {
-                                $(this).remove();
-                                
-                                
+                        // Realizar una nueva solicitud AJAX para obtener las tareas filtradas por el funcionario
+                        $.ajax({
+                            url: jsonUrl,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(response) {
+                                $tareaItem.fadeOut(300, function() {
+                                    $(this).remove();
+                                    
+                                    
 
-                                let currentPage = parseInt($('#pagination-container .page-item.active').text());
-                                let remainingTasksInPage = $('.task-item').length;
+                                    let currentPage = parseInt($('#pagination-container .page-item.active').text());
+                                    let remainingTasksInPage = $('.task-item').length;
 
-                                if (remainingTasksInPage === 0 && currentPage > 1) {
-                                    currentPage--; // Retrocede si la página quedó vacía
-                                }
-                                else{
-                                    currentPage  = 1
-                                }
+                                    if (remainingTasksInPage === 0 && currentPage > 1) {
+                                        currentPage--; // Retrocede si la página quedó vacía
+                                    }
+                                    else{
+                                        currentPage  = 1
+                                    }
 
-                                let funcionarioId = $('#funcionarioSelect').val();
-                                let baseUrl = $('#funcionarioSelect').data('url');
-                                let urlWithParam = baseUrl.replace('0', funcionarioId) + 'json/?funcionario=' + funcionarioId;
+                                    let funcionarioId = $('#funcionarioSelect').val();
+                                    let baseUrl = $('#funcionarioSelect').data('url');
+                                    let urlWithParam = baseUrl.replace('0', funcionarioId) + 'json/?funcionario=' + funcionarioId;
 
-                                loadTasks(urlWithParam);
-                            });
-                        },
-                        error: function(error) {
-                            console.error("Error al cargar tareas:", error);
-                            listaTareas.html('<p class="text-danger text-center">⚠️ Error al cargar las tareas.</p>');
-                        }
-                    });
-                } else {
-                    // Si no se seleccionó un funcionario, recargar la página para actualizar la vista
-                    window.location.reload();
-                }
-            });
-        },
-        error: function(error) {
-            console.error("Error al completar tarea:", error);
-            alert("Error al completar la tarea. Inténtalo de nuevo.");
-        }
-    });
-});
-
-    $(document).on('click', 'a[href^="/tareas/editar_tarea/"]', function(e) {
-        e.preventDefault();
-        let editarUrl = $(this).attr('href');
-        let idFuncionario = $('#funcionarioSelect').val();
-
-        sessionStorage.setItem('funcionarioSeleccionado', idFuncionario);
-        window.location.href = editarUrl;
+                                    loadTasks(urlWithParam);
+                                });
+                            },
+                            error: function(error) {
+                                console.error("Error al cargar tareas:", error);
+                                listaTareas.html('<p class="text-danger text-center">⚠️ Error al cargar las tareas.</p>');
+                            }
+                        });
+                    } else {
+                        // Si no se seleccionó un funcionario, recargar la página para actualizar la vista
+                        window.location.reload();
+                    }
+                });
+            },
+            error: function(error) {
+                console.error("Error al completar tarea:", error);
+                alert("Error al completar la tarea. Inténtalo de nuevo.");
+            }
+        });
     });
 
     let funcionarioAlmacenado = sessionStorage.getItem('funcionarioSeleccionado');
