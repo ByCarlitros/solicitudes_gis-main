@@ -139,15 +139,10 @@ tr:nth-child(even) {
                 </div>
 
                 <!-- Buscador + Filtro por año centrados -->
-                <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
-                    <input type="text" id="buscador-id" class="form-control" placeholder="Buscar por ID..." style="max-width: 250px;">
-
-                    <select id="filtro-anio" name="filtro-anio" class="form-select" style="max-width: 200px;">
-                        <option value="">Todos</option>
-                        {% for anio in anios %}
-                            <option value="{{ anio }}">{{ anio }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="container d-flex justify-content-end align-items-center mt-3">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#filtroModal">
+                        🔎 Filtros Avanzados
+                    </button>
                 </div>
             </div>
             <div class="toast-container position-fixed top-0 end-0 p-3">
@@ -353,7 +348,49 @@ tr:nth-child(even) {
         </div>
     </div>
 
-   
+    <!-- Modal para filtrar por fecha e ID-->
+    <div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="filtroModalLabel">Filtro Avanzado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Filtro por ID -->
+                <div class="mb-3">
+                    <label for="filtro-id" class="form-label">Buscar por ID</label>
+                    <input type="text" id="filtro-id" class="form-control">
+                </div>
+
+                <!-- Filtro por Fecha (item.fecha) -->
+                <div class="mb-3">
+                    <label class="form-label">Fecha de llegada</label>
+                    <div class="d-flex gap-2">
+                        <input type="date" id="filtro-fecha-inicio" class="form-control">
+                        <input type="date" id="filtro-fecha-fin" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha_D (item.fecha_D) -->
+                <div class="mb-3">
+                    <label class="form-label">Fecha Designio</label>
+                    <div class="d-flex gap-2">
+                        <input type="date" id="filtro-fechaD-inicio" class="form-control">
+                        <input type="date" id="filtro-fechaD-fin" class="form-control">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="limpiarFiltros">Limpiar</button>
+                <button type="button" class="btn btn-primary" id="aplicarFiltros" data-bs-dismiss="modal">Aplicar Filtros</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
     
     
     
@@ -381,19 +418,48 @@ tr:nth-child(even) {
 
                 // ✅ FILTRO POR AÑO
                 var solicitudesOrdenadas = response.Solicitudes.sort((a, b) => b.id - a.id);
-                var anioSeleccionado = $('#filtro-anio').val();
-                var solicitudesFiltradas = solicitudesOrdenadas;
+                // Leer filtros del modal
+                var filtroID = $('#filtro-id').val().trim().toLowerCase();
 
-                if (anioSeleccionado) {
-                    solicitudesFiltradas = solicitudesOrdenadas.filter(function(item) {
-                        if (!item.fecha) return false;
+                var fechaInicio = $('#filtro-fecha-inicio').val();
+                var fechaFin = $('#filtro-fecha-fin').val();
 
-                        const fechaObj = new Date(item.fecha);
-                        const anio = fechaObj.getFullYear();
+                var fechaDInicio = $('#filtro-fechaD-inicio').val();
+                var fechaDFin = $('#filtro-fechaD-fin').val();
 
-                        return anio.toString() === anioSeleccionado;
-                    });
-                }
+                solicitudesFiltradas = solicitudesOrdenadas.filter(function(item) {
+                    // Filtro por ID
+                    if (filtroID && !item.id.toString().toLowerCase().includes(filtroID)) {
+                        return false;
+                    }
+
+                    // Filtro por Fecha llegada
+                    if (fechaInicio) {
+                        const fechaItem = item.fecha ? new Date(item.fecha) : null;
+                        const fechaInicioDate = new Date(fechaInicio);
+                        if (!fechaItem || fechaItem < fechaInicioDate) return false;
+                    }
+                    if (fechaFin) {
+                        const fechaItem = item.fecha ? new Date(item.fecha) : null;
+                        const fechaFinDate = new Date(fechaFin);
+                        if (!fechaItem || fechaItem > fechaFinDate) return false;
+                    }
+
+                    // Filtro por Fecha Designio
+                    if (fechaDInicio) {
+                        const fechaDItem = item.fecha_D ? new Date(item.fecha_D) : null;
+                        const fechaDInicioDate = new Date(fechaDInicio);
+                        if (!fechaDItem || fechaDItem < fechaDInicioDate) return false;
+                    }
+                    if (fechaDFin) {
+                        const fechaDItem = item.fecha_D ? new Date(item.fecha_D) : null;
+                        const fechaDFinDate = new Date(fechaDFin);
+                        if (!fechaDItem || fechaDItem > fechaDFinDate) return false;
+                    }
+
+                    return true;
+                });
+
 
                 var totalItems = solicitudesFiltradas.length;
                 totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -912,27 +978,124 @@ function abrirModalApoyo(item) {
     });
 }
     
-    $(document).ready(function () {
-    // Cargar la tabla al iniciar
+    // ... todas tus funciones y variables globales ...
+
+function cambiarPagina(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
     actualizarTabla();
+}
 
-    // Buscar por ID
-    $("#buscador-id").on("keyup", function() {
-        var searchText = $(this).val().trim().toLowerCase();
-
-        $("#tabla_registro tbody tr").each(function() {
-            var idText = $(this).find("td:first").text().trim().toLowerCase();
-            $(this).toggle(idText.includes(searchText));
-        });
-    });
-
-    // Filtrar por año
-    $('#filtro-anio').on('change', function () {
-        currentPage = 1; // Reiniciar paginación
+$(document).ready(function() {
+    // Eventos para actualizar tabla con filtros
+    $('#filtro-id').on('input', function() {
+        currentPage = 1;
         actualizarTabla();
     });
+    $('#filtro-fecha-inicio, #filtro-fecha-fin, #filtro-fechaD-inicio, #filtro-fechaD-fin').on('change', function() {
+        currentPage = 1;
+        actualizarTabla();
+    });
+
+    // Inicializa tabla
+    actualizarTabla();
 });
 
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    let dataSolicitudes = [];
+
+    // Cargar datos al inicio por AJAX
+    function cargarDatos() {
+        fetch("/solicitude_llegadas/", {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            dataSolicitudes = data.solicitudes;
+            renderTabla(dataSolicitudes);
+        })
+        .catch(error => console.error("Error al cargar solicitudes:", error));
+    }
+
+    // Renderiza la tabla con los datos
+    function renderTabla(datos) {
+        const tbody = document.querySelector('#tabla_registro tbody');
+        tbody.innerHTML = "";
+
+        if (datos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="20" class="text-center">No hay solicitudes disponibles</td></tr>`;
+            return;
+        }
+
+        datos.forEach(item => {
+            const row = `<tr>
+                <td>${item.id}</td>
+                <td>${item.orden_trabajo || ''}</td>
+                <td>${item.solicitante || ''}</td>
+                <td>${item.fecha || ''}</td>
+                <td>${item.departamento || ''}</td>
+                <td>PREVIEW-BOTONES</td>  <!-- aquí iría tu código real -->
+                <td>ESTADO</td>
+                <td>LIMITE</td>
+                <td>PROFESIONAL</td>
+                <td>${item.fecha_D || ''}</td>
+                <td>${item.fecha_T || ''}</td>
+                <td>${item.dias_restantes || ''}</td>
+            </tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    // Función de filtrado
+    function filtrar() {
+        const valorId = document.getElementById('filtro-id').value.trim().toLowerCase();
+        const fechaInicioStr = document.getElementById('filtro-fecha-subida-inicio').value;
+        const fechaFinStr = document.getElementById('filtro-fecha-subida-fin').value;
+
+        const fechaInicio = fechaInicioStr ? new Date(fechaInicioStr) : null;
+        const fechaFin = fechaFinStr ? new Date(fechaFinStr) : null;
+
+        const filtrado = dataSolicitudes.filter(item => {
+            let mostrar = true;
+
+            if (valorId && !item.id.toString().toLowerCase().includes(valorId)) {
+                mostrar = false;
+            }
+
+            if (fechaInicio) {
+                const fechaItem = item.fecha ? new Date(item.fecha) : null;
+                if (!fechaItem || fechaItem < fechaInicio) mostrar = false;
+            }
+
+            if (fechaFin) {
+                const fechaItemD = item.fecha_D ? new Date(item.fecha_D) : null;
+                if (!fechaItemD || fechaItemD > fechaFin) mostrar = false;
+            }
+
+            return mostrar;
+        });
+
+        renderTabla(filtrado);
+    }
+
+    // Listeners de botones del modal
+    document.getElementById('aplicarFiltros').addEventListener('click', filtrar);
+
+    document.getElementById('limpiarFiltros').addEventListener('click', () => {
+        document.getElementById('filtro-id').value = "";
+        document.getElementById('filtro-fecha-subida-inicio').value = "";
+        document.getElementById('filtro-fecha-subida-fin').value = "";
+        renderTabla(dataSolicitudes);
+    });
+
+    cargarDatos(); // Cargamos al inicio
+});
 
 </script>
 

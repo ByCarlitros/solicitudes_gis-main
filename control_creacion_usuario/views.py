@@ -373,19 +373,20 @@ def control(request):
 
 
     context = {
-        "total_solicitudes": total_solicitudes,
-        "total_tareas": total_tareas,
-        "labels_json": labels_json,
-        "trabajo_porcentual_apoyo_json": trabajo_apoyo_json,
-        "trabajo_porcentual_propio_json": trabajo_propio_json,
-        "total_unitario_solicitudes_json": total_solicitudes_json,
-        "total_unitario_solicitudes_apoyo_json": total_solicitudes_apoyo_json,
-        "total_tareas_json": total_tareas_json,
-        "total_apoyos_tareas_json": total_apoyos_tareas_json,
-        "en_proceso": estado_counts.get("EN PROCESO", 0),
-        "ejecutado": estado_counts.get("EJECUTADO", 0),
-        "rechazado": estado_counts.get("RECHAZADO", 0),
-    }
+    "total_solicitudes": total_solicitudes,
+    "total_tareas": total_tareas,
+    "labels_json": labels_json,
+    "trabajo_propio_json": trabajo_propio_json,
+    "trabajo_apoyo_json": trabajo_apoyo_json,
+    "total_solicitudes_json": total_solicitudes_json,
+    "total_solicitudes_apoyo_json": total_solicitudes_apoyo_json,
+    "total_tareas_json": total_tareas_json,
+    "total_apoyos_tareas_json": total_apoyos_tareas_json,
+    "en_proceso": estado_counts.get("EN PROCESO", 0),
+    "ejecutado": estado_counts.get("EJECUTADO", 0),
+    "rechazado": estado_counts.get("RECHAZADO", 0),
+}
+
 
     return render(request, "Control.html", context)
 
@@ -1427,12 +1428,15 @@ def obtener_nota(request):
         return JsonResponse({"error": "Protocolo no encontrado"}, status=404)
 
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.timezone import now, is_naive, make_aware
 from datetime import datetime
 from .models import Solicitud
 from django.db.models.functions import ExtractYear
 from django.utils.dateparse import parse_datetime
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 def capitalize_words(texto):
     return ' '.join(p.capitalize() for p in texto.split())
@@ -1441,8 +1445,29 @@ def vista_consolidada(request):
     mensaje_exito = ""
     mensaje_error = ""
 
+    # FILTROS GET
+    solicitudes = Solicitud.objects.all()
+
+    id_filtro = request.GET.get('id')
+    if id_filtro:
+        solicitudes = solicitudes.filter(id__icontains=id_filtro)
+
+    fecha_subida_inicio = request.GET.get('fecha_subida_inicio')
+    fecha_subida_fin = request.GET.get('fecha_subida_fin')
+    if fecha_subida_inicio:
+        solicitudes = solicitudes.filter(fecha_subida__date__gte=fecha_subida_inicio)
+    if fecha_subida_fin:
+        solicitudes = solicitudes.filter(fecha_subida__date__lte=fecha_subida_fin)
+
+    fecha_actualizacion_inicio = request.GET.get('fecha_actualizacion_inicio')
+    fecha_actualizacion_fin = request.GET.get('fecha_actualizacion_fin')
+    if fecha_actualizacion_inicio:
+        solicitudes = solicitudes.filter(fecha_actualizacion__date__gte=fecha_actualizacion_inicio)
+    if fecha_actualizacion_fin:
+        solicitudes = solicitudes.filter(fecha_actualizacion__date__lte=fecha_actualizacion_fin)
+
+    # PROCESO POST (igual como tenías antes)
     if request.method == "POST" and "solicitud_id" in request.POST:
-        # Edición de solicitud existente
         solicitud_id = request.POST.get("solicitud_id")
         try:
             solicitud = Solicitud.objects.get(id=solicitud_id)
@@ -1470,7 +1495,6 @@ def vista_consolidada(request):
                     return redirect("vista_consolidada")
 
     elif request.method == "POST":
-        # Creación de nueva solicitud
         nombre_usuario = capitalize_words(request.POST.get("nombre_usuario", "").strip())
         nombre_archivo = capitalize_words(request.POST.get("nombre_archivo", "").strip())
         fuente = capitalize_words(request.POST.get("fuente", "").strip())
@@ -1501,8 +1525,7 @@ def vista_consolidada(request):
                 )
                 return redirect("vista_consolidada")
 
-    # Preparar datos para GET
-    solicitudes = Solicitud.objects.all()
+    # Procesar días restantes (exactamente igual)
     for solicitud in solicitudes:
         delta = solicitud.fecha_actualizacion - now()
         dias_restantes = delta.days
@@ -1521,7 +1544,6 @@ def vista_consolidada(request):
     }
     return render(request, "consolidado/consolidado.html", context)
 
-
 @csrf_exempt
 def actualizar_estado(request, id):
     if request.method == "POST":
@@ -1537,7 +1559,6 @@ def actualizar_estado(request, id):
             if not nueva_fecha:
                 return JsonResponse({"error": "Fecha de actualización inválida."}, status=400)
 
-            # Aplica capitalize_words para normalizar texto
             validado_por = capitalize_words(validado_por)
             comentario = capitalize_words(comentario)
 

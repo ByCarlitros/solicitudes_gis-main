@@ -94,8 +94,10 @@
 {% endblock custom_css %}
 
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.css" />
-<script src="https://cdn.datatables.net/2.1.7/js/dataTables.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="{% static 'css/table.css' %}" />
+
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=text_snippet" />
 
@@ -103,30 +105,33 @@
     <div class="row">
         <div class="col" style="display: flex;justify-content: center;flex-wrap: wrap;">
             <div class="container_new">
-                {% if request.user.is_superuser %}
-                    <div class="container" style="margin: 1rem; width: auto;">
-                        <div class="wrapper">
-                            <a class="enviado" href="#" data-bs-toggle="modal" data-bs-target="#agregarSolicitudModal">
-                                <i class="fa-solid fa-file-lines"></i>
-                            </a>
-                        </div>
-                    </div>
-                {% endif %}
-
-                <div class="container" style="margin: 1rem; width: auto;">
-                    <div id="paginacion" class="pagination-container d-flex justify-content-center gap-2"></div>
-                </div>
-
-                <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
-                    <input type="text" id="buscador-id" class="form-control" placeholder="Buscar por ID..." style="max-width: 250px;">
-                    <select id="filtro-anio" name="filtro-anio" class="form-select" style="max-width: 150px;">
-                        <option value="">Todos</option>
-                        {% for anio in anios %}
-                            <option value="{{ anio }}">{{ anio }}</option>
-                        {% endfor %}
-                    </select>
+            {% if request.user.is_superuser %}
+            <div class="container" style="margin: 1rem; width: auto;">
+                <div class="wrapper">
+                    <a class="enviado" href="#" data-bs-toggle="modal" data-bs-target="#agregarSolicitudModal">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </a>
                 </div>
             </div>
+            {% endif %}
+
+            <div class="container d-flex justify-content-center mt-3">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Paginación">
+                    <button id="prevPage" class="btn btn-outline-secondary px-3">«</button>
+                    <span id="pageInfo" class="btn btn-light disabled">1 / X</span>
+                    <button id="nextPage" class="btn btn-outline-secondary px-3">»</button>
+                </div>
+            </div>
+
+
+
+            <div class="container d-flex justify-content-end align-items-center mt-3">
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#filtroModal">
+                    🔎 Filtros Avanzados
+                </button>
+            </div>
+        </div>
+
 
             <div class="toast-container position-fixed top-0 end-0 p-3">
                 <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -164,11 +169,15 @@
                         <td>{{ solicitud.fecha_actualizacion|date:"Y-m-d" }}</td>
                         <td>{{ solicitud.validado_por }}</td>
                         <td>
+                            {% if request.user.is_superuser %}
                             <select class="form-select form-select-sm estado-dropdown" data-id="{{ solicitud.id }}">
                                 {% for key, val in solicitud.ESTADO_CHOICES %}
                                     <option value="{{ key }}" {% if solicitud.estado == key %}selected{% endif %}>{{ val }}</option>
                                 {% endfor %}
                             </select>
+                            {% else %}
+                            {{ solicitud.get_estado_display }}
+                            {% endif %}
                         </td>
                         <td>
                             <span class="dias-estado" data-fecha="{{ solicitud.fecha_actualizacion|date:'Y-m-d' }}"></span>
@@ -302,7 +311,60 @@
     </div>
     </div>
 
+    <!-- Filtro en modal -->
+     <div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="filtroModalLabel">Filtro Avanzado</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
 
+                <!-- Filtro por ID -->
+                <div class="mb-3">
+                    <label for="filtro-id" class="form-label">Buscar por ID</label>
+                    <input type="text" id="filtro-id" class="form-control">
+                </div>
+
+                <!-- Filtro por Fecha Subida -->
+                <div class="mb-3">
+                    <label class="form-label">Fecha Subida</label>
+                    <div class="d-flex gap-2">
+                        <input type="date" id="filtro-fecha-subida-inicio" class="form-control">
+                        <input type="date" id="filtro-fecha-subida-fin" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha Actualización -->
+                <div class="mb-3">
+                    <label class="form-label">Fecha Actualización</label>
+                    <div class="d-flex gap-2">
+                        <input type="date" id="filtro-fecha-actualizacion-inicio" class="form-control">
+                        <input type="date" id="filtro-fecha-actualizacion-fin" class="form-control">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="limpiarFiltros">Limpiar</button>
+                <button type="button" class="btn btn-primary" id="aplicarFiltros" data-bs-dismiss="modal">Aplicar Filtros</button>
+            </div>
+            </div>
+        </div>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery (obligatorio antes de DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- DataTables CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Bootstrap Bundle (incluye Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -322,18 +384,10 @@ document.addEventListener('DOMContentLoaded', () => {
             estadoOriginal = dropdown.value;
             dropdownActual = dropdown;
         });
-        dropdown.addEventListener('mousedown', () => {
-            estadoOriginal = dropdown.value;
-            dropdownActual = dropdown;
-        });
-
         dropdown.addEventListener('change', function () {
             const fila = this.closest('tr');
             if (!fila) return;
-
             const celdas = fila.querySelectorAll('td');
-            if (celdas.length < 8) return;
-
             const id = celdas[0].innerText.trim();
             const usuario = celdas[1].innerText.trim();
             const archivo = celdas[2].innerText.trim();
@@ -352,26 +406,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('editar_fecha_subida').value = fecha_subida;
 
             const date = new Date(fecha_actualizacion);
-            if (!isNaN(date)) {
-                const isoLocal = date.toISOString().slice(0,16);
-                document.getElementById('editar_fecha_actualizacion').value = isoLocal;
-            } else {
-                document.getElementById('editar_fecha_actualizacion').value = "";
-            }
+            document.getElementById('editar_fecha_actualizacion').value = !isNaN(date) ? date.toISOString().slice(0, 16) : "";
 
             document.getElementById('editar_estado').value = estadoSeleccionado;
             document.getElementById('editar_validado_por').value = validado_por || '';
             document.getElementById('editar_comentario').value = '';
 
             form.action = `/actualizar_estado/${id}/`;
-
             modalEditar.show();
         });
     });
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-
         const id = document.getElementById('editar_solicitud_id').value;
         const estado = document.getElementById('editar_estado').value;
         const fecha = document.getElementById('editar_fecha_actualizacion').value;
@@ -396,195 +443,173 @@ document.addEventListener('DOMContentLoaded', () => {
                 comentario: comentario
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    throw new Error(data.error || 'Error desconocido');
-                });
-            }
-            return response.json();
-        })
+        .then(response => response.ok ? response.json() : response.json().then(err => { throw new Error(err.error) }))
         .then(data => {
-            if (dropdownActual) {
-                dropdownActual.value = estado;
-            }
-
+            if (dropdownActual) dropdownActual.value = estado;
             modalEditar.hide();
-
-            const mensajeExito = modalExitoEl.querySelector('.modal-body');
-            if (mensajeExito) {
-                mensajeExito.innerText = '✅ La solicitud fue actualizada correctamente.';
-            }
-
-            setTimeout(() => {
-                modalExito.show();
-            }, 300);
-
-            setTimeout(() => {
-                modalExito.hide();
-                location.reload();
-            }, 2300);
+            setTimeout(() => modalExito.show(), 300);
+            setTimeout(() => { modalExito.hide(); location.reload(); }, 2300);
         })
         .catch(error => {
-            console.error('Error al actualizar la solicitud:', error);
-            alert('Hubo un error al actualizar la solicitud: ' + error.message);
+            console.error('Error:', error);
+            alert('Error al actualizar: ' + error.message);
         });
     });
 
     modalEl.addEventListener('hidden.bs.modal', () => {
-        if (dropdownActual && estadoOriginal !== null) {
-            dropdownActual.value = estadoOriginal;
-        }
+        if (dropdownActual) dropdownActual.value = estadoOriginal;
         dropdownActual = null;
         estadoOriginal = null;
     });
-
-    // Colorea y muestra días desde fecha en elementos con clase .dias-estado (usando data-fecha)
-    const elementos = document.querySelectorAll(".dias-estado");
-    const hoy = new Date();
-    hoy.setHours(0,0,0,0);
-
-    elementos.forEach(el => {
-        const fechaTexto = el.getAttribute('data-fecha');
-        if (!fechaTexto) {
-            el.innerText = 'Fecha no disponible';
-            el.style.color = 'gray';
-            return;
-        }
-        const fechaActualizacion = new Date(fechaTexto);
-        if (isNaN(fechaActualizacion)) {
-            el.innerText = 'Fecha inválida';
-            el.style.color = 'gray';
-            return;
-        }
-
-        fechaActualizacion.setHours(0,0,0,0);
-
-        const diffMs = fechaActualizacion - hoy;
-        const dias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        el.innerText = `${Math.abs(dias)} día${Math.abs(dias) !== 1 ? 's' : ''}`;
-
-        if (dias > 7) {
-            el.style.color = 'green';
-        } else if (dias === 7) {
-            el.style.color = 'yellowgreen';
-        } else if (dias >= 1 && dias < 7) {
-            el.style.color = 'orange';
-        } else if (dias === 0) {
-            el.style.color = 'orange';
-        } else {
-            el.style.color = 'red';
-        }
-    });
-
-    // Variables para paginación
-    const rowsPerPage = 10;
-    let currentPage = 1;
-
-    // Elementos DOM para paginación y filtros
-    const inputBuscar = document.getElementById('buscador-id');
-    const selectAnio = document.getElementById('filtro-anio');
-    const tabla = document.getElementById('tabla_registro')?.getElementsByTagName('tbody')[0];
-    if (!tabla) return;
-    const filas = Array.from(tabla.getElementsByTagName('tr'));
-
-    // Función para filtrar filas
-    function filtrarFilas() {
-        const textoBuscar = inputBuscar.value.trim();
-        const anioFiltro = selectAnio.value;
-
-        return filas.filter(fila => {
-            if (fila.querySelector('td').hasAttribute('colspan')) return false; // fila vacía "No hay solicitudes"
-
-            const id = fila.cells[0].textContent.trim();
-            const anioFila = fila.getAttribute('data-anio');
-
-            const cumpleId = id.includes(textoBuscar);
-            const cumpleAnio = anioFiltro === "" || anioFila === anioFiltro;
-
-            return cumpleId && cumpleAnio;
-        });
-    }
-
-    // Función para mostrar página
-    function mostrarPagina(pagina) {
-        const filasFiltradas = filtrarFilas();
-        const totalPaginas = Math.ceil(filasFiltradas.length / rowsPerPage) || 1;
-
-        if (pagina < 1) pagina = 1;
-        if (pagina > totalPaginas) pagina = totalPaginas;
-        currentPage = pagina;
-
-        // Ocultar todas las filas primero
-        filas.forEach(fila => fila.style.display = 'none');
-
-        // Mostrar solo las filas de la página actual
-        const inicio = (pagina - 1) * rowsPerPage;
-        const fin = inicio + rowsPerPage;
-        filasFiltradas.slice(inicio, fin).forEach(fila => fila.style.display = '');
-
-        renderizarPaginacion(totalPaginas);
-    }
-
-    // Función para renderizar botones de paginación
-    function renderizarPaginacion(totalPaginas) {
-        const contenedor = document.getElementById('paginacion');
-        contenedor.innerHTML = '';
-
-        // Botón Anterior
-        const btnAnterior = document.createElement('button');
-        btnAnterior.className = 'btn btn-sm btn-outline-primary';
-        btnAnterior.textContent = 'Anterior';
-        btnAnterior.disabled = currentPage === 1;
-        btnAnterior.addEventListener('click', () => mostrarPagina(currentPage - 1));
-        contenedor.appendChild(btnAnterior);
-
-        // Botones de páginas (máximo 5 botones, centrados)
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPaginas, startPage + 4);
-        if (endPage - startPage < 4) {
-            startPage = Math.max(1, endPage - 4);
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            const btnPagina = document.createElement('button');
-            btnPagina.className = 'btn btn-sm ' + (i === currentPage ? 'btn-primary' : 'btn-outline-primary');
-            btnPagina.textContent = i;
-            btnPagina.addEventListener('click', () => mostrarPagina(i));
-            contenedor.appendChild(btnPagina);
-        }
-
-        // Botón Siguiente
-        const btnSiguiente = document.createElement('button');
-        btnSiguiente.className = 'btn btn-sm btn-outline-primary';
-        btnSiguiente.textContent = 'Siguiente';
-        btnSiguiente.disabled = currentPage === totalPaginas;
-        btnSiguiente.addEventListener('click', () => mostrarPagina(currentPage + 1));
-        contenedor.appendChild(btnSiguiente);
-    }
-
-    // Cuando cambian los filtros, volver a mostrar página 1
-    function filtrosYPaginacionHandler() {
-        mostrarPagina(1);
-    }
-
-    inputBuscar.addEventListener('input', filtrosYPaginacionHandler);
-    selectAnio.addEventListener('change', filtrosYPaginacionHandler);
-
-    // Inicializar
-    mostrarPagina(1);
 });
 </script>
 
-<!-- DataTables CSS Bootstrap 5 -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
-<!-- DataTables JS y jQuery (necesario) -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Modal
+    const filtroModalEl = document.getElementById('filtroModal');
+    const filtroModal = new bootstrap.Modal(filtroModalEl);
+
+    // Inputs dentro del modal
+    const inputIdModal = document.getElementById('filtro-id');
+    const fechaSubidaInicio = document.getElementById('filtro-fecha-subida-inicio');
+    const fechaSubidaFin = document.getElementById('filtro-fecha-subida-fin');
+    const fechaActualizacionInicio = document.getElementById('filtro-fecha-actualizacion-inicio');
+    const fechaActualizacionFin = document.getElementById('filtro-fecha-actualizacion-fin');
+
+    const filas = document.querySelectorAll('#tabla_registro tbody tr');
+
+    function parseDate(str) {
+        if (!str) return null;
+        const d = new Date(str);
+        return isNaN(d) ? null : d;
+    }
+
+    function filtrar() {
+        const valorId = inputIdModal.value.trim().toLowerCase();
+        const fSubidaInicio = parseDate(fechaSubidaInicio.value);
+        const fSubidaFin = parseDate(fechaSubidaFin.value);
+        const fActualizacionInicio = parseDate(fechaActualizacionInicio.value);
+        const fActualizacionFin = parseDate(fechaActualizacionFin.value);
+
+        filas.forEach(fila => {
+            const id = fila.cells[0].innerText.trim().toLowerCase();
+            const fechaSubidaStr = fila.cells[5].innerText.trim();
+            const fechaActualizacionStr = fila.cells[6].innerText.trim();
+            const fechaSubida = parseDate(fechaSubidaStr);
+            const fechaActualizacion = parseDate(fechaActualizacionStr);
+
+            let mostrar = true;
+
+            if (valorId) {
+                if (!id.includes(valorId)) {
+                    mostrar = false;
+                }
+            } else {
+                if (fSubidaInicio && (!fechaSubida || fechaSubida < fSubidaInicio)) mostrar = false;
+                if (fSubidaFin && (!fechaSubida || fechaSubida > fSubidaFin)) mostrar = false;
+                if (fActualizacionInicio && (!fechaActualizacion || fechaActualizacion < fActualizacionInicio)) mostrar = false;
+                if (fActualizacionFin && (!fechaActualizacion || fechaActualizacion > fActualizacionFin)) mostrar = false;
+            }
+
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+
+    document.getElementById('aplicarFiltros').addEventListener('click', () => {
+        filtrar();
+    });
+
+    document.getElementById('limpiarFiltros').addEventListener('click', () => {
+        inputIdModal.value = '';
+        fechaSubidaInicio.value = '';
+        fechaSubidaFin.value = '';
+        fechaActualizacionInicio.value = '';
+        fechaActualizacionFin.value = '';
+        filas.forEach(fila => fila.style.display = '');
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const elementosDias = document.querySelectorAll('.dias-estado');
+
+    elementosDias.forEach(span => {
+        const fechaStr = span.dataset.fecha;
+        const fechaActualizacion = new Date(fechaStr);
+        const hoy = new Date();
+
+        // Ajustamos la zona horaria (opcional según servidor)
+        hoy.setHours(0, 0, 0, 0);
+        fechaActualizacion.setHours(0, 0, 0, 0);
+
+        const diffTime = fechaActualizacion - hoy;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+        let color = 'black';
+        if (diffDays > 7) {
+            color = 'green';
+        } else if (diffDays <= 7 && diffDays > 1) {
+            color = 'orange';
+        } else if (diffDays === 0) {
+            color = 'orangered';
+        } else if (diffDays < 0) {
+            color = 'red';
+        }
+
+        span.innerText = `${diffDays} días`;
+        span.style.color = color;
+        span.style.fontWeight = 'bold';
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filas = Array.from(document.querySelectorAll('#tabla_registro tbody tr'));
+    const filasPorPagina = 10;
+    let paginaActual = 1;
+    const totalPaginas = Math.ceil(filas.length / filasPorPagina);
+
+    const pageInfo = document.getElementById('pageInfo');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+
+    function mostrarPagina(pagina) {
+        paginaActual = pagina;
+        filas.forEach(fila => fila.style.display = 'none');
+        const inicio = (paginaActual - 1) * filasPorPagina;
+        const fin = inicio + filasPorPagina;
+        filas.slice(inicio, fin).forEach(fila => fila.style.display = '');
+
+        pageInfo.textContent = `Página ${paginaActual} de ${totalPaginas}`;
+        prevBtn.disabled = paginaActual === 1;
+        nextBtn.disabled = paginaActual === totalPaginas;
+
+        // Aplicar estilos de Bootstrap a botones activos/desactivados
+        prevBtn.parentElement.classList.toggle('disabled', paginaActual === 1);
+        nextBtn.parentElement.classList.toggle('disabled', paginaActual === totalPaginas);
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (paginaActual > 1) {
+            mostrarPagina(paginaActual - 1);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (paginaActual < totalPaginas) {
+            mostrarPagina(paginaActual + 1);
+        }
+    });
+
+    mostrarPagina(1);
+});
+</script>
 
 
 </section>
