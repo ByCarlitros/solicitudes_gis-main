@@ -5,8 +5,8 @@
 {% block custom_css %}
   <link href="{% static 'css/control.css' %}" rel="stylesheet" />
 {% endblock %}
-
 {% block main_content %}
+
   <section class="container">
     <div class="flex-column-red">
       <div class="flex-row-content p-1">
@@ -15,10 +15,16 @@
           <div class="flex-column-gap fill-available">
             <div class="info-box p-1 fill-available">
               <h3>Gráfico de Solicitudes y Trabajos Interno</h3>
+              
+
+
+              <!-- Espacio para el gráfico -->
               <canvas id="puntajePorProfesionalChart"></canvas>
+
             </div>
           </div>
         </div>
+        
 
         <!-- Sección de Dashboard -->
         <div class="flex-row-dashboard">
@@ -32,20 +38,25 @@
             </div>
           </div>
 
-          <!-- Parte Media del Dashboard -->
+          <!-- Parte Media del Dashboard: Solicitudes en Proceso, Ejecutadas y Rechazadas -->
           <div class="dashboard-middle fill-available">
+            <!-- Solicitudes en Proceso -->
             <div class="flex-column-gap fill-available">
               <div class="dashboard-box-3 h-full">
                 <h3>En Proceso</h3>
                 <p class="counter" data-target="{{ en_proceso }}">0</p>
               </div>
             </div>
+
+            <!-- Solicitudes Ejecutadas -->
             <div class="flex-column-gap fill-available">
               <div class="dashboard-box-4 h-full">
                 <h3>Ejecutadas</h3>
                 <p class="counter" data-target="{{ ejecutado }}">0</p>
               </div>
             </div>
+
+            <!-- Solicitudes Rechazadas -->
             <div class="flex-column-gap fill-available">
               <div class="dashboard-box-5 h-full">
                 <h3>Rechazadas</h3>
@@ -53,34 +64,36 @@
               </div>
             </div>
           </div>
-        </div>
 
+          <!-- Parte Inferior del Dashboard: Promedio de Carga de Trabajo -->
+          
+        </div>
       </div>
     </div>
   </section>
 {% endblock %}
 
 {% block custom_js %}
-  <!-- Primero JQUERY -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- Luego SELECT2 -->
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-  <!-- Luego Chart.js -->
+  <!-- Incluir Chart.js desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Variables para el gráfico -->
+  <!-- Definir las variables necesarias para el gráfico de barras -->
   <script>
-    var labels = {{ labels_json|safe }} || [];
-    var trabajo_propio = {{ trabajo_propio_json|safe }} || [];
-    var trabajo_apoyo = {{ trabajo_apoyo_json|safe }} || [];
-    var total_tareas = {{ total_tareas_json|safe }} || [];
-    var total_apoyo_tareas = {{ total_apoyos_tareas_json|safe }} || [];
-  </script>
+    var labels = {{ labels_json|safe }};
+    var trabajo_propio = {{ total_unitario_solicitudes_json|safe }};
+    var trabajo_apoyo = {{ total_unitario_solicitudes_apoyo_json|safe }};
+    var total_tareas = {{ total_tareas_json|safe }};
+    var total_apoyo_tareas = {{ total_apoyos_tareas_json|safe }};
 
-  <!-- Finalmente tu control.js -->
+    var trabajo_porcentual_propio = {{ trabajo_porcentual_propio_json|safe }};
+    var trabajo_porcentual_apoyo = {{ trabajo_porcentual_apoyo_json|safe }};
+
+</script>
+
+
+
+
+
+  <!-- Incluir el script externo de control.js -->
   <script src="{% static 'js/control_v1.js' %}"></script>
 {% endblock %}
-
