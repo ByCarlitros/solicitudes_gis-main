@@ -4,14 +4,13 @@ document.addEventListener('DOMContentLoaded', function () {
     counters.forEach((counter) => {
         const target = +counter.getAttribute('data-target');
         let count = 0;
-        const increment = target / 200; // Ajusta la velocidad aquí
+        const increment = target / 200;
 
         const updateCount = () => {
             if (count < target) {
                 count += increment;
                 counter.innerText = Math.ceil(count);
 
-                // Aplicar la clase 'visible' cuando el conteo alcance la mitad del objetivo
                 if (count >= target / 2.5 && !counter.classList.contains('visible')) {
                     counter.classList.add('visible');
                 }
@@ -19,23 +18,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 setTimeout(updateCount, 10);
             } else {
                 counter.innerText = target;
-                // Opcional: Mantener la clase 'visible' o eliminarla
-                // counter.classList.remove('visible');
             }
         };
 
         updateCount();
     });
 
-
-    // Configuración del Gráfico de Barras con animación gradual de izquierda a derecha
+    // Configuración del Gráfico de Barras
     if (typeof labels !== "undefined" && typeof trabajo_propio !== "undefined" && typeof trabajo_apoyo !== "undefined" &&
         typeof trabajo_porcentual_propio !== "undefined" && typeof trabajo_porcentual_apoyo !== "undefined" && 
         typeof total_apoyo_tareas !== "undefined") {
         
         const ctx1 = document.getElementById("puntajePorProfesionalChart").getContext("2d");
 
-        // Definir los datos de ambos gráficos
         const datosAbsolutos = {
             labels: labels,
             datasets: [
@@ -60,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     borderColor: "rgb(9, 127, 3)",
                     borderWidth: 1
                 },
-                
                 {
                     label: "Tareas Internas como apoyo",
                     data: total_apoyo_tareas,
@@ -70,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
             ]
         };
-        const chart = new Chart(ctx1, {
 
+        const chart = new Chart(ctx1, {
             type: "bar",
             data: datosAbsolutos,
             options: {
@@ -86,7 +80,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         beginAtZero: false,
                         ticks: {
                             callback: function (value) {
-                                return Number(value.toString());
+                                if (value === 1 || value === 10 || value === 100 || value === 1000 || value === 10000 || value === 100000) {
+                                    return value;
+                                }
+                                return '';
                             }
                         }
                     }

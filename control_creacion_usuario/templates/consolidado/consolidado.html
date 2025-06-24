@@ -464,9 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
-
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Modal
@@ -504,15 +501,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let mostrar = true;
 
-            if (valorId) {
-                if (!id.includes(valorId)) {
-                    mostrar = false;
-                }
-            } else {
-                if (fSubidaInicio && (!fechaSubida || fechaSubida < fSubidaInicio)) mostrar = false;
-                if (fSubidaFin && (!fechaSubida || fechaSubida > fSubidaFin)) mostrar = false;
-                if (fActualizacionInicio && (!fechaActualizacion || fechaActualizacion < fActualizacionInicio)) mostrar = false;
-                if (fActualizacionFin && (!fechaActualizacion || fechaActualizacion > fActualizacionFin)) mostrar = false;
+            // Filtro por ID
+            if (valorId && !id.includes(valorId)) {
+                mostrar = false;
+            }
+
+            // Filtro por fecha de subida
+            if (fSubidaInicio && (!fechaSubida || fechaSubida < fSubidaInicio)) {
+                mostrar = false;
+            }
+            if (fSubidaFin && (!fechaSubida || fechaSubida > fSubidaFin)) {
+                mostrar = false;
+            }
+
+            // Filtro por fecha de actualización
+            if (fActualizacionInicio && (!fechaActualizacion || fechaActualizacion < fActualizacionInicio)) {
+                mostrar = false;
+            }
+            if (fActualizacionFin && (!fechaActualizacion || fechaActualizacion > fActualizacionFin)) {
+                mostrar = false;
             }
 
             fila.style.display = mostrar ? '' : 'none';
@@ -533,6 +540,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
+
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

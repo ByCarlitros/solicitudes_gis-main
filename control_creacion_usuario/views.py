@@ -226,12 +226,10 @@ def control(request):
     estados = ProtocoloSolicitud.objects.values("estado").annotate(total=Count("estado"))
     estado_counts = {estado["estado"]: estado["total"] for estado in estados}
 
-    # Definir estados posibles
     estados_posibles = ["RECIBIDO", "EN PROCESO", "EJECUTADO", "RECHAZADO"]
     for estado in estados_posibles:
         estado_counts.setdefault(estado, 0)
 
-    # Trabajo Propio (Puntaje y Total de Solicitudes)
     profesionales_solicitudes = (
         ProtocoloSolicitud.objects.filter(profesional__isnull=False)
         .values("profesional__first_name", "profesional__last_name", "profesional_id")
@@ -241,7 +239,6 @@ def control(request):
         )
     )
 
-    # Trabajo de Apoyo (Puntaje y Total de Solicitudes)
     profesionales_apoyos = (
         Apoyo_Protocolo.objects.filter(profesional__isnull=False)
         .values("profesional__first_name", "profesional__last_name", "profesional_id")
@@ -251,7 +248,6 @@ def control(request):
         )
     )
 
-    # Tareas Internas (Filtrar solo tareas completadas)
     tareas_completadas = (
         Tarea.objects.filter(completada=True)
         .values("funcionario__nombre", "funcionario__apellido", "funcionario_id")
@@ -263,10 +259,9 @@ def control(request):
         .values("funcionario_id")
         .annotate(total_apoyos=Count("id"))
     )
-    # Combinar datos
+
     puntajes_por_profesional = {}
 
-    # Agregar ProtocoloSolicitud
     for item in profesionales_solicitudes:
         full_name = f"{item['profesional__first_name']} {item['profesional__last_name']}"
         puntajes_por_profesional[item["profesional_id"]] = {
@@ -275,7 +270,7 @@ def control(request):
             "trabajo_apoyo": 0,
             "total_solicitudes": item["total_solicitudes"],
             "total_solicitudes_apoyo": 0,
-            "total_tareas": 0  # Inicialmente 0
+            "total_tareas": 0
         }
     
     solicitudes_per_profesional = (
@@ -286,11 +281,10 @@ def control(request):
     )
 
     labels = [
-    f"{item['profesional__first_name']} {item['profesional__last_name']}"
-    for item in solicitudes_per_profesional
+        f"{item['profesional__first_name']} {item['profesional__last_name']}"
+        for item in solicitudes_per_profesional
     ]
 
-    # Agregar Apoyo_Protocolo
     for item in profesionales_apoyos:
         full_name = f"{item['profesional__first_name']} {item['profesional__last_name']}"
         if item["profesional_id"] in puntajes_por_profesional:
@@ -306,11 +300,9 @@ def control(request):
                 "total_tareas": 0
             }
 
-    # Agregar Tareas Internas
     for item in tareas_completadas:
         funcionario = Funcionario.objects.get(id=item["funcionario_id"])
         user = obtener_usuario_por_funcionario(funcionario)
-        
         if user:
             if user.id in puntajes_por_profesional:
                 puntajes_por_profesional[user.id]["total_tareas"] = item["total_tareas"]
@@ -328,7 +320,6 @@ def control(request):
     for item in tareas_con_apoyo:
         funcionario = Funcionario.objects.get(id=item["funcionario_id"])
         user = obtener_usuario_por_funcionario(funcionario)
-
         if user:
             if user.id in puntajes_por_profesional:
                 puntajes_por_profesional[user.id]["total_apoyos_tareas"] = item["total_apoyos"]
@@ -344,16 +335,12 @@ def control(request):
                     "total_apoyos_tareas": item["total_apoyos"]
                 }
 
-
-
-    # Ordenar por total de trabajo
     sorted_puntajes = sorted(
         puntajes_por_profesional.values(),
         key=lambda x: x["trabajo_propio"] + x["trabajo_apoyo"] + x["total_tareas"] + x.get("total_apoyos_tareas", 0),
         reverse=True
     )
 
-    # Listas para gráficos
     labels = [item["name"] for item in sorted_puntajes]
     trabajo_propio_data = [item["trabajo_propio"] for item in sorted_puntajes]
     trabajo_apoyo_data = [item["trabajo_apoyo"] for item in sorted_puntajes]
@@ -362,33 +349,31 @@ def control(request):
     total_tareas_data = [item["total_tareas"] for item in sorted_puntajes]
     total_apoyos_tareas_data = [item.get("total_apoyos_tareas", 0) for item in sorted_puntajes]
 
-    # Convertir a JSON
     labels_json = json.dumps(labels)
-    trabajo_propio_json = json.dumps(trabajo_propio_data)
-    trabajo_apoyo_json = json.dumps(trabajo_apoyo_data)
-    total_solicitudes_json = json.dumps(total_solicitudes_data)
-    total_solicitudes_apoyo_json = json.dumps(total_solicitudes_apoyo_data)
+    total_unitario_solicitudes_json = json.dumps(total_solicitudes_data)
+    total_unitario_solicitudes_apoyo_json = json.dumps(total_solicitudes_apoyo_data)
     total_tareas_json = json.dumps(total_tareas_data)
     total_apoyos_tareas_json = json.dumps(total_apoyos_tareas_data)
-
+    trabajo_porcentual_propio_json = json.dumps(trabajo_propio_data)
+    trabajo_porcentual_apoyo_json = json.dumps(trabajo_apoyo_data)
 
     context = {
-    "total_solicitudes": total_solicitudes,
-    "total_tareas": total_tareas,
-    "labels_json": labels_json,
-    "trabajo_propio_json": trabajo_propio_json,
-    "trabajo_apoyo_json": trabajo_apoyo_json,
-    "total_solicitudes_json": total_solicitudes_json,
-    "total_solicitudes_apoyo_json": total_solicitudes_apoyo_json,
-    "total_tareas_json": total_tareas_json,
-    "total_apoyos_tareas_json": total_apoyos_tareas_json,
-    "en_proceso": estado_counts.get("EN PROCESO", 0),
-    "ejecutado": estado_counts.get("EJECUTADO", 0),
-    "rechazado": estado_counts.get("RECHAZADO", 0),
-}
-
+        "total_solicitudes": total_solicitudes,
+        "total_tareas": total_tareas,
+        "labels_json": labels_json,
+        "total_unitario_solicitudes_json": total_unitario_solicitudes_json,
+        "total_unitario_solicitudes_apoyo_json": total_unitario_solicitudes_apoyo_json,
+        "total_tareas_json": total_tareas_json,
+        "total_apoyos_tareas_json": total_apoyos_tareas_json,
+        "trabajo_porcentual_propio_json": trabajo_porcentual_propio_json,
+        "trabajo_porcentual_apoyo_json": trabajo_porcentual_apoyo_json,
+        "en_proceso": estado_counts.get("EN PROCESO", 0),
+        "ejecutado": estado_counts.get("EJECUTADO", 0),
+        "rechazado": estado_counts.get("RECHAZADO", 0),
+    }
 
     return render(request, "Control.html", context)
+
 
 def cambiar_contraseña(request):
     if request.method == 'POST':
