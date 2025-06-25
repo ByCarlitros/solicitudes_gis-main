@@ -126,10 +126,30 @@
 
 
             <div class="container d-flex justify-content-end align-items-center mt-3">
-                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#filtroModal">
-                    🔎 Filtros Avanzados
-                </button>
-            </div>
+                <div class="d-flex align-items-center border rounded px-2 py-1" style="overflow: hidden; max-width: 500px; gap: 0.5rem;">
+                    <select id="filtroPrincipal" class="form-select border-0 bg-light" style="width: auto;" onchange="cambiarFiltro()">
+                    <option value="id">ID</option>
+                    <option value="nombre_usuario">Nombre de usuario</option>
+                    <option value="lugar">Lugar</option>
+                    <option value="estado">Estado</option>
+                    </select>
+
+                    <!-- Filtro secundario para "estado", oculto por defecto -->
+                    <select id="filtroEstado" class="form-select border-0 bg-light d-none" style="width: auto;">
+                        <option value="">Todos</option>
+                        <option value="1">En revisión</option>
+                        <option value="2">Aprobado</option>
+                        <option value="3">Rechazado</option>
+                    </select>
+
+
+                    <!-- Campo de búsqueda -->
+                    <input id="inputBusqueda" type="text" class="form-control border-0" placeholder="Buscar..." />
+
+                    <!-- Botón para limpiar -->
+                    <button class="btn btn-link text-decoration-none" type="button" onclick="limpiarBusqueda()">✕</button>
+                </div>
+                </div>
         </div>
 
 
@@ -311,48 +331,6 @@
     </div>
     </div>
 
-    <!-- Filtro en modal -->
-     <div class="modal fade" id="filtroModal" tabindex="-1" aria-labelledby="filtroModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="filtroModalLabel">Filtro Avanzado</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-
-                <!-- Filtro por ID -->
-                <div class="mb-3">
-                    <label for="filtro-id" class="form-label">Buscar por ID</label>
-                    <input type="text" id="filtro-id" class="form-control">
-                </div>
-
-                <!-- Filtro por Fecha Subida -->
-                <div class="mb-3">
-                    <label class="form-label">Fecha Subida</label>
-                    <div class="d-flex gap-2">
-                        <input type="date" id="filtro-fecha-subida-inicio" class="form-control">
-                        <input type="date" id="filtro-fecha-subida-fin" class="form-control">
-                    </div>
-                </div>
-
-                <!-- Filtro por Fecha Actualización -->
-                <div class="mb-3">
-                    <label class="form-label">Fecha Actualización</label>
-                    <div class="d-flex gap-2">
-                        <input type="date" id="filtro-fecha-actualizacion-inicio" class="form-control">
-                        <input type="date" id="filtro-fecha-actualizacion-fin" class="form-control">
-                    </div>
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="limpiarFiltros">Limpiar</button>
-                <button type="button" class="btn btn-primary" id="aplicarFiltros" data-bs-dismiss="modal">Aplicar Filtros</button>
-            </div>
-            </div>
-        </div>
-        </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -465,85 +443,88 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Modal
-    const filtroModalEl = document.getElementById('filtroModal');
-    const filtroModal = new bootstrap.Modal(filtroModalEl);
-
-    // Inputs dentro del modal
-    const inputIdModal = document.getElementById('filtro-id');
-    const fechaSubidaInicio = document.getElementById('filtro-fecha-subida-inicio');
-    const fechaSubidaFin = document.getElementById('filtro-fecha-subida-fin');
-    const fechaActualizacionInicio = document.getElementById('filtro-fecha-actualizacion-inicio');
-    const fechaActualizacionFin = document.getElementById('filtro-fecha-actualizacion-fin');
-
+    document.addEventListener('DOMContentLoaded', () => {
+    const filtroPrincipal = document.getElementById('filtroPrincipal');
+    const filtroEstado = document.getElementById('filtroEstado');
+    const inputBusqueda = document.getElementById('inputBusqueda');
     const filas = document.querySelectorAll('#tabla_registro tbody tr');
 
-    function parseDate(str) {
-        if (!str) return null;
-        const d = new Date(str);
-        return isNaN(d) ? null : d;
+    const estadoTexto = {
+        1: "En revisión",
+        2: "Aprobado",
+        3: "Rechazado"
+    };
+
+    function normalizarTexto(texto) {
+        return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
     }
 
-    function filtrar() {
-        const valorId = inputIdModal.value.trim().toLowerCase();
-        const fSubidaInicio = parseDate(fechaSubidaInicio.value);
-        const fSubidaFin = parseDate(fechaSubidaFin.value);
-        const fActualizacionInicio = parseDate(fechaActualizacionInicio.value);
-        const fActualizacionFin = parseDate(fechaActualizacionFin.value);
+    function filtrarTabla() {
+        const filtroSeleccionado = filtroPrincipal.value;
+        let valorBusqueda;
+
+        if (filtroSeleccionado === 'estado') {
+            const valorSeleccionado = filtroEstado.value;
+            if (!valorSeleccionado) {
+                filas.forEach(fila => fila.style.display = '');
+                return;
+            }
+            valorBusqueda = normalizarTexto(estadoTexto[valorSeleccionado] || '');
+        } else {
+            valorBusqueda = normalizarTexto(inputBusqueda.value);
+        }
 
         filas.forEach(fila => {
-            const id = fila.cells[0].innerText.trim().toLowerCase();
-            const fechaSubidaStr = fila.cells[5].innerText.trim();
-            const fechaActualizacionStr = fila.cells[6].innerText.trim();
-            const fechaSubida = parseDate(fechaSubidaStr);
-            const fechaActualizacion = parseDate(fechaActualizacionStr);
+            let textoCelda = '';
 
-            let mostrar = true;
-
-            // Filtro por ID
-            if (valorId && !id.includes(valorId)) {
-                mostrar = false;
+            switch (filtroSeleccionado) {
+                case 'id':
+                    textoCelda = fila.cells[0].innerText;
+                    break;
+                case 'nombre_usuario':
+                    textoCelda = fila.cells[1].innerText;
+                    break;
+                case 'lugar':
+                    textoCelda = fila.cells[4].innerText;  // lugar es columna 5, índice 4
+                    break;
+                case 'estado':
+                    const celdaEstado = fila.cells[8];
+                    const selectEstado = celdaEstado.querySelector('select');
+                    textoCelda = selectEstado 
+                        ? selectEstado.selectedOptions[0].text 
+                        : celdaEstado.innerText;
+                    break;
+                default:
+                    textoCelda = '';
             }
 
-            // Filtro por fecha de subida
-            if (fSubidaInicio && (!fechaSubida || fechaSubida < fSubidaInicio)) {
-                mostrar = false;
-            }
-            if (fSubidaFin && (!fechaSubida || fechaSubida > fSubidaFin)) {
-                mostrar = false;
-            }
-
-            // Filtro por fecha de actualización
-            if (fActualizacionInicio && (!fechaActualizacion || fechaActualizacion < fActualizacionInicio)) {
-                mostrar = false;
-            }
-            if (fActualizacionFin && (!fechaActualizacion || fechaActualizacion > fActualizacionFin)) {
-                mostrar = false;
-            }
-
-            fila.style.display = mostrar ? '' : 'none';
+            fila.style.display = normalizarTexto(textoCelda).includes(valorBusqueda) ? '' : 'none';
         });
     }
 
-    document.getElementById('aplicarFiltros').addEventListener('click', () => {
-        filtrar();
+    filtroPrincipal.addEventListener('change', () => {
+        if (filtroPrincipal.value === 'estado') {
+            filtroEstado.classList.remove('d-none');
+            inputBusqueda.classList.add('d-none');
+        } else {
+            filtroEstado.classList.add('d-none');
+            inputBusqueda.classList.remove('d-none');
+        }
+        filtrarTabla();
     });
 
-    document.getElementById('limpiarFiltros').addEventListener('click', () => {
-        inputIdModal.value = '';
-        fechaSubidaInicio.value = '';
-        fechaSubidaFin.value = '';
-        fechaActualizacionInicio.value = '';
-        fechaActualizacionFin.value = '';
+    inputBusqueda.addEventListener('input', filtrarTabla);
+    filtroEstado.addEventListener('change', filtrarTabla);
+
+    window.limpiarBusqueda = function () {
+        inputBusqueda.value = '';
+        filtroEstado.value = '';
         filas.forEach(fila => fila.style.display = '');
-    });
+    };
 });
+
+
 </script>
-
-
-
-
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -621,7 +602,26 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarPagina(1);
 });
 </script>
+<script>
+  function cambiarFiltro() {
+    const filtro = document.getElementById('filtroPrincipal').value;
+    const input = document.getElementById('inputBusqueda');
+    const filtroEstado = document.getElementById('filtroEstado');
 
+    if (filtro === 'estado') {
+      input.classList.add('d-none');
+      filtroEstado.classList.remove('d-none');
+    } else {
+      input.classList.remove('d-none');
+      filtroEstado.classList.add('d-none');
+    }
+  }
+
+  function limpiarBusqueda() {
+    document.getElementById('inputBusqueda').value = '';
+    document.getElementById('filtroEstado').value = '';
+  }
+</script>
 
 </section>
 

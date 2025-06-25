@@ -138,12 +138,20 @@ tr:nth-child(even) {
                     <div id="paginacion" class="pagination-container"></div>
                 </div>
 
-                <!-- Buscador + Filtro por año centrados -->
                 <div class="container d-flex justify-content-end align-items-center mt-3">
-                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#filtroModal">
-                        🔎 Filtros Avanzados
-                    </button>
+                    <div class="d-flex align-items-center border rounded px-2 py-1" style="overflow: hidden; max-width: 500px; gap: 0.5rem;">
+                        <select id="filtroPrincipal" class="form-select border-0 bg-light" style="width: auto;">
+                            <option value="id">ID</option>
+                            <option value="nombre_solicitante">Nombre Solicitante</option>
+                            <option value="departamento">Departamento</option>
+                        </select>
+
+                        <input id="inputBusqueda" type="text" class="form-control border-0" placeholder="Buscar..." />
+
+                        <button class="btn btn-link text-decoration-none" type="button" id="btnLimpiarFiltro">✕</button>
+                    </div>
                 </div>
+
             </div>
             <div class="toast-container position-fixed top-0 end-0 p-3">
                 <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -986,20 +994,66 @@ function cambiarPagina(page) {
     actualizarTabla();
 }
 
+function normalizarTexto(texto) {
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+}
+
+// Función para filtrar la tabla según filtro principal y texto buscado
+function filtrarTabla() {
+    const filtroSeleccionado = $('#filtroPrincipal').val();
+    const valorBusqueda = normalizarTexto($('#inputBusqueda').val() || '');
+
+    $('#tabla_registro tbody tr').each(function() {
+        const fila = $(this);
+        let textoCelda = '';
+
+        switch (filtroSeleccionado) {
+            case 'id':
+                textoCelda = fila.find('td').eq(0).text();
+                break;
+            case 'nombre_solicitante':
+                textoCelda = fila.find('td').eq(2).text();
+                break;
+            case 'departamento':
+                textoCelda = fila.find('td').eq(4).text();
+                break;
+            default:
+                textoCelda = '';
+        }
+
+        if (normalizarTexto(textoCelda).includes(valorBusqueda)) {
+            fila.show();
+        } else {
+            fila.hide();
+        }
+    });
+}
+
 $(document).ready(function() {
-    // Eventos para actualizar tabla con filtros
+    // ✅ Filtros avanzados (modal)
     $('#filtro-id').on('input', function() {
         currentPage = 1;
         actualizarTabla();
     });
+
     $('#filtro-fecha-inicio, #filtro-fecha-fin, #filtro-fechaD-inicio, #filtro-fechaD-fin').on('change', function() {
         currentPage = 1;
         actualizarTabla();
     });
 
+    // ✅ Filtros principales (dropdown e input visible)
+    $('#filtroPrincipal').on('change', function () {
+        filtrarTabla();
+    });
+
+    $('#inputBusqueda').on('input', function () {
+        filtrarTabla();
+    });
+
     // Inicializa tabla
     actualizarTabla();
 });
+
 
 
 </script>
