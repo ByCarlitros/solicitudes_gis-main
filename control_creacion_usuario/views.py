@@ -403,14 +403,15 @@ from django.core.paginator import Paginator
 def Gestion_imagen(request):
     usuarios = User.objects.all().order_by('username')  # Para el filtro
 
-    usuario_id = request.GET.get('usuario')
-    imagenes = Imagen_sig.objects.all().order_by('-id')
+    usuario_id = request.GET.get('usuario')  # Puede ser None, "", o id string
 
+    imagenes = Imagen_sig.objects.all().order_by('-id')
     usuario_filtrado = None
     nombre_usuario = "Todos"
 
-    # Filtrar imágenes por usuario si se pasó usuario_id válido
-    if usuario_id:
+    # Caso 1: No viene filtro -> filtro por usuario logueado por defecto
+    if usuario_id is None:
+        usuario_id = str(request.user.id)
         try:
             usuario_filtrado = int(usuario_id)
             imagenes = imagenes.filter(usuario_id=usuario_filtrado)
@@ -420,36 +421,51 @@ def Gestion_imagen(request):
             usuario_filtrado = None
             nombre_usuario = "Desconocido"
 
-    # Paginación: 6 imágenes por página
+    # Caso 2: Viene filtro vacío "" -> mostrar todas las imágenes
+    elif usuario_id == '':
+        usuario_filtrado = None
+        nombre_usuario = "Todos"
+        # imagenes ya tiene todas las imágenes, no filtramos
+
+    # Caso 3: Viene id usuario -> filtrar por ese usuario
+    else:
+        try:
+            usuario_filtrado = int(usuario_id)
+            imagenes = imagenes.filter(usuario_id=usuario_filtrado)
+            usuario_obj = User.objects.get(id=usuario_filtrado)
+            nombre_usuario = usuario_obj.username
+        except (User.DoesNotExist, ValueError):
+            usuario_filtrado = None
+            nombre_usuario = "Desconocido"
+            # mostrar todas las imágenes
+            imagenes = Imagen_sig.objects.all().order_by('-id')
+
     paginator = Paginator(imagenes, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Manejo del formulario de subida de imagen
     if request.method == 'POST':
         form = ImagenForm(request.POST, request.FILES)
         if form.is_valid():
             imagen = form.save(commit=False)
             imagen.usuario = request.user
             imagen.save()
-            # Redirige manteniendo el filtro actual y en la primera página para evitar inconsistencias
+            # redirigir manteniendo filtro actual
             redirect_url = 'Gestion_imagen'
-            # Construimos la URL con query string para mantener filtro
-            query_params = ''
-            if usuario_filtrado:
-                query_params = f'?usuario={usuario_filtrado}'
+            query_params = f'?usuario={usuario_id}' if usuario_id is not None else ''
             return redirect(f"{redirect_url}{query_params}")
     else:
         form = ImagenForm()
 
     context = {
         'usuarios': usuarios,
-        'usuario_filtrado': str(usuario_filtrado) if usuario_filtrado else '',
+        'usuario_filtrado': str(usuario_filtrado) if usuario_filtrado is not None else '',
         'nombre_usuario': nombre_usuario,
         'page_obj': page_obj,
         'form': form,
     }
     return render(request, 'Gestion_imagen.html', context)
+
 
 
 @csrf_exempt

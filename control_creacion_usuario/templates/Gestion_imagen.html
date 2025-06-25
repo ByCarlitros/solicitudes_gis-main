@@ -66,25 +66,28 @@
               <form method="get" class="mb-3">
                 <label for="usuario">Filtrar por usuario:</label>
                 <select name="usuario" id="usuario" class="form-select">
-                    <option value="">Todos</option>
                     <option value="{{ request.user.id }}" {% if usuario_filtrado == request.user.id|stringformat:"s" %}selected{% endif %}>
                         {{ request.user.username }}
                     </option>
+                    <option value="" {% if not usuario_filtrado %}selected{% endif %}>Todos</option>
                 </select>
               </form>
               <h2>
-              Imágenes de:
               {% if usuario_filtrado and usuario_filtrado != "" %}
-                {% for usuario in usuarios %}
-                  {% if usuario.id|stringformat:"s" == usuario_filtrado %}
-                    {{ usuario.username }}
-                  {% endif %}
-                {% endfor %}
+                {% if usuario_filtrado == request.user.id|stringformat:"s" %}
+                  Tus imágenes
+                {% else %}
+                  Imágenes de:
+                  {% for usuario in usuarios %}
+                    {% if usuario.id|stringformat:"s" == usuario_filtrado %}
+                      {{ usuario.username }}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
               {% else %}
-                Todos
+                Imágenes de todos
               {% endif %}
             </h2>
-
 
               <div class="row flex-container">
                 {% for imagen in page_obj %}
