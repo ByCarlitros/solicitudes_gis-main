@@ -58,6 +58,16 @@
         padding: 1px;
         border-radius: 5px;
     }
+    .nav-link.active > a.nav-link {
+    background-color: #d6e6f8;
+    color: #0f52a9 !important;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(15, 82, 169, 0.2);
+  }
+
+
     </style>
     {% endblock %}
   </head>
@@ -72,20 +82,25 @@
           {% if request.user.is_authenticated %}
 
           <ul class="navbar-nav col-lg-10 justify-content-lg-center">
-       
-            <li class="nav-link">
-              <a class="nav-link" href="{% url 'solicitude_llegadas' %}">Solicitudes </a>
+
+            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.get_full_path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/solicitude_llegadas/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'solicitude_llegadas' %}">Solicitudes</a>
             </li>
-            <li class="nav-link">
+
+            <li class="nav-link {% if request.path == '/tareas/' %}active{% endif %}">
               <a class="nav-link" href="/tareas/">Tareas SIG</a>
             </li>
-            <li class="nav-link">
+
+            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/vista_consolidada/' %}active{% endif %}">
               <a class="nav-link" href="{% url 'vista_consolidada' %}">Consolidado</a>
             </li>
-            <li class="nav-link">
+
+            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/control/' %}active{% endif %}">
               <a class="nav-link" href="{% url 'control' %}">Estadísticas</a>
             </li>
-          </ul>
+
+        </ul>
+
 
 
          
