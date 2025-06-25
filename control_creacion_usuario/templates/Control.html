@@ -19,7 +19,11 @@
 
 
               <!-- Espacio para el gráfico -->
-              <canvas id="puntajePorProfesionalChart"></canvas>
+              <div style="overflow-x: auto; max-width: 100%; width: 100%; height: 400px;">
+                <canvas id="puntajePorProfesionalChart" style="display: block; width: 100%; height: 100%;"></canvas>
+              </div>
+
+
 
             </div>
           </div>
@@ -76,6 +80,8 @@
 {% block custom_js %}
   <!-- Incluir Chart.js desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
 
   <!-- Definir las variables necesarias para el gráfico de barras -->
   <script>

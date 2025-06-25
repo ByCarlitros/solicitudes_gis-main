@@ -72,19 +72,19 @@
                     </option>
                 </select>
               </form>
-
               <h2>
-                Imágenes de:
-                {% if usuario_filtrado %}
-                  {% for usuario in usuarios %}
-                    {% if usuario.id|stringformat:"s" == usuario_filtrado %}
-                      {{ usuario.username }}
-                    {% endif %}
-                  {% endfor %}
-                {% else %}
-                  Todos
-                {% endif %}
-              </h2>
+              Imágenes de:
+              {% if usuario_filtrado and usuario_filtrado != "" %}
+                {% for usuario in usuarios %}
+                  {% if usuario.id|stringformat:"s" == usuario_filtrado %}
+                    {{ usuario.username }}
+                  {% endif %}
+                {% endfor %}
+              {% else %}
+                Todos
+              {% endif %}
+            </h2>
+
 
               <div class="row flex-container">
                 {% for imagen in page_obj %}

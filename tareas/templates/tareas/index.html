@@ -43,9 +43,7 @@
 
 
     <style>
-        
-         /* Estilos globales */
-
+        /* Estilos globales */
 
 .card-header {
     background: linear-gradient(to right, #0f52a9, #0f52a9) !important;
@@ -176,24 +174,23 @@ h1.text-primary {
 }
 
 .apoyo-lista {
-  list-style-type: none;
-  padding: 0;
-  margin: 10px 0;
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
 }
 
 .apoyo-item {
-  margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 
-    </style>
-<style>
+/* Tarjetas de tareas */
 .task-card {
     background-color: #ffffff;
     border-radius: 29px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
     margin-bottom: 20px;
     overflow: hidden;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .task-card:hover {
@@ -333,11 +330,7 @@ h1.text-primary {
     background-color: #059669;
 }
 
-.task-card {
-    /* ... existing styles ... */
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
+/* Animaciones */
 @keyframes slideAndFade {
     to {
         transform: translateX(100%);
@@ -345,6 +338,7 @@ h1.text-primary {
     }
 }
 
+/* Inputs personalizados */
 .input-personalizado {
     background-color: #f8f9fa !important; /* Gris claro */
     border-color: #ced4da !important; /* Gris claro */
@@ -361,6 +355,7 @@ h1.text-primary {
     color: #343a40 !important; /* Gris oscuro */
 }
 
+/* Botones secundarios y primarios */
 .boton-secundario {
     background-color: #6c757d !important; /* Gris medio */
     border-color: #6c757d !important; /* Gris medio */
@@ -372,83 +367,106 @@ h1.text-primary {
     border-color: #007bff !important; /* Azul */
     color: #ffffff !important; /* Blanco */
 }
-</style>
-<style>
-    .custom-header {
-        background-color: #CEF2B3 !important; /* Color naranja */
-        color: rgb(10, 0, 0);
-    }
-</style>
 
-<style>
-    /* Optional: Customize Select2 appearance */
-    .select2-container--default .select2-selection--single {
-        height: 38px; /* Adjust height as needed */
-        padding: 6px 12px;
-        border: 2px solid #ced4da;
-        border-radius: 40px;
-        background-color: #fff;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 26px; /* Adjust line height to center text */
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        top: 50%;
-        transform: translateY(-50%);
-    }
+/* Encabezado personalizado */
+.custom-header {
+    background-color: #CEF2B3 !important; /* Color naranja */
+    color: rgb(10, 0, 0);
+}
 
+/* Select2 Personalización */
+.select2-container--default .select2-selection--single {
+    height: 38px; /* Ajusta la altura según sea necesario */
+    padding: 6px 12px;
+    border: 2px solid #ced4da;
+    border-radius: 40px;
+    background-color: #fff;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 26px; /* Centra verticalmente el texto */
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+}
 
-</style>
-<style>
-    .btn-details {
-        background-color: #fdfdfd; /* Azul brillante */
-        color: #1E90FF;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-    .btn-details:hover {
-        background-color: #fcfcfc; /* Azul un poco más oscuro al pasar el cursor */
-    }
+/* Botón detalles */
+.btn-details {
+    background-color: #fdfdfd; /* Azul brillante */
+    color: #1E90FF;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.btn-details:hover {
+    background-color: #fcfcfc; /* Azul un poco más oscuro al pasar el cursor */
+}
 
+/* Hover para botones outline */
+.btn-outline-success:hover {
+    background-color: #198754;
+    color: white;
+}
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
 
-  </style>
-    <style>
-    .btn-outline-success:hover {
-        background-color: #198754;
-        color: white;
-    }
-    .btn-outline-primary:hover {
-        background-color: #0d6efd;
-        color: white;
-    }
-</style>
-    <style>
-  /* Para que la tabla mantenga anchos fijos y no cambien */
-  #tabla_registro {
+/* Para que la tabla mantenga anchos fijos y no cambien */
+#tabla_registro {
     table-layout: fixed;
     width: 100%;
-  }
-  #tabla_registro td,
-  #tabla_registro th {
+}
+#tabla_registro td,
+#tabla_registro th {
+    background-color: #f8f9fa;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-</style>
-<style>
-    .wrapper .enviado {
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-    .wrapper .enviado:hover {
-        transform: translateY(-2px);
-    }
-</style>
+}
+
+/* Fondo general tbody */
+#tabla_registro tbody {
+    background-color: #d1efee; /* Fondo celeste suave */
+}
+
+/* Filas pares fondo celeste más oscuro */
+#tabla_registro tbody tr:nth-child(even) {
+    background-color: #d1efee;
+}
+
+/* Para las celdas numéricas en filas pares, color claro original */
+#tabla_registro tbody tr:nth-child(even) td.col-numerica {
+    background-color: #f9f9f9;
+}
+
+/* Hover */
+#tabla_registro tbody tr:hover {
+    background-color: white;
+}
+
+/* Ajusta el blanco para las celdas en general */
+#tabla_registro tbody td {
+    background-color: transparent; /* Para no sobreescribir los anteriores */
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+
+
+/* Wrapper para enlaces con transición */
+.wrapper .enviado {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.wrapper .enviado:hover {
+    transform: translateY(-2px);
+}
+
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -516,31 +534,36 @@ h1.text-primary {
 
 
 <div class="container_new">
-    <!-- Contenedor para botón de agregar (superuser) -->
-    {% if request.user.is_superuser %}
-    <div class="container" style="margin: 1rem; width: auto;">
+    <!-- Contenedor general con disposición horizontal -->
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3 mt-2 mb-4"
+         style="max-width: 380px; width: 100%; margin: 0 auto;">
+        
+        <!-- Botón de agregar (solo para superuser) -->
+        {% if request.user.is_superuser %}
         <div class="wrapper">
             <a class="enviado" href="#" data-bs-toggle="modal" data-bs-target="#agregarTareaModal">
                 <i class="fas fa-plus"></i>
             </a>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
-    <!-- Contenedor para selector y botón de completadas -->
-    <div class="container d-flex justify-content-center align-items-center flex-wrap gap-3 mt-2">
-        <select id="funcionarioSelect" class="form-select" style="max-width: 220px;" data-url="{% url 'tareas_por_funcionario' 0 %}">
-            <option value="">Seleccionar funcionario</option>
-            {% for funcionario in funcionarios %}
-            <option value="{{ funcionario.id }}">{{ funcionario }}</option>
-            {% endfor %}
-        </select>
+        <!-- Selector y botón de completadas -->
+        <div class="d-flex align-items-center gap-3">
+            <select id="funcionarioSelect" class="form-select" style="width: 250px;"
+                    data-url="{% url 'tareas_por_funcionario' 0 %}">
+                <option value="">Seleccionar funcionario</option>
+                {% for funcionario in funcionarios %}
+                <option value="{{ funcionario.id }}">{{ funcionario }}</option>
+                {% endfor %}
+            </select>
 
-        <div class="wrapper">
-            <a id="verTareasBtn" class="enviado" href="#">
-                <i class="fas fa-check-circle"></i>
-            </a>
+            <div class="wrapper">
+                <a id="verTareasBtn" class="enviado" href="#">
+                    <i class="fas fa-check-circle"></i>
+                </a>
+            </div>
         </div>
+
     </div>
 </div>
 
@@ -568,7 +591,7 @@ h1.text-primary {
 
 <div class="d-flex justify-content-center">
   <div class="card shadow mb-3" style="width: 98%; max-width: 1750px;">
-    <div class="card-header bg-primary text-white py-1 px-2">
+    <div class="card-header bg-primary text-white py-4 px-2">
       <div class="d-flex align-items-center justify-content-between flex-nowrap" style="font-size: 0.85rem;">
         <div style="flex: 0 0 5%; text-align: center;">ID</div>
         <div style="flex: 0 0 30%; text-align: start;">Descripción</div>

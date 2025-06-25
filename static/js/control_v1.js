@@ -24,75 +24,123 @@ document.addEventListener('DOMContentLoaded', function () {
         updateCount();
     });
 
-    // Configuración del Gráfico de Barras
-    if (typeof labels !== "undefined" && typeof trabajo_propio !== "undefined" && typeof trabajo_apoyo !== "undefined" &&
-        typeof trabajo_porcentual_propio !== "undefined" && typeof trabajo_porcentual_apoyo !== "undefined" && 
+    // Gráfico de barras con escala logarítmica en Y (vertical)
+    if (typeof labels !== "undefined" && typeof trabajo_propio !== "undefined" &&
+        typeof trabajo_apoyo !== "undefined" && typeof total_tareas !== "undefined" &&
         typeof total_apoyo_tareas !== "undefined") {
-        
-        const ctx1 = document.getElementById("puntajePorProfesionalChart").getContext("2d");
 
-        const datosAbsolutos = {
-            labels: labels,
-            datasets: [
-                {
-                    label: "Solitudes asignada como profesional",
-                    data: trabajo_propio,
-                    backgroundColor: "rgba(3, 28, 143, 0.58)",
-                    borderColor: "rgb(17, 86, 235)",
-                    borderWidth: 1
-                },
-                {
-                    label: "Tareas Internas completadas",
-                    data: total_tareas,
-                    backgroundColor: "rgba(30, 106, 229, 0.38)",
-                    borderColor: "rgb(32, 98, 203)",
-                    borderWidth: 1
-                },
-                {
-                    label: "Solitudes asignada como apoyo",
-                    data: trabajo_apoyo,
-                    backgroundColor: "rgba(14, 174, 6, 0.53)",
-                    borderColor: "rgb(9, 127, 3)",
-                    borderWidth: 1
-                },
-                {
-                    label: "Tareas Internas como apoyo",
-                    data: total_apoyo_tareas,
-                    backgroundColor: "rgba(30, 229, 66, 0.38)",
-                    borderColor: "rgb(63, 203, 32)",
-                    borderWidth: 1
-                },
-            ]
-        };
+        const ctx = document.getElementById("puntajePorProfesionalChart").getContext("2d");
 
-        const chart = new Chart(ctx1, {
-            type: "bar",
-            data: datosAbsolutos,
+        const miGrafico = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Solicitudes como Profesional",
+                        data: trabajo_propio,
+                        backgroundColor: "rgba(3, 28, 143, 0.58)",
+                        borderColor: "rgb(17, 86, 235)",
+                        borderWidth: 1,
+                        hoverBackgroundColor: "rgba(3, 28, 143, 0.8)",
+                        hoverBorderColor: "#ffffff",
+                        hoverBorderWidth: 2
+                    },
+                    {
+                        label: "Tareas Internas Completadas",
+                        data: total_tareas,
+                        backgroundColor: "rgba(30, 106, 229, 0.38)",
+                        borderColor: "rgb(32, 98, 203)",
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Solicitudes como Apoyo",
+                        data: trabajo_apoyo,
+                        backgroundColor: "rgba(14, 174, 6, 0.53)",
+                        borderColor: "rgb(9, 127, 3)",
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Tareas como Apoyo",
+                        data: total_apoyo_tareas,
+                        backgroundColor: "rgba(30, 229, 66, 0.38)",
+                        borderColor: "rgb(63, 203, 32)",
+                        borderWidth: 1
+                    },
+                ]
+            },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                    title: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 10,
+                        cornerRadius: 4,
+                        displayColors: false
+                    },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        formatter: function (value) {
+                            return value >= 1000 ? value.toLocaleString() : value;
+                        },
+                        font: {
+                            weight: 'bold'
+                        },
+                        color: '#000'
+                    }
+                },
                 scales: {
                     x: {
-                        stacked: true
+                        stacked: true,
+                        grid: {
+                            color: 'rgba(55, 65, 81, 0.5)'
+                        }
                     },
                     y: {
                         type: 'logarithmic',
                         stacked: true,
                         beginAtZero: false,
+                        grid: {
+                            color: 'rgba(55, 65, 81, 0.5)'
+                        },
                         ticks: {
                             callback: function (value) {
-                                if (value === 1 || value === 10 || value === 100 || value === 1000 || value === 10000 || value === 100000) {
-                                    return value;
-                                }
-                                return '';
+                                const logValue = Math.log10(value);
+                                return Number.isInteger(logValue) ? value.toLocaleString() : '';
                             }
                         }
                     }
                 },
-                plugins: {
-                    legend: { display: true },
-                    tooltip: { enabled: true }
+                layout: {
+                    padding: {
+                        left: 20,
+                        right: 40,
+                        top: 10,
+                        bottom: 10
+                    }
                 }
-            }
+            },
+            plugins: [ChartDataLabels]
         });
     }
 });
