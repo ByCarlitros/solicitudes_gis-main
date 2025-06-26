@@ -399,7 +399,7 @@ def logout(request):
     return redirect('control')
 
 from django.core.paginator import Paginator
-
+from django.urls import reverse
 def Gestion_imagen(request):
     usuarios = User.objects.all().order_by('username')  # Para el filtro
 
@@ -451,9 +451,10 @@ def Gestion_imagen(request):
             imagen.usuario = request.user
             imagen.save()
             # redirigir manteniendo filtro actual
-            redirect_url = 'Gestion_imagen'
+            redirect_url = reverse('Gestion_imagen')  # ✅ convierte el nombre en una URL real
             query_params = f'?usuario={usuario_id}' if usuario_id is not None else ''
             return redirect(f"{redirect_url}{query_params}")
+
     else:
         form = ImagenForm()
 
