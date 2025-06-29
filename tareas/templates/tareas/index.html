@@ -466,11 +466,6 @@ h1.text-primary {
 .wrapper .enviado:hover {
     transform: translateY(-2px);
 }
-.nav-link.active > a.nav-link {
-  font-weight: bold;
-  color: #0f52a9 !important; /* Azul del sitio */
-
-}
 
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -485,26 +480,48 @@ h1.text-primary {
       <div class="collapse navbar-collapse" id="navbarsExample03">
         {% if request.user.is_authenticated %}
 
-        <ul class="navbar-nav col-lg-10 justify-content-lg-center">
+            <ul class="navbar-nav col-lg-10 justify-content-lg-center">
 
-            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.get_full_path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/solicitude_llegadas/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'solicitude_llegadas' %}">Solicitudes</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link"
+                  href="{% url 'solicitude_llegadas' %}"
+                  {% if request.path == '/solicitude_llegadas/' %}
+                    style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                  {% endif %}>
+                  Solicitudes
+                </a>
+              </li>
 
-            <li class="nav-link {% if request.path == '/tareas/' %}active{% endif %}">
-                <a class="nav-link" href="/tareas/">Tareas SIG</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link"
+                  href="/tareas/"
+                  {% if request.path == '/tareas/' %}
+                    style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                  {% endif %}>
+                  Tareas SIG
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link"
+                  href="{% url 'vista_consolidada' %}"
+                  {% if request.path == '/vista_consolidada/' %}
+                    style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                  {% endif %}>
+                  Consolidado
+                </a>
+              </li>
 
-            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/vista_consolidada/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'vista_consolidada' %}">Consolidado</a>
-            </li>
-
-            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/control/' %}active{% endif %}">
-                <a class="nav-link" href="{% url 'control' %}">Estadísticas</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link"
+                  href="{% url 'control' %}"
+                  {% if request.path == '/control/' %}
+                    style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                  {% endif %}>
+                  Estadísticas
+                </a>
+              </li>
 
             </ul>
-
 
 
 

@@ -58,14 +58,6 @@
         padding: 1px;
         border-radius: 5px;
     }
-    .nav-link.active > a.nav-link {
-    background-color: #d6e6f8;
-    color: #0f52a9 !important;
-    font-weight: 600;
-    padding: 0.4rem 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 6px rgba(15, 82, 169, 0.2);
-  }
 
 
     </style>
@@ -80,26 +72,48 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarsExample03">
           {% if request.user.is_authenticated %}
-
           <ul class="navbar-nav col-lg-10 justify-content-lg-center">
 
-            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.get_full_path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/solicitude_llegadas/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'solicitude_llegadas' %}">Solicitudes</a>
+            <li class="nav-item">
+              <a class="nav-link"
+                href="{% url 'solicitude_llegadas' %}"
+                {% if request.path == '/solicitude_llegadas/' %}
+                  style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                {% endif %}>
+                Solicitudes
+              </a>
             </li>
 
-            <li class="nav-link {% if request.path == '/tareas/' %}active{% endif %}">
-              <a class="nav-link" href="/tareas/">Tareas SIG</a>
+            <li class="nav-item">
+              <a class="nav-link"
+                href="/tareas/"
+                {% if request.path == '/tareas/' %}
+                  style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                {% endif %}>
+                Tareas SIG
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link"
+                href="{% url 'vista_consolidada' %}"
+                {% if request.path == '/vista_consolidada/' %}
+                  style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                {% endif %}>
+                Consolidado
+              </a>
             </li>
 
-            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/vista_consolidada/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'vista_consolidada' %}">Consolidado</a>
+            <li class="nav-item">
+              <a class="nav-link"
+                href="{% url 'control' %}"
+                {% if request.path == '/control/' %}
+                  style="text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 4px; font-weight: 600; color: #0f52a9;"
+                {% endif %}>
+                Estadísticas
+              </a>
             </li>
 
-            <li class="nav-link {% if request.path == request.build_absolute_uri|cut:request.get_full_path|stringformat:'s'|add:request.path or request.path == '/control/' %}active{% endif %}">
-              <a class="nav-link" href="{% url 'control' %}">Estadísticas</a>
-            </li>
-
-        </ul>
+          </ul>
 
 
 
