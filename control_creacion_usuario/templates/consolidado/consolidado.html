@@ -115,13 +115,15 @@
             </div>
             {% endif %}
 
-            <div class="container d-flex justify-content-center mt-3">
-                <div class="btn-group btn-group-sm" role="group" aria-label="Paginación">
-                    <button id="prevPage" class="btn btn-outline-secondary px-3">«</button>
-                    <span id="pageInfo" class="btn btn-light disabled">1 / X</span>
-                    <button id="nextPage" class="btn btn-outline-secondary px-3">»</button>
+            <!-- Contenedor para la paginación -->
+            <div class="container" style="margin: 1rem; width: auto;">
+                <div id="paginacion" 
+                    class="pagination-container d-flex justify-content-center" 
+                    style="gap: 0.5rem; flex-wrap: nowrap; overflow-x: auto;">
                 </div>
             </div>
+
+
 
 
 
@@ -566,42 +568,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const filasPorPagina = 10;
     let paginaActual = 1;
     const totalPaginas = Math.ceil(filas.length / filasPorPagina);
-
-    const pageInfo = document.getElementById('pageInfo');
-    const prevBtn = document.getElementById('prevPage');
-    const nextBtn = document.getElementById('nextPage');
+    const paginacion = document.getElementById('paginacion');
 
     function mostrarPagina(pagina) {
         paginaActual = pagina;
         filas.forEach(fila => fila.style.display = 'none');
-        const inicio = (paginaActual - 1) * filasPorPagina;
+        const inicio = (pagina - 1) * filasPorPagina;
         const fin = inicio + filasPorPagina;
         filas.slice(inicio, fin).forEach(fila => fila.style.display = '');
 
-        pageInfo.textContent = `Página ${paginaActual} de ${totalPaginas}`;
-        prevBtn.disabled = paginaActual === 1;
-        nextBtn.disabled = paginaActual === totalPaginas;
-
-        // Aplicar estilos de Bootstrap a botones activos/desactivados
-        prevBtn.parentElement.classList.toggle('disabled', paginaActual === 1);
-        nextBtn.parentElement.classList.toggle('disabled', paginaActual === totalPaginas);
+        generarPaginacion();
     }
 
-    prevBtn.addEventListener('click', () => {
-        if (paginaActual > 1) {
-            mostrarPagina(paginaActual - 1);
-        }
-    });
+    function generarPaginacion() {
+        paginacion.innerHTML = '';
 
-    nextBtn.addEventListener('click', () => {
-        if (paginaActual < totalPaginas) {
-            mostrarPagina(paginaActual + 1);
+        if (totalPaginas <= 1) return;
+
+        const crearBoton = (texto, pagina, deshabilitado = false, activo = false) => {
+            const btn = document.createElement('button');
+            btn.textContent = texto;
+            btn.className = `page-link btn btn-sm mx-1 ${activo ? 'btn-primary' : 'btn-outline-primary'}`;
+            btn.disabled = deshabilitado;
+            if (!deshabilitado) {
+                btn.addEventListener('click', () => mostrarPagina(pagina));
+            }
+            paginacion.appendChild(btn);
+        };
+
+        crearBoton('«', paginaActual - 1, paginaActual === 1);
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i === 1 || i === totalPaginas || (i >= paginaActual - 1 && i <= paginaActual + 1)) {
+                crearBoton(i, i, false, i === paginaActual);
+            } else if (i === paginaActual - 2 || i === paginaActual + 2) {
+                const span = document.createElement('span');
+                span.className = 'page-link disabled';
+                span.textContent = '...';
+                paginacion.appendChild(span);
+            }
         }
-    });
+
+        crearBoton('»', paginaActual + 1, paginaActual === totalPaginas);
+    }
 
     mostrarPagina(1);
 });
 </script>
+
 <script>
   function cambiarFiltro() {
     const filtro = document.getElementById('filtroPrincipal').value;
